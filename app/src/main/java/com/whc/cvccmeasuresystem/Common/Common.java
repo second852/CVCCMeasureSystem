@@ -10,6 +10,7 @@ import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static com.beardedhen.androidbootstrap.font.FontAwesome.FA_CALCULATOR;
@@ -30,8 +31,8 @@ public class Common {
         return  hashMap;
     }
 
-    public static HashMap<String,String> SolutionType(){
-        HashMap<String,String> hashMap=new HashMap<>();
+    public static LinkedHashMap<String,String> SolutionType(){
+        LinkedHashMap<String,String> hashMap=new LinkedHashMap<>();
         hashMap.put("0","pH");
         hashMap.put("1","pK");
         hashMap.put("2","pCa");
@@ -45,12 +46,11 @@ public class Common {
         fragmentTransaction.commit();
     }
 
-    public static List<BootstrapText> DateChoiceSetBsTest(Activity activity, String[] data) {
+    public static List<BootstrapText> SolutionTypeBS(Activity activity) {
         List<BootstrapText> bootstrapTexts = new ArrayList<>();
-        for (String s : data) {
+        for (String s : SolutionType().keySet()) {
             BootstrapText text = new BootstrapText.Builder(activity)
-                    .addText(s + " ")
-                    .addFontAwesomeIcon(FA_SIGN_IN)
+                    .addText(SolutionType().get(s))
                     .build();
             bootstrapTexts.add(text);
         }

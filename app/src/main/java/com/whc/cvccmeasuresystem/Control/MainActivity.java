@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Fragment fragment=new SignIn();
+        fragment=new Batch();
         switchFragment(fragment,getSupportFragmentManager().beginTransaction());
     }
 

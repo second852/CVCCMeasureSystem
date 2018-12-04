@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">BC System</string>
 
+    <string-array name="ion">
+        <item>pH</item>
+        <item>pK</item>
+        <item>pCa</item>
+        <item>pCl</item>
+        <item>X</item>
+    </string-array>
+
 </resources>
