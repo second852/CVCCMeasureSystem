@@ -48,7 +48,7 @@ public class UserDB {
         return users;
     }
 
-    public String findlUserName(String name) {
+    public String findUserName(String name) {
         String sql = "SELECT name FROM User where name = '"+name+"' order by id desc;";
         String[] args = {};
         Cursor cursor = db.rawQuery(sql, args);
@@ -58,6 +58,20 @@ public class UserDB {
         }
         cursor.close();
         return result;
+    }
+
+    public User findUser(String name) {
+        String sql = "SELECT name FROM User where name = '"+name+"' order by id desc;";
+        String[] args = {};
+        Cursor cursor = db.rawQuery(sql, args);
+        User user=null;
+        if (cursor.moveToNext()) {
+            user=new User();
+            user.setId(cursor.getInt(0));
+            user.setName(cursor.getString(1));
+        }
+        cursor.close();
+        return user;
     }
 
     public long insert(User user) {

@@ -1,13 +1,14 @@
 package com.whc.cvccmeasuresystem.Model;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class Solution {
 
     private int ID;//DB ID
-    private String type;// solution type Common-SolutionType
-    private Timestamp beginTime;//begin measure Time
-    private Timestamp endTime;// end measure Time
+    private int concentration;// pH7 for 7
+    private Timestamp time;//Time of read voltage
+    private int voltage;// read Voltage
+    private int sampleID;//  measure Sample
 
     public int getID() {
         return ID;
@@ -17,27 +18,35 @@ public class Solution {
         this.ID = ID;
     }
 
-    public String getType() {
-        return type;
+    public Timestamp getTime() {
+        return time;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setTime(Timestamp time) {
+        this.time = time;
     }
 
-    public Timestamp getBeginTime() {
-        return beginTime;
+    public int getConcentration() {
+        return concentration;
     }
 
-    public void setBeginTime(Timestamp beginTime) {
-        this.beginTime = beginTime;
+    public void setConcentration(int concentration) {
+        this.concentration = concentration;
     }
 
-    public Timestamp getEndTime() {
-        return endTime;
+    public int getVoltage() {
+        return voltage;
     }
 
-    public void setEndTime(Timestamp endTime) {
-        this.endTime = endTime;
+    public void setVoltage(int voltage) {
+        this.voltage = voltage;
+    }
+
+    public int getSampleID() {
+        return sampleID;
+    }
+
+    public void setSampleID(int sampleID) {
+        this.sampleID = sampleID;
     }
 }

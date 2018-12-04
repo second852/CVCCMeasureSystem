@@ -14,11 +14,15 @@ public class DataBase extends SQLiteOpenHelper {
 
     private static final String Table_SaveFile =
             "CREATE TABLE SaveFile ( id INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL," +
-                    "type TEXT, time DATETIME , solutionID INTEGER ) ;";
+                    "type TEXT, time DATETIME , userId INTEGER ) ;";
+
+    private static final String Table_Sample =
+            "CREATE TABLE Sample ( id INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL," +
+                    "type TEXT, fileID INTEGER) ;";
 
     private static final String Table_Solution =
-            "CREATE TABLE Solution ( id INTEGER PRIMARY KEY AUTOINCREMENT, type TEXT NOT NULL," +
-                    "beginTime DATETIME, endTime DATETIME) ;";
+            "CREATE TABLE Solution ( id INTEGER PRIMARY KEY AUTOINCREMENT, concentration TEXT NOT NULL," +
+                    "time DATETIME, voltage INTEGER, sampleID INTEGER) ;";
 
 
     public DataBase(Context context) {
@@ -29,6 +33,7 @@ public class DataBase extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(Table_User);
         db.execSQL(Table_SaveFile);
+        db.execSQL(Table_Sample);
         db.execSQL(Table_Solution);
     }
 
@@ -36,6 +41,7 @@ public class DataBase extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS User");
         db.execSQL("DROP TABLE IF EXISTS SaveFile");
+        db.execSQL("DROP TABLE IF EXISTS Sample");
         db.execSQL("DROP TABLE IF EXISTS Solution");
         onCreate(db);
     }

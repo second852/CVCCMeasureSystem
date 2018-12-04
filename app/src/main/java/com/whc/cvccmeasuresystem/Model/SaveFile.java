@@ -1,6 +1,6 @@
 package com.whc.cvccmeasuresystem.Model;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class SaveFile {
 
@@ -9,7 +9,7 @@ public class SaveFile {
     private String name;//1 file name
     private String type;//2 measure type Common-MeasureType
     private Timestamp time;//3 create file time
-    private int solutionID;//4 measure Solution
+
     private int userId;
 
     public int getUserId() {
@@ -52,11 +52,4 @@ public class SaveFile {
         this.time = time;
     }
 
-    public int getSolutionID() {
-        return solutionID;
-    }
-
-    public void setSolutionID(int solutionID) {
-        this.solutionID = solutionID;
-    }
 }

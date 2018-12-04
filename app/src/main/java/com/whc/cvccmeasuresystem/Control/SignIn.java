@@ -2,6 +2,7 @@ package com.whc.cvccmeasuresystem.Control;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,12 +22,16 @@ import com.whc.cvccmeasuresystem.R;
 
 import java.util.List;
 
+import static com.whc.cvccmeasuresystem.Common.Common.userId;
+import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+
 public class SignIn extends Fragment{
     private View view;
     private Activity activity;
     private AutoCompleteTextView userName;
     private UserDB userDB;
     private BootstrapButton enter;
+    private SharedPreferences sharedPreferences;
 
     @Override
     public void onAttach(Context context) {
@@ -36,6 +41,7 @@ public class SignIn extends Fragment{
         } else {
             activity = getActivity();
         }
+        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
     }
 
     @Nullable
@@ -45,8 +51,6 @@ public class SignIn extends Fragment{
         activity.setTitle(R.string.app_name);
         userName=view.findViewById(R.id.userName);
         enter=view.findViewById(R.id.enter);
-
-
         DataBase dataBase=new DataBase(activity);
         userDB=new UserDB(dataBase.getReadableDatabase());
         return view;
@@ -76,11 +80,13 @@ public class SignIn extends Fragment{
                 userName.setError("Please enter user Name");
                 return;
             }
-            String oldName=userDB.findlUserName(name);
+            String oldName=userDB.findUserName(name);
             if(oldName==null)
             {
                 userDB.insert(new User(name));
             }
+            User user=userDB.findUser(name);
+            sharedPreferences.edit().putInt(userId, user.getId()).apply();
             Common.switchFragment(new ChoiceFunction(),getFragmentManager().beginTransaction());
         }
     }

@@ -1,6 +1,8 @@
 package com.whc.cvccmeasuresystem.Model;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable{
 
     private int id; //DB id
     private String name;// user name

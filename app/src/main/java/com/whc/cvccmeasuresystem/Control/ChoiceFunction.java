@@ -81,7 +81,7 @@ public class ChoiceFunction extends Fragment {
             FragmentTransaction fragmentTransaction=getFragmentManager().beginTransaction();
             switch (i){
                 case 0:
-                    fragment=new Batch();
+                    fragment=new BatchStep1();
                     switchFragment(fragment,fragmentTransaction);
                     break;
                 case 1:
