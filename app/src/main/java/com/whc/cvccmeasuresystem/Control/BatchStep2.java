@@ -3,40 +3,48 @@ package com.whc.cvccmeasuresystem.Control;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
-import com.beardedhen.androidbootstrap.BootstrapDropDown;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
-import com.beardedhen.androidbootstrap.BootstrapText;
+import com.whc.cvccmeasuresystem.Clent.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Common.DataAdapter;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
-import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
 import com.whc.cvccmeasuresystem.Model.Sample;
-import com.whc.cvccmeasuresystem.Model.SaveFile;
+import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
-import java.sql.Timestamp;
-import java.util.Date;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.needName;
-import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+import static com.whc.cvccmeasuresystem.Common.Common.*;
 
 public class BatchStep2 extends Fragment {
 
     private View view;
     private Activity activity;
-    private BootstrapEditText firstName, secondName, thirdName, fourthName;
-    private BootstrapDropDown firstType, secondType, thirdType, fourthType;
-    private BootstrapButton next;
-    private List<BootstrapText> bootstrapTexts;
+    private BootstrapButton con1, con2, con3, con4, start;
+    private BootstrapEditText ion1, ion2, ion3, ion4, measureTime;
+    private SharedPreferences sharedPreferences;
+    private Sample sample1, sample2, sample3, sample4;
+    private DataBase dataBase;
+    private String mTime;
+    private ListView data;
+
 
     @Override
     public void onAttach(Context context) {
@@ -46,14 +54,14 @@ public class BatchStep2 extends Fragment {
         } else {
             activity = getActivity();
         }
-        activity.setTitle("BatchStep1 Monitor");
-        bootstrapTexts = Common.SolutionTypeBS(activity);
+        activity.setTitle("BatchStep2 Monitor");
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.batch_step2, container, false);
+        dataBase = new DataBase(activity);
         findViewById();
         return view;
     }
@@ -62,137 +70,132 @@ public class BatchStep2 extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        setDropDownClick(firstType);
-        setDropDownClick(secondType);
-        setDropDownClick(thirdType);
-        setDropDownClick(fourthType);
-        next.setOnClickListener(new nextStep());
+        setSample();
+        start.setOnClickListener(new startMeasure());
     }
 
-    private void setDropDownClick(BootstrapDropDown bootstrapDropDown) {
-        choiceSolutionType choiceSolutionType = new choiceSolutionType();
-        choiceSolutionType.setBootstrapDropDown(bootstrapDropDown);
-        bootstrapDropDown.setOnDropDownItemClickListener(choiceSolutionType);
+    private void setSample() {
+        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+        SampleDB sampleDB = new SampleDB(dataBase.getReadableDatabase());
+
+        //sample 1
+        int sampleID = sharedPreferences.getInt(Common.sample1, 0);
+        sample1 = sampleDB.findOldSample(sampleID);
+        con1.setText(sample1.getIonType());
+
+        //sample 2
+        sampleID = sharedPreferences.getInt(Common.sample2, 0);
+        sample2 = sampleDB.findOldSample(sampleID);
+        con2.setText(sample2.getIonType());
+
+        //sample 3
+        sampleID = sharedPreferences.getInt(Common.sample3, 0);
+        sample3 = sampleDB.findOldSample(sampleID);
+        con3.setText(sample3.getIonType());
+
+        //sample 4
+        sampleID = sharedPreferences.getInt(Common.sample4, 0);
+        sample4 = sampleDB.findOldSample(sampleID);
+        con4.setText(sample4.getIonType());
     }
 
 
     private void findViewById() {
-        firstName = view.findViewById(R.id.firstName);
-        secondName = view.findViewById(R.id.secondName);
-        thirdName = view.findViewById(R.id.thirdName);
-        fourthName = view.findViewById(R.id.fourthName);
-        firstType = view.findViewById(R.id.firstType);
-        secondType = view.findViewById(R.id.secondType);
-        thirdType = view.findViewById(R.id.thirdType);
-        fourthType = view.findViewById(R.id.fourthType);
-        next = view.findViewById(R.id.next);
+        con1 = view.findViewById(R.id.con1);
+        con2 = view.findViewById(R.id.con2);
+        con3 = view.findViewById(R.id.con3);
+        con4 = view.findViewById(R.id.con4);
+        ion1 = view.findViewById(R.id.ion1);
+        ion2 = view.findViewById(R.id.ion2);
+        ion3 = view.findViewById(R.id.ion3);
+        ion4 = view.findViewById(R.id.ion4);
+        measureTime = view.findViewById(R.id.measureTime);
+        start = view.findViewById(R.id.start);
+        data = view.findViewById(R.id.data);
+
     }
 
-    private class choiceSolutionType implements BootstrapDropDown.OnDropDownItemClickListener {
 
-        private BootstrapDropDown bootstrapDropDown;
-
-
-        public void setBootstrapDropDown(BootstrapDropDown bootstrapDropDown) {
-            this.bootstrapDropDown = bootstrapDropDown;
-        }
-
+    private Runnable measureThread = new Runnable() {
         @Override
-        public void onItemClick(ViewGroup parent, View v, int id) {
-            bootstrapDropDown.setText(bootstrapTexts.get(id));
+        public void run() {
+            new TCPClient("1", "1", handlerMessage).run();
         }
-    }
+    };
 
-    private class nextStep implements View.OnClickListener {
+    //setList
+    private Handler handlerMessage = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            List<Solution> solutions=new ArrayList<>();
+            solutions.add(new Solution());
+            data.setAdapter(new DataAdapter(activity,solutions));
+            data.invalidate();
+        }
+    };
+
+
+    private class startMeasure implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            String getFirstName = firstName.getText().toString();
-            String getSecondName = secondName.getText().toString();
-            String getThirdName = thirdName.getText().toString();
-            String getFourthName = fourthName.getText().toString();
+            String ionOne = ion1.getText().toString();
+            String ionTwo = ion2.getText().toString();
+            String ionThree = ion3.getText().toString();
+            String ionFour = ion4.getText().toString();
+            mTime = measureTime.getText().toString();
+            //one
+            if (Common.checkViewIon(ion1, ionOne)) {
 
-            //first
-            if (getFirstName == null) {
-                firstName.setError(needName);
                 return;
             }
-            getFirstName=getFirstName.trim();
-            if (getFirstName.length() <= 0) {
-                firstName.setError(needName);
+            ionOne = ionOne.trim();
+
+            //two
+            if (Common.checkViewIon(ion2, ionTwo)) {
                 return;
             }
+            ionTwo = ionTwo.trim();
 
-            //second
-            if (getSecondName == null) {
-                secondName.setError(needName);
+            //three
+            if (Common.checkViewIon(ion3, ionThree)) {
                 return;
             }
-            getSecondName=getSecondName.trim();
-            if (getSecondName.length() <= 0) {
-                secondName.setError(needName);
+            ionThree = ionThree.trim();
+
+            //four
+            if (Common.checkViewIon(ion4, ionFour)) {
                 return;
             }
+            ionFour = ionFour.trim();
 
-            //third
-            if (getThirdName == null) {
-                thirdName.setError(needName);
+            //measureTime
+            if (mTime == null) {
+                measureTime.setError(needInt);
                 return;
             }
-            getThirdName=getThirdName.trim();
-            if (getThirdName.length() <= 0) {
-                thirdName.setError(needName);
+            mTime = mTime.trim();
+            if (mTime.length() <= 0) {
+                measureTime.setError(needInt);
                 return;
             }
+            try {
 
-            //fourth
-            if (getFourthName == null) {
-                fourthName.setError(needName);
+                new Double(mTime);
+            } catch (Exception e) {
+                measureTime.setError(needInt);
                 return;
             }
-            getFourthName=getFourthName.trim();
-            if (getFourthName.length() <= 0) {
-                fourthName.setError(needName);
+            //check Wifi
+            WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(activity.WIFI_SERVICE);
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            String ssId = wifiInfo.getSSID();
+            if (ssId == null || ssId.indexOf("BCS_Device") == -1) {
+                Common.showToast(activity, "Please connect BCS_Device");
                 return;
             }
-
-
-            DataBase dataBase=new DataBase(activity);
-            SaveFileDB saveFileDB=new SaveFileDB(dataBase.getReadableDatabase());
-
-            //insert File
-            SharedPreferences sharedPreferences= activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-            int useId=sharedPreferences.getInt(Common.userId,0);
-            SaveFile saveFile=new SaveFile();
-            saveFile.setType("0");
-            saveFile.setName(Common.timeToString.format(new Date(System.currentTimeMillis())));
-            saveFile.setTime(new Timestamp(System.currentTimeMillis()));
-            saveFile.setUserId(useId);
-            saveFileDB.insert(saveFile);
-
-            SaveFile nowFile=saveFileDB.findOldSaveFile(saveFile.getName());
-            //insert
-
-            SampleDB sampleDB=new SampleDB(dataBase.getReadableDatabase());
-            //Sample 1
-            insert(getFirstName,nowFile.getID(),sampleDB);
-            //Sample 2
-            insert(getSecondName,nowFile.getID(),sampleDB);
-            //Sample 3
-            insert(getThirdName,nowFile.getID(),sampleDB);
-            //Sample 4
-            insert(getFourthName,nowFile.getID(),sampleDB);
-
-
+            //conection
+            new Thread(measureThread).start();
         }
     }
-
-    public void insert(String name,int fileID,SampleDB sampleDB)
-    {
-        Sample sample=new Sample();
-        sample.setName(name);
-        sample.setType("0");
-        sample.setFileID(fileID);
-        sampleDB.insert(sample);
-    }
-
 }

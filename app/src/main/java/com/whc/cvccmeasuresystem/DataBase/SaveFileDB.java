@@ -33,7 +33,7 @@ public class SaveFileDB {
             saveFile=new SaveFile();
             saveFile.setID(cursor.getInt(0));
             saveFile.setName(cursor.getString(1));
-            saveFile.setType(cursor.getString(2));
+            saveFile.setMeasureType(cursor.getString(2));
             saveFile.setTime(new Timestamp(cursor.getLong(3)));
             saveFile.setUserId(cursor.getInt(4));
             saveFiles.add(saveFile);
@@ -51,7 +51,7 @@ public class SaveFileDB {
             saveFile=new SaveFile();
             saveFile.setID(cursor.getInt(0));
             saveFile.setName(cursor.getString(1));
-            saveFile.setType(cursor.getString(2));
+            saveFile.setMeasureType(cursor.getString(2));
             saveFile.setTime(new Timestamp(cursor.getLong(3)));
             saveFile.setUserId(cursor.getInt(4));
         }
@@ -61,9 +61,8 @@ public class SaveFileDB {
 
     public long insert(SaveFile saveFile) {
         ContentValues values = new ContentValues();
-        values.put("id", saveFile.getID());
         values.put("name", saveFile.getName());
-        values.put("type", saveFile.getType());
+        values.put("measureType", saveFile.getMeasureType());
         values.put("time", saveFile.getTime().getTime());
         values.put("userId", saveFile.getUserId());
         return db.insert(TABLE_NAME, null, values);
@@ -73,7 +72,7 @@ public class SaveFileDB {
         ContentValues values = new ContentValues();
         values.put("id", saveFile.getID());
         values.put("name", saveFile.getName());
-        values.put("type", saveFile.getType());
+        values.put("measureType", saveFile.getMeasureType());
         values.put("time", saveFile.getTime().getTime());
         values.put("userId", saveFile.getUserId());
         String whereClause = "id = ?;";

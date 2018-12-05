@@ -10,15 +10,15 @@ public class DataBase extends SQLiteOpenHelper {
 
 
     private static final String Table_User =
-            "CREATE TABLE User ( id INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL) ;";
+            "CREATE TABLE User ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL) ;";
 
     private static final String Table_SaveFile =
-            "CREATE TABLE SaveFile ( id INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL," +
-                    "type TEXT, time DATETIME , userId INTEGER ) ;";
+            "CREATE TABLE SaveFile ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL," +
+                    "measureType TEXT, time DATETIME , userId INTEGER ) ;";
 
     private static final String Table_Sample =
-            "CREATE TABLE Sample ( id INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL," +
-                    "type TEXT, fileID INTEGER) ;";
+            "CREATE TABLE Sample ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL," +
+                    "ionType TEXT, fileID INTEGER) ;";
 
     private static final String Table_Solution =
             "CREATE TABLE Solution ( id INTEGER PRIMARY KEY AUTOINCREMENT, concentration TEXT NOT NULL," +

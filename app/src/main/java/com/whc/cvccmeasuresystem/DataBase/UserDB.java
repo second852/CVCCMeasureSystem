@@ -61,7 +61,7 @@ public class UserDB {
     }
 
     public User findUser(String name) {
-        String sql = "SELECT name FROM User where name = '"+name+"' order by id desc;";
+        String sql = "SELECT * FROM User where name = '"+name+"' order by id desc;";
         String[] args = {};
         Cursor cursor = db.rawQuery(sql, args);
         User user=null;

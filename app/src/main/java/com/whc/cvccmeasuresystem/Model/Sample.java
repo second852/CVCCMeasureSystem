@@ -1,15 +1,17 @@
 package com.whc.cvccmeasuresystem.Model;
 
+import java.util.Objects;
+
 /**
  * Created by Wang on 2018/12/4.
  */
 
 public class Sample {
 
-    private int ID;
-    private String name;
-    private String type;// solution type Common-SolutionType
-    private int fileID;// file measure id
+    private int ID;//0 DB id
+    private String name;//1 sample name
+    private String ionType;//2 solution type Common-SolutionType
+    private int fileID;//3 file measure id
 
 
     public int getID() {
@@ -36,11 +38,33 @@ public class Sample {
         this.fileID = fileID;
     }
 
-    public String getType() {
-        return type;
+    public String getIonType() {
+        return ionType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setIonType(String ionType) {
+        this.ionType = ionType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Sample sample = (Sample) o;
+
+        if (ID != sample.ID) return false;
+        if (fileID != sample.fileID) return false;
+        if (name != null ? !name.equals(sample.name) : sample.name != null) return false;
+        return ionType != null ? ionType.equals(sample.ionType) : sample.ionType == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = ID;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (ionType != null ? ionType.hashCode() : 0);
+        result = 31 * result + fileID;
+        return result;
     }
 }

@@ -32,8 +32,9 @@ public class SampleDB {
         while (cursor.moveToNext()) {
             sample=new Sample();
             sample.setID(cursor.getInt(0));
-            sample.setType(cursor.getString(1));
-            sample.setFileID(cursor.getInt(2));
+            sample.setName(cursor.getString(1));
+            sample.setIonType(cursor.getString(2));
+            sample.setFileID(cursor.getInt(3));
             samples.add(sample);
         }
         cursor.close();
@@ -49,8 +50,25 @@ public class SampleDB {
         if (cursor.moveToNext()) {
             sample=new Sample();
             sample.setID(cursor.getInt(0));
-            sample.setType(cursor.getString(1));
-            sample.setFileID(cursor.getInt(2));
+            sample.setName(cursor.getString(1));
+            sample.setIonType(cursor.getString(2));
+            sample.setFileID(cursor.getInt(3));
+        }
+        cursor.close();
+        return sample;
+    }
+
+    public Sample findOldSample(Integer ID) {
+        String sql = "SELECT * FROM Sample where id = '"+ID+"';";
+        String[] args = {};
+        Cursor cursor = db.rawQuery(sql, args);
+        Sample sample=null;
+        if (cursor.moveToNext()) {
+            sample=new Sample();
+            sample.setID(cursor.getInt(0));
+            sample.setName(cursor.getString(1));
+            sample.setIonType(cursor.getString(2));
+            sample.setFileID(cursor.getInt(3));
         }
         cursor.close();
         return sample;
@@ -59,19 +77,18 @@ public class SampleDB {
 
     public long insert(Sample sample) {
         ContentValues values = new ContentValues();
-        values.put("id", sample.getID());
-        values.put("type", sample.getType());
+        values.put("name", sample.getName());
+        values.put("ionType", sample.getIonType());
         values.put("fileID", sample.getFileID());
-        values.put("NAME", sample.getName());
         return db.insert(TABLE_NAME, null, values);
     }
 
     public int update(Sample sample) {
         ContentValues values = new ContentValues();
         values.put("id", sample.getID());
-        values.put("type", sample.getType());
+        values.put("name", sample.getName());
+        values.put("ionType", sample.getIonType());
         values.put("fileID", sample.getFileID());
-        values.put("NAME", sample.getName());
         String whereClause = "id = ?;";
         String[] whereArgs = {Integer.toString(sample.getID())};
         return db.update(TABLE_NAME, values, whereClause, whereArgs);

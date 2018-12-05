@@ -1,10 +1,13 @@
 package com.whc.cvccmeasuresystem.Clent;
+
 import android.util.Log;
+
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import android.os.Handler;
 
 public class TCPClient {
 
@@ -13,27 +16,30 @@ public class TCPClient {
     public static final int SERVERPORT = 23;
     private boolean mRun = false;
 
-    PrintWriter out;
-    BufferedReader in;
+    private String measureDuration;
+    private String measureTime;
+    private Handler handlerMessage;
+
+   private PrintWriter out;
+   private BufferedReader in;
 
 
+    public TCPClient(String measureDuration, String measureTime, Handler handlerMessage) {
+        this.measureDuration = measureDuration;
+        this.measureTime = measureTime;
+        this.handlerMessage = handlerMessage;
+    }
 
-    /**
-     * Sends the message entered by client to the server
-     * @param message text entered by client
-     */
-    public void sendMessage(char message){
+    public void sendMessage() {
         if (out != null && !out.checkError()) {
-            out.print("D"+','+"6"+','+"1"+',');
+            out.print("D" + ',' + measureTime + ',' + measureDuration + ',');
             out.flush();
         }
     }
 
-    public void stopClient(){
-        mRun = false;
-    }
 
-    public void run(){
+
+    public void run() {
 
         mRun = true;
 
@@ -50,31 +56,40 @@ public class TCPClient {
 
                 //send the message to the server
                 out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-                sendMessage(',');
-
+                sendMessage();
                 Log.e("TCP Client", "C: Sent.");
                 Log.e("TCP Client", "C: Done.");
 
                 //receive the message which the server sends back
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                InputStream inTest=socket.getInputStream();
+                InputStream inTest = socket.getInputStream();
                 //in this while the client listens for the messages sent by the server
-                StringBuilder stringBuilder=new StringBuilder();
+                int i=0;
+                int times=Integer.valueOf(measureTime)/Integer.valueOf(measureDuration);
                 while (mRun) {
-                    long startTime=System.currentTimeMillis();
-                   byte[] bytes=readStream(inTest);
-                   String str = new String(bytes, Charset.forName("UTF-8"));
-                   stringBuilder.append(str);
-                   if(str.equals("$D,Start,#"))
-                   {
-
-                   }else{
-                       sendMessage(',');
-                   }
-                   Log.d("XXXXXxx",str+" Time :"+(System.currentTimeMillis()-startTime));
+                    long startTime = System.currentTimeMillis();
+                    byte[] bytes = readStream(inTest);
+                    String str = new String(bytes, Charset.forName("UTF-8"));
+                    switch (str)
+                    {
+                        case "$D,Start,#":
+                            break;
+                        case "$D,End,#":
+                            mRun=false;
+                             break;
+                        default:
+                            if(i>times)
+                            {
+                                mRun=false;
+                            }
+                            i++;
+                            break;
+                    }
+                    Log.d("XXXXXxx", str + " Time :" + (System.currentTimeMillis() - startTime));
                 }
+                handlerMessage.sendEmptyMessage(0);
+                socket.close();
                 Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + serverMessage + "'");
-
             } catch (Exception e) {
 
                 Log.e("TCP", "S: Error", e);
@@ -86,7 +101,6 @@ public class TCPClient {
             }
 
         } catch (Exception e) {
-
             Log.e("TCP", "C: Error", e);
 
         }
@@ -94,7 +108,7 @@ public class TCPClient {
     }
 
 
-    public  byte[] readStream(InputStream inStream) throws Exception {
+    public byte[] readStream(InputStream inStream) throws Exception {
         int count = 0;
         while (count == 0) {
             count = inStream.available();

@@ -7,10 +7,11 @@ public class SaveFile {
 
     private int ID; // 0 DB id
     private String name;//1 file name
-    private String type;//2 measure type Common-MeasureType
+    private String measureType;//2 measure type Common-MeasureType
     private Timestamp time;//3 create file time
+    private int userId;// 4 user ID
 
-    private int userId;
+
 
     public int getUserId() {
         return userId;
@@ -36,12 +37,12 @@ public class SaveFile {
         this.name = name;
     }
 
-    public String getType() {
-        return type;
+    public String getMeasureType() {
+        return measureType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setMeasureType(String measureType) {
+        this.measureType = measureType;
     }
 
     public Timestamp getTime() {

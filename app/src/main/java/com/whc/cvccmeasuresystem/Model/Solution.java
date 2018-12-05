@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 public class Solution {
 
     private int ID;//DB ID
-    private int concentration;// pH7 for 7
+    private String concentration;// pH7 for 7
     private Timestamp time;//Time of read voltage
     private int voltage;// read Voltage
     private int sampleID;//  measure Sample
@@ -26,11 +26,11 @@ public class Solution {
         this.time = time;
     }
 
-    public int getConcentration() {
+    public String getConcentration() {
         return concentration;
     }
 
-    public void setConcentration(int concentration) {
+    public void setConcentration(String concentration) {
         this.concentration = concentration;
     }
 

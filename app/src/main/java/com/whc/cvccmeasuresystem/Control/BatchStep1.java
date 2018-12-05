@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -169,7 +170,7 @@ public class BatchStep1 extends Fragment {
             sharedPreferences= activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
             int useId=sharedPreferences.getInt(Common.userId,0);
             SaveFile saveFile=new SaveFile();
-            saveFile.setType("0");
+            saveFile.setMeasureType("0");
             saveFile.setName(Common.timeToString.format(new Date(System.currentTimeMillis())));
             saveFile.setTime(new Timestamp(System.currentTimeMillis()));
             saveFile.setUserId(useId);
@@ -180,13 +181,13 @@ public class BatchStep1 extends Fragment {
 
             SampleDB sampleDB=new SampleDB(dataBase.getReadableDatabase());
             //Sample 1
-            insert(sample1,getFirstName,nowFile.getID(),sampleDB);
+            insert(sample1,getFirstName,firstType.getText().toString(),nowFile.getID(),sampleDB);
             //Sample 2
-            insert(sample2,getSecondName,nowFile.getID(),sampleDB);
+            insert(sample2,getSecondName,secondType.getText().toString(),nowFile.getID(),sampleDB);
             //Sample 3
-            insert(sample3,getThirdName,nowFile.getID(),sampleDB);
+            insert(sample3,getThirdName,thirdType.getText().toString(),nowFile.getID(),sampleDB);
             //Sample 4
-            insert(sample4,getFourthName,nowFile.getID(),sampleDB);
+            insert(sample4,getFourthName,fourthType.getText().toString(),nowFile.getID(),sampleDB);
             switchFragment(new BatchStep2(),getFragmentManager().beginTransaction());
         }
     }
@@ -194,15 +195,15 @@ public class BatchStep1 extends Fragment {
 
 
 
-    public void insert(String saveName,String name,int fileID,SampleDB sampleDB)
+    public void insert(String saveName,String name,String measureType,int fileID,SampleDB sampleDB)
     {
         Sample sample=new Sample();
         sample.setName(name);
-        sample.setType("0");
+        sample.setIonType(measureType);
         sample.setFileID(fileID);
         sampleDB.insert(sample);
         Sample nowSample=sampleDB.findOldSample(name,fileID);
-        sharedPreferences.edit().putInt(saveName,nowSample.getID());
+        sharedPreferences.edit().putInt(saveName,nowSample.getID()).apply();
     }
 
 }
