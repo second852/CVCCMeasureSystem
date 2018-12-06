@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,7 @@ import java.util.List;
 import static com.whc.cvccmeasuresystem.Common.Common.userId;
 import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
-public class SignIn extends Fragment{
+public class BatchStep2Data extends Fragment{
     private View view;
     private Activity activity;
     private AutoCompleteTextView userName;

@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:orientation="horizontal">
 
             <com.beardedhen.androidbootstrap.BootstrapButton
@@ -67,7 +67,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="50dp"
             android:text="Sample = S "
             android:textSize="20sp"
             app:bootstrapBrand="primary" />
@@ -303,7 +303,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="70dp"
             android:orientation="horizontal">
 
             <com.beardedhen.androidbootstrap.BootstrapButton
@@ -347,13 +347,5 @@
                 app:roundedCorners="true"
                 app:showOutline="false" />
         </LinearLayout>
-        <ListView
-            android:id="@+id/data"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <ListView
-            android:id="@+id/chart"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
     </LinearLayout>
 </ScrollView>

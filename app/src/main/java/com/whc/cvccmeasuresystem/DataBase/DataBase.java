@@ -14,7 +14,7 @@ public class DataBase extends SQLiteOpenHelper {
 
     private static final String Table_SaveFile =
             "CREATE TABLE SaveFile ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL," +
-                    "measureType TEXT, time DATETIME , userId INTEGER ) ;";
+                    "measureType TEXT, startTime DATETIME ,endTime DATETIME, userId INTEGER ) ;";
 
     private static final String Table_Sample =
             "CREATE TABLE Sample ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL," +

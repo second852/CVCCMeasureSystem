@@ -8,7 +8,8 @@ public class SaveFile {
     private int ID; // 0 DB id
     private String name;//1 file name
     private String measureType;//2 measure type Common-MeasureType
-    private Timestamp time;//3 create file time
+    private Timestamp statTime;//3 create file time
+    private Timestamp endTime;//4 end file time
     private int userId;// 4 user ID
 
 
@@ -45,12 +46,19 @@ public class SaveFile {
         this.measureType = measureType;
     }
 
-    public Timestamp getTime() {
-        return time;
+    public Timestamp getStatTime() {
+        return statTime;
     }
 
-    public void setTime(Timestamp time) {
-        this.time = time;
+    public void setStatTime(Timestamp statTime) {
+        this.statTime = statTime;
     }
 
+    public Timestamp getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Timestamp endTime) {
+        this.endTime = endTime;
+    }
 }

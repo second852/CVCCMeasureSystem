@@ -27,4 +27,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.beardedhen:androidbootstrap:2.3.2'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    compile 'com.ogaclejapan.smarttablayout:utils-v4:1.6.1@aar'
+    compile 'com.ogaclejapan.smarttablayout:library:1.6.1@aar'
 }

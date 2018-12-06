@@ -34,8 +34,9 @@ public class SaveFileDB {
             saveFile.setID(cursor.getInt(0));
             saveFile.setName(cursor.getString(1));
             saveFile.setMeasureType(cursor.getString(2));
-            saveFile.setTime(new Timestamp(cursor.getLong(3)));
-            saveFile.setUserId(cursor.getInt(4));
+            saveFile.setStatTime(new Timestamp(cursor.getLong(3)));
+            saveFile.setEndTime(new Timestamp(cursor.getLong(4)));
+            saveFile.setUserId(cursor.getInt(5));
             saveFiles.add(saveFile);
         }
         cursor.close();
@@ -52,8 +53,9 @@ public class SaveFileDB {
             saveFile.setID(cursor.getInt(0));
             saveFile.setName(cursor.getString(1));
             saveFile.setMeasureType(cursor.getString(2));
-            saveFile.setTime(new Timestamp(cursor.getLong(3)));
-            saveFile.setUserId(cursor.getInt(4));
+            saveFile.setStatTime(new Timestamp(cursor.getLong(3)));
+            saveFile.setEndTime(new Timestamp(cursor.getLong(4)));
+            saveFile.setUserId(cursor.getInt(5));
         }
         cursor.close();
         return saveFile;
@@ -63,7 +65,8 @@ public class SaveFileDB {
         ContentValues values = new ContentValues();
         values.put("name", saveFile.getName());
         values.put("measureType", saveFile.getMeasureType());
-        values.put("time", saveFile.getTime().getTime());
+        values.put("startTime", saveFile.getStatTime().getTime());
+        values.put("endTime", saveFile.getEndTime().getTime());
         values.put("userId", saveFile.getUserId());
         return db.insert(TABLE_NAME, null, values);
     }
@@ -73,7 +76,8 @@ public class SaveFileDB {
         values.put("id", saveFile.getID());
         values.put("name", saveFile.getName());
         values.put("measureType", saveFile.getMeasureType());
-        values.put("time", saveFile.getTime().getTime());
+        values.put("startTime", saveFile.getStatTime().getTime());
+        values.put("endTime", saveFile.getEndTime().getTime());
         values.put("userId", saveFile.getUserId());
         String whereClause = "id = ?;";
         String[] whereArgs = {Integer.toString(saveFile.getID())};

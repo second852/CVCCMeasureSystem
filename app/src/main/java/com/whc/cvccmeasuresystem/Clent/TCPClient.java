@@ -1,5 +1,6 @@
 package com.whc.cvccmeasuresystem.Clent;
 
+import android.os.Message;
 import android.util.Log;
 
 
@@ -82,12 +83,14 @@ public class TCPClient {
                             {
                                 mRun=false;
                             }
+                            Message message=new Message();
+                            message.obj=str;
+                            handlerMessage.sendMessage(message);
                             i++;
                             break;
                     }
                     Log.d("XXXXXxx", str + " Time :" + (System.currentTimeMillis() - startTime));
                 }
-                handlerMessage.sendEmptyMessage(0);
                 socket.close();
                 Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + serverMessage + "'");
             } catch (Exception e) {

@@ -78,11 +78,10 @@ public class ChoiceFunction extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             Fragment fragment;
-            FragmentTransaction fragmentTransaction=getFragmentManager().beginTransaction();
             switch (i){
                 case 0:
                     fragment=new BatchStep1();
-                    switchFragment(fragment,fragmentTransaction);
+                    switchFragment(fragment,getFragmentManager());
                     break;
                 case 1:
                     break;

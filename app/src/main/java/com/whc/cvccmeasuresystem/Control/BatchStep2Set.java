@@ -2,48 +2,40 @@ package com.whc.cvccmeasuresystem.Control;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
+
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.whc.cvccmeasuresystem.Clent.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
-import com.whc.cvccmeasuresystem.Common.DataAdapter;
-import com.whc.cvccmeasuresystem.DataBase.DataBase;
-import com.whc.cvccmeasuresystem.DataBase.SampleDB;
-import com.whc.cvccmeasuresystem.Model.Sample;
+
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 
-import java.util.ArrayList;
-import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.*;
+import static com.whc.cvccmeasuresystem.Common.Common.needInt;
+import static com.whc.cvccmeasuresystem.Control.BatchStep2Main.*;
 
-public class BatchStep2 extends Fragment {
+
+public class BatchStep2Set extends Fragment {
 
     private View view;
     private Activity activity;
     private BootstrapButton con1, con2, con3, con4, start;
     private BootstrapEditText ion1, ion2, ion3, ion4, measureTime;
-    private SharedPreferences sharedPreferences;
-    private Sample sample1, sample2, sample3, sample4;
-    private DataBase dataBase;
     private String mTime;
-    private ListView data;
+
+
 
 
     @Override
@@ -54,50 +46,31 @@ public class BatchStep2 extends Fragment {
         } else {
             activity = getActivity();
         }
-        activity.setTitle("BatchStep2 Monitor");
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.batch_step2, container, false);
-        dataBase = new DataBase(activity);
+        view = inflater.inflate(R.layout.batch_step2_set, container, false);
         findViewById();
+        setIon();
         return view;
+    }
+
+    private void setIon() {
+        con1.setText(sample1.getIonType());
+        con2.setText(sample2.getIonType());
+        con3.setText(sample3.getIonType());
+        con4.setText(sample4.getIonType());
     }
 
 
     @Override
     public void onStart() {
         super.onStart();
-        setSample();
         start.setOnClickListener(new startMeasure());
     }
 
-    private void setSample() {
-        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-        SampleDB sampleDB = new SampleDB(dataBase.getReadableDatabase());
-
-        //sample 1
-        int sampleID = sharedPreferences.getInt(Common.sample1, 0);
-        sample1 = sampleDB.findOldSample(sampleID);
-        con1.setText(sample1.getIonType());
-
-        //sample 2
-        sampleID = sharedPreferences.getInt(Common.sample2, 0);
-        sample2 = sampleDB.findOldSample(sampleID);
-        con2.setText(sample2.getIonType());
-
-        //sample 3
-        sampleID = sharedPreferences.getInt(Common.sample3, 0);
-        sample3 = sampleDB.findOldSample(sampleID);
-        con3.setText(sample3.getIonType());
-
-        //sample 4
-        sampleID = sharedPreferences.getInt(Common.sample4, 0);
-        sample4 = sampleDB.findOldSample(sampleID);
-        con4.setText(sample4.getIonType());
-    }
 
 
     private void findViewById() {
@@ -111,29 +84,17 @@ public class BatchStep2 extends Fragment {
         ion4 = view.findViewById(R.id.ion4);
         measureTime = view.findViewById(R.id.measureTime);
         start = view.findViewById(R.id.start);
-        data = view.findViewById(R.id.data);
-
     }
 
 
     private Runnable measureThread = new Runnable() {
         @Override
         public void run() {
-            new TCPClient("1", "1", handlerMessage).run();
+            new TCPClient("1", mTime, handlerMessage).run();
         }
     };
 
-    //setList
-    private Handler handlerMessage = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            List<Solution> solutions=new ArrayList<>();
-            solutions.add(new Solution());
-            data.setAdapter(new DataAdapter(activity,solutions));
-            data.invalidate();
-        }
-    };
+
 
 
     private class startMeasure implements View.OnClickListener {
@@ -195,7 +156,13 @@ public class BatchStep2 extends Fragment {
                 return;
             }
             //conection
+            solution1=new Solution(ionOne,sample1.getID());
+            solution2=new Solution(ionTwo,sample2.getID());
+            solution3=new Solution(ionThree,sample3.getID());
+            solution4=new Solution(ionFour,sample4.getID());
             new Thread(measureThread).start();
+            BatchStep2Main.startMeasure=true;
+            BatchStep2Main.priceViewPager.setCurrentItem(1);
         }
     }
 }

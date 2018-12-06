@@ -7,8 +7,16 @@ public class Solution {
     private int ID;//DB ID
     private String concentration;// pH7 for 7
     private Timestamp time;//Time of read voltage
-    private int voltage;// read Voltage
+    private Integer voltage;// read Voltage
     private int sampleID;//  measure Sample
+
+    public Solution(String concentration, int sampleID) {
+        this.concentration = concentration;
+        this.sampleID = sampleID;
+    }
+
+    public Solution() {
+    }
 
     public int getID() {
         return ID;
@@ -34,11 +42,11 @@ public class Solution {
         this.concentration = concentration;
     }
 
-    public int getVoltage() {
+    public Integer getVoltage() {
         return voltage;
     }
 
-    public void setVoltage(int voltage) {
+    public void setVoltage(Integer voltage) {
         this.voltage = voltage;
     }
 

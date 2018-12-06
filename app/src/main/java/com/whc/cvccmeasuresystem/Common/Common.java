@@ -4,6 +4,7 @@ package com.whc.cvccmeasuresystem.Common;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +14,7 @@ import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.beardedhen.androidbootstrap.BootstrapText;
 import com.whc.cvccmeasuresystem.R;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,9 +59,20 @@ public class Common {
         return hashMap;
     }
 
-    public static void switchFragment(Fragment fragment, FragmentTransaction fragmentTransaction) {
-        fragmentTransaction.replace(R.id.body, fragment);
+    public static void switchFragment(Fragment fragment, FragmentManager fragmentManager) {
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        for (Fragment f : fragmentManager.getFragments()) {
+            fragmentTransaction.remove(f);
+        }
+        fragmentTransaction.add(R.id.body, fragment);
         fragmentTransaction.commit();
+    }
+
+    public static int DoubleToInt(double a) {
+        double b = new BigDecimal(a)
+                .setScale(0, BigDecimal.ROUND_HALF_UP)
+                .doubleValue();
+        return (int) b;
     }
 
     public static List<BootstrapText> SolutionTypeBS(Activity activity) {

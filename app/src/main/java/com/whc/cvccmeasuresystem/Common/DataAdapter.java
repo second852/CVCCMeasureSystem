@@ -11,27 +11,29 @@ import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
+import java.util.Date;
 import java.util.List;
 
 public class DataAdapter extends BaseAdapter {
 
     private Context context;
     private List<Solution> solutions;
-    private List<Sample> samples;
+    private Sample sample;
 
-    public DataAdapter(Context context, List<Solution> objects) {
+    public DataAdapter(Context context, List<Solution> solutions, Sample sample) {
         this.context = context;
-        this.solutions = objects;
+        this.solutions = solutions;
+        this.sample = sample;
     }
 
     @Override
     public int getCount() {
-        return solutions.size();
+        return solutions.size()+1;
     }
 
     @Override
     public Object getItem(int i) {
-        return solutions.get(i);
+        return solutions.get(i-1);
     }
 
     @Override
@@ -48,33 +50,20 @@ public class DataAdapter extends BaseAdapter {
         TextView times=itemView.findViewById(R.id.times);
         TextView sampleIon1=itemView.findViewById(R.id.sampleIon1);
         TextView sampleIVol1=itemView.findViewById(R.id.sampleIVol1);
-        TextView sampleIon2=itemView.findViewById(R.id.sampleIon2);
-        TextView sampleIVol2=itemView.findViewById(R.id.sampleIVol2);
-        TextView sampleIon3=itemView.findViewById(R.id.sampleIon3);
-        TextView sampleIVol3=itemView.findViewById(R.id.sampleIVol3);
-        TextView sampleIon4=itemView.findViewById(R.id.sampleIon4);
-        TextView sampleIVol4=itemView.findViewById(R.id.sampleIVol4);
         TextView dateTime=itemView.findViewById(R.id.dateTime);
-
         if(position==0)
         {
             times.setText("Time");
-            sampleIon1.setText("pH");
+            sampleIon1.setText(sample.getIonType());
             sampleIVol1.setText("S 1(mV)");
-            sampleIon2.setText("pH");
-            sampleIVol2.setText("S 2(mV)");
-            sampleIon3.setText("pH");
-            sampleIVol3.setText("S 3(mV)");
-            sampleIon4.setText("pH");
-            sampleIVol4.setText("S 4(mV)");
             dateTime.setText("dateTime");
         }else {
-
+            Solution solution=solutions.get(position-1);
+            times.setText(String.valueOf(position-1));
+            sampleIon1.setText(solution.getConcentration());
+            sampleIVol1.setText(solution.getVoltage());
+            dateTime.setText(Common.timeToString.format(new Date(solution.getTime().getTime())));
         }
-
-
-
-
         return itemView;
     }
 }

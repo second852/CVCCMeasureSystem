@@ -172,7 +172,8 @@ public class BatchStep1 extends Fragment {
             SaveFile saveFile=new SaveFile();
             saveFile.setMeasureType("0");
             saveFile.setName(Common.timeToString.format(new Date(System.currentTimeMillis())));
-            saveFile.setTime(new Timestamp(System.currentTimeMillis()));
+            saveFile.setStatTime(new Timestamp(System.currentTimeMillis()));
+            saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
             saveFile.setUserId(useId);
             saveFileDB.insert(saveFile);
 
@@ -188,7 +189,7 @@ public class BatchStep1 extends Fragment {
             insert(sample3,getThirdName,thirdType.getText().toString(),nowFile.getID(),sampleDB);
             //Sample 4
             insert(sample4,getFourthName,fourthType.getText().toString(),nowFile.getID(),sampleDB);
-            switchFragment(new BatchStep2(),getFragmentManager().beginTransaction());
+            switchFragment(new BatchStep2Main(),getFragmentManager());
         }
     }
 

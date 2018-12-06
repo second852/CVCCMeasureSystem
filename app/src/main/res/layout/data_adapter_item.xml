@@ -27,48 +27,6 @@
         android:gravity="center"
         android:textColor="#000000"/>
     <TextView
-        android:id="@+id/sampleIon2"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:textSize="12sp"
-        android:gravity="center"
-        android:textColor="#000000"/>
-    <TextView
-        android:id="@+id/sampleIVol2"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:textSize="12sp"
-        android:gravity="center"
-        android:textColor="#000000"/>
-    <TextView
-        android:id="@+id/sampleIon3"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:textSize="12sp"
-        android:gravity="center"
-        android:textColor="#000000"/>
-    <TextView
-        android:id="@+id/sampleIVol3"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:textSize="12sp"
-        android:gravity="center"
-        android:textColor="#000000"/>
-    <TextView
-        android:id="@+id/sampleIon4"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:textSize="12sp"
-        android:gravity="center"
-        android:textColor="#000000"/>
-    <TextView
-        android:id="@+id/sampleIVol4"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:textSize="12sp"
-        android:gravity="center"
-        android:textColor="#000000"/>
-    <TextView
         android:id="@+id/dateTime"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
