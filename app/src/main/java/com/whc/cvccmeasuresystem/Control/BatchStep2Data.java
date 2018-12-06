@@ -11,9 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ListView;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Common.SampleAdapter;
+import com.whc.cvccmeasuresystem.Common.SolutionAdapter;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.UserDB;
 import com.whc.cvccmeasuresystem.Model.User;
@@ -21,16 +24,15 @@ import com.whc.cvccmeasuresystem.R;
 
 import java.util.List;
 
+import static com.whc.cvccmeasuresystem.Common.Common.checkViewIon;
 import static com.whc.cvccmeasuresystem.Common.Common.userId;
 import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
 public class BatchStep2Data extends Fragment{
     private View view;
     private Activity activity;
-    private AutoCompleteTextView userName;
-    private UserDB userDB;
-    private BootstrapButton enter;
-    private SharedPreferences sharedPreferences;
+    private ListView listData;
+
 
     @Override
     public void onAttach(Context context) {
@@ -40,53 +42,26 @@ public class BatchStep2Data extends Fragment{
         } else {
             activity = getActivity();
         }
-        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.signin_main, container, false);
-        activity.setTitle(R.string.app_name);
-        userName=view.findViewById(R.id.userName);
-        enter=view.findViewById(R.id.enter);
-        DataBase dataBase=new DataBase(activity);
-        userDB=new UserDB(dataBase.getReadableDatabase());
+        view = inflater.inflate(R.layout.batch_step2_data, container, false);
+        listData=view.findViewById(R.id.listData);
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        List<String> users=userDB.getAllUserName();
-        ArrayAdapter arrayAdapter =new ArrayAdapter(activity,android.R.layout.simple_spinner_item,users.toArray());
-        userName.setAdapter(arrayAdapter);
-        enter.setOnClickListener(new enterFunction());
+        setListView();
     }
 
-    private class enterFunction implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            String name=userName.getText().toString();
-            if(name==null)
-            {
-               userName.setError("Please enter user Name");
-               return;
-            }
-            name=name.trim();
-            if(name.length()<=0)
-            {
-                userName.setError("Please enter user Name");
-                return;
-            }
-            String oldName=userDB.findUserName(name);
-            if(oldName==null)
-            {
-                userDB.insert(new User(name));
-            }
-            User user=userDB.findUser(name);
-            sharedPreferences.edit().putInt(userId, user.getId()).apply();
-            Common.switchFragment(new ChoiceFunction(),getFragmentManager());
-        }
+    public void setListView()
+    {
+        listData.setAdapter(new SampleAdapter(activity,BatchStep2Main.samples,BatchStep2Main.dataMap));
     }
+
 }

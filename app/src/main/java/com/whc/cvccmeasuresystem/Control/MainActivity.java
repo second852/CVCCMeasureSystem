@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Fragment fragment=new BatchStep2Main();
+//        fragment=new SignIn();
         switchFragment(fragment,getSupportFragmentManager());
     }
 

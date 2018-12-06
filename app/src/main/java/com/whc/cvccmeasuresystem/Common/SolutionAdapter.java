@@ -14,13 +14,13 @@ import com.whc.cvccmeasuresystem.R;
 import java.util.Date;
 import java.util.List;
 
-public class DataAdapter extends BaseAdapter {
+public class SolutionAdapter extends BaseAdapter {
 
     private Context context;
     private List<Solution> solutions;
     private Sample sample;
 
-    public DataAdapter(Context context, List<Solution> solutions, Sample sample) {
+    public SolutionAdapter(Context context, List<Solution> solutions, Sample sample) {
         this.context = context;
         this.solutions = solutions;
         this.sample = sample;
@@ -45,7 +45,7 @@ public class DataAdapter extends BaseAdapter {
     public View getView(int position, View itemView, final ViewGroup parent) {
         if (itemView == null) {
             LayoutInflater layoutInflater = LayoutInflater.from(context);
-            itemView = layoutInflater.inflate(R.layout.data_adapter_item, parent, false);
+            itemView = layoutInflater.inflate(R.layout.data_adapter_item2, parent, false);
         }
         TextView times=itemView.findViewById(R.id.times);
         TextView sampleIon1=itemView.findViewById(R.id.sampleIon1);

@@ -59,6 +59,8 @@ public class BatchStep2Main extends Fragment {
     public static boolean startMeasure;
     public static Solution solution1,solution2,solution3,solution4;
     public static FragmentPagerItemAdapter adapter;
+    public static int currentPage;
+    public static List<Sample> samples;
 
 
 
@@ -105,6 +107,7 @@ public class BatchStep2Main extends Fragment {
 
     private void setSample() {
         dataMap=new HashMap<>();
+        samples=new ArrayList<>();
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
 
         dataBase = new DataBase(activity);
@@ -115,18 +118,22 @@ public class BatchStep2Main extends Fragment {
         int sampleID = sharedPreferences.getInt(Common.sample1, 0);
         sample1 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample1,new ArrayList<Solution>());
+        samples.add(sample1);
         //sample 2
         sampleID = sharedPreferences.getInt(Common.sample2, 0);
         sample2 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample2,new ArrayList<Solution>());
+        samples.add(sample2);
         //sample 3
         sampleID = sharedPreferences.getInt(Common.sample3, 0);
         sample3 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample3,new ArrayList<Solution>());
+        samples.add(sample3);
         //sample 4
         sampleID = sharedPreferences.getInt(Common.sample4, 0);
         sample4 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample4,new ArrayList<Solution>());
+        samples.add(sample4);
     }
 
 
@@ -138,6 +145,7 @@ public class BatchStep2Main extends Fragment {
 
         @Override
         public void onPageSelected(int position) {
+            currentPage=position;
             switch (position)
             {
                 case 1:
@@ -145,6 +153,8 @@ public class BatchStep2Main extends Fragment {
                     batchStep2Chart.setData();
                     break;
                 case 2:
+                    BatchStep2Data batchStep2Data= (BatchStep2Data) adapter.getPage(2);
+                    batchStep2Data.setListView();
                     break;
             }
         }
@@ -160,6 +170,8 @@ public class BatchStep2Main extends Fragment {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            //data 處理
+            int currentPage=priceViewPager.getCurrentItem();
             String result= (String) msg.obj;
             String[] voltages=result.split(",");
             try {
@@ -191,8 +203,7 @@ public class BatchStep2Main extends Fragment {
             BatchStep2Main.dataMap.get(sample3).add(solution3);
             BatchStep2Main.dataMap.get(sample4).add(solution4);
 
-            //data 處理
-            int currentPage=priceViewPager.getCurrentItem();
+
             switch (currentPage)
             {
                 case 1:

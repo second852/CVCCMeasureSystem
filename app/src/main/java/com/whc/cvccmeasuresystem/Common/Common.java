@@ -3,6 +3,7 @@ package com.whc.cvccmeasuresystem.Common;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Paint;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.beardedhen.androidbootstrap.BootstrapText;
+import com.github.mikephil.charting.components.Description;
 import com.whc.cvccmeasuresystem.R;
 
 import java.math.BigDecimal;
@@ -47,6 +49,17 @@ public class Common {
         hashMap.put("3", "Drift");
         hashMap.put("4", "Hysteresis");
         return hashMap;
+    }
+
+
+
+    public static Description description(String name) {
+        Description description= new Description();
+        description.setText(name);
+        description.setTextSize(14f);
+        description.setTextAlign(Paint.Align.LEFT);
+        description.setPosition(250,140);
+        return description;
     }
 
     public static LinkedHashMap<String, String> SolutionType() {

@@ -1,5 +1,6 @@
 package com.whc.cvccmeasuresystem.Clent;
 
+import android.graphics.Color;
 import android.os.Message;
 import android.util.Log;
 
@@ -9,6 +10,12 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import android.os.Handler;
+
+import com.whc.cvccmeasuresystem.Control.BatchStep2Chart;
+import com.whc.cvccmeasuresystem.R;
+
+import static com.whc.cvccmeasuresystem.Control.BatchStep2Main.currentPage;
+import static com.whc.cvccmeasuresystem.Control.BatchStep2Main.startMeasure;
 
 public class TCPClient {
 
@@ -67,6 +74,7 @@ public class TCPClient {
                 //in this while the client listens for the messages sent by the server
                 int i=0;
                 int times=Integer.valueOf(measureTime)/Integer.valueOf(measureDuration);
+                Message message;
                 while (mRun) {
                     long startTime = System.currentTimeMillis();
                     byte[] bytes = readStream(inTest);
@@ -83,13 +91,24 @@ public class TCPClient {
                             {
                                 mRun=false;
                             }
-                            Message message=new Message();
+                            message=new Message();
                             message.obj=str;
                             handlerMessage.sendMessage(message);
                             i++;
                             break;
                     }
                     Log.d("XXXXXxx", str + " Time :" + (System.currentTimeMillis() - startTime));
+                }
+
+                startMeasure=false;
+                switch (currentPage)
+                {
+                    case 1:
+                        BatchStep2Chart.message.setText(R.string.measure_stop);
+                        BatchStep2Chart.message.setTextColor(Color.RED);
+                        break;
+                    case 2:
+                        break;
                 }
                 socket.close();
                 Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + serverMessage + "'");

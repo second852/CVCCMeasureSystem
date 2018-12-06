@@ -29,6 +29,7 @@ import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import static com.whc.cvccmeasuresystem.Common.Common.DoubleToInt;
+import static com.whc.cvccmeasuresystem.Common.Common.description;
 import static com.whc.cvccmeasuresystem.Control.BatchStep2Main.*;
 
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class BatchStep2Chart extends Fragment{
     private Activity activity;
     private LineChart[] lineCharts;
     private int size;
-    public  TextView message;
+    public  static  TextView message;
 
 
 
@@ -89,45 +90,56 @@ public class BatchStep2Chart extends Fragment{
         if(startMeasure)
         {
             message.setText(R.string.measure_start);
+            message.setTextColor(Color.BLUE);
         }else{
             message.setText(R.string.measure_stop);
+            message.setTextColor(Color.RED);
         }
 
-//        List<Solution> solutions=dataMap.get(sample1);
-        List<Solution> solutions=new ArrayList<>();
-        Solution solution=new Solution();
-        solution.setVoltage(2000);
-        solutions.add(solution);
-        solutions.add(solution);
-        setLineChart(lineCharts[0],solutions,sample1.getName());
-//        setLineChart(lineCharts[1],solutions,sample2.getName());
-//        setLineChart(lineCharts[2],solutions,sample3.getName());
-//        setLineChart(lineCharts[3],solutions,sample4.getName());
+        List<Solution> solutions=dataMap.get(sample1);
+//        Solution solution=new Solution();
+//        solution.setVoltage(200);
+//        solutions.add(solution);
+//        solutions.add(solution);
+        setLineChart(lineCharts[0],solutions,sample1.getName(),"sample1");
+
+        solutions=dataMap.get(sample2);
+        setLineChart(lineCharts[1],solutions,sample2.getName(),"sample2");
+
+        solutions=dataMap.get(sample3);
+        setLineChart(lineCharts[2],solutions,sample3.getName(),"sample3");
+
+        solutions=dataMap.get(sample4);
+        setLineChart(lineCharts[3],solutions,sample4.getName(),"sample4");
     }
 
 
 
-    private void setLineChart(LineChart lineChart, List<Solution> solutions, String name) {
+    private void setLineChart(LineChart lineChart, List<Solution> solutions, String name,String describse) {
         List<Entry> entries = new ArrayList<Entry>();
         size=solutions.size();
-        Log.d("xxxxxx SIZE","j S"+size);
         if(size<=0)
         {
             return;
         }
 
         for (int i=0;i<solutions.size();i++) {
-            entries.add(new Entry(0, solutions.get(i).getVoltage()));
+            entries.add(new Entry(i, solutions.get(i).getVoltage()));
         }
+
+
         LineDataSet dataSet = new LineDataSet(entries, name);
         dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
         dataSet.setDrawFilled(true);
         dataSet.setColor(Color.parseColor("#000000"));
         dataSet.setFillColor(Color.parseColor("#000000"));
+        dataSet.setCircleColor(Color.parseColor("#000000"));
         dataSet.setHighlightEnabled(false);
         dataSet.setDrawValues(false);
         dataSet.setCircleRadius(3);
         dataSet.setDrawCircleHole(false);
+
+
 
         LineData data = new LineData(dataSet);
         XAxis xAxis = lineChart.getXAxis();
@@ -144,13 +156,18 @@ public class BatchStep2Chart extends Fragment{
                 }
             }
         });
+
+
+        lineChart.setDescription(description(describse));
+        lineChart.setDrawBorders(true);
         lineChart.setData(data);
         lineChart.setDragEnabled(true);
-//        lineChart.setDescription(Common.getDeescription());
         lineChart.setTouchEnabled(false);
-        lineChart.setScaleEnabled(true);
+        lineChart.setScaleEnabled(false);
         YAxis yAxis = lineChart.getAxis(YAxis.AxisDependency.LEFT);
         YAxis yAxis1 = lineChart.getAxis(YAxis.AxisDependency.RIGHT);
+        yAxis1.setDrawAxisLine(false);
+        yAxis1.setDrawLabels(false);
         yAxis.setValueFormatter(new IAxisValueFormatter(){
 
             @Override
@@ -159,7 +176,7 @@ public class BatchStep2Chart extends Fragment{
             }
         });
         Legend l = lineChart.getLegend();
-        l.setFormSize(18f);
+        l.setFormSize(12f);
         l.setTextColor(Color.parseColor("#000000"));
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
@@ -167,7 +184,7 @@ public class BatchStep2Chart extends Fragment{
 
     private List<String> getLabels(int size) {
         List<String> chartLabels = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < (size+1); i++) {
             chartLabels.add( (i+1) + "min");
         }
         return chartLabels;
