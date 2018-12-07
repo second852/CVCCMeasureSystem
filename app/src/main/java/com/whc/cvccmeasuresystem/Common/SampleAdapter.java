@@ -67,7 +67,6 @@ public class SampleAdapter extends BaseAdapter {
         Sample sample=samples.get(position);
         List<Solution> solutions=dataMap.get(sample);
         textView.setText("Sample"+(position+1));
-        listView.setAdapter(new SolutionAdapter(context,solutions,sample));
         return itemView;
     }
 

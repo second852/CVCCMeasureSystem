@@ -2,7 +2,6 @@ package com.whc.cvccmeasuresystem.Control;
 
 import android.app.Activity;
 import android.content.Context;
-
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -12,12 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.whc.cvccmeasuresystem.Clent.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
-
 import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
@@ -26,13 +23,11 @@ import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 
-
-
 import static com.whc.cvccmeasuresystem.Common.Common.*;
-import static com.whc.cvccmeasuresystem.Control.BatchStep2Main.*;
 
 
-public class BatchStep2Set extends Fragment {
+
+public class SensitivityStep2Set extends Fragment {
 
     private View view;
     private Activity activity;
@@ -104,7 +99,7 @@ public class BatchStep2Set extends Fragment {
     private Runnable measureThread = new Runnable() {
         @Override
         public void run() {
-            tcpClient=new TCPClient("1", mTime, handlerMessage,BatchStep2Set.this);
+            tcpClient=new TCPClient("1", mTime, SensitivityStep2Main.handlerMessage,SensitivityStep2Set.this);
             tcpClient.run();
         }
     };
@@ -211,7 +206,7 @@ public class BatchStep2Set extends Fragment {
                 solutionDB.insert(solutions);
             }
         }
-        Common.finishToSave=true;
+
         Common.switchFragment(new BatchStep1(),getFragmentManager());
         tcpClient=null;
     }
@@ -227,7 +222,7 @@ public class BatchStep2Set extends Fragment {
                 return;
             }
             FinishDialogFragment aa= new FinishDialogFragment();
-            aa.setObject(BatchStep2Set.this);
+            aa.setObject(SensitivityStep2Set.this);
             aa.show(getFragmentManager(),"show");
         }
     }

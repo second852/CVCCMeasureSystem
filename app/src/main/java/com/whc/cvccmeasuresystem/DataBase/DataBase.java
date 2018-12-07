@@ -22,7 +22,7 @@ public class DataBase extends SQLiteOpenHelper {
 
     private static final String Table_Solution =
             "CREATE TABLE Solution ( id INTEGER PRIMARY KEY AUTOINCREMENT, concentration TEXT NOT NULL," +
-                    "time DATETIME, voltage INTEGER, sampleID INTEGER) ;";
+                    "number text,time DATETIME, voltage INTEGER, sampleID INTEGER) ;";
 
 
     public DataBase(Context context) {

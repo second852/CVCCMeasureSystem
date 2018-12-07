@@ -1,10 +1,13 @@
 package com.whc.cvccmeasuresystem.Model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Comparator;
 
-public class Solution {
+public class Solution implements Serializable{
 
     private int ID;//DB ID
+    private String number;// measure times
     private String concentration;// pH7 for 7
     private Timestamp time;//Time of read voltage
     private Integer voltage;// read Voltage
@@ -16,6 +19,14 @@ public class Solution {
     }
 
     public Solution() {
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public int getID() {
@@ -57,4 +68,5 @@ public class Solution {
     public void setSampleID(int sampleID) {
         this.sampleID = sampleID;
     }
+
 }

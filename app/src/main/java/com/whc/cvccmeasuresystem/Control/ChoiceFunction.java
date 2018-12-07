@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -37,7 +40,10 @@ public class ChoiceFunction extends Fragment {
         } else {
             activity = getActivity();
         }
+        ((AppCompatActivity)activity).getSupportActionBar().show();
     }
+
+
 
     @Nullable
     @Override
@@ -45,6 +51,7 @@ public class ChoiceFunction extends Fragment {
         view = inflater.inflate(R.layout.chociefunction_main, container, false);
         activity.setTitle(R.string.app_name);
         gridView=view.findViewById(R.id.gridView);
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -86,6 +93,8 @@ public class ChoiceFunction extends Fragment {
                 case 1:
                     break;
                 case 2:
+                    fragment=new SensitivityStep1();
+                    switchFragment(fragment,getFragmentManager());
                     break;
                 case 3:
                     break;

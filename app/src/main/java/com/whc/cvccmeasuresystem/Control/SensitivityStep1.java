@@ -27,11 +27,10 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-
 import static com.whc.cvccmeasuresystem.Common.Common.*;
 
 
-public class BatchStep1 extends Fragment {
+public class SensitivityStep1 extends Fragment {
 
     private View view;
     private Activity activity;
@@ -50,7 +49,7 @@ public class BatchStep1 extends Fragment {
         } else {
             activity = getActivity();
         }
-        activity.setTitle("Batch Monitor Step1");
+        activity.setTitle("Sensitivity Monitor Step1");
         bootstrapTexts = Common.SolutionTypeBS(activity);
         ((AppCompatActivity)activity).getSupportActionBar().show();
     }
@@ -58,7 +57,7 @@ public class BatchStep1 extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.batch_step1, container, false);
+        view = inflater.inflate(R.layout.sensitivity_step1, container, false);
         findViewById();
         return view;
     }
@@ -168,7 +167,7 @@ public class BatchStep1 extends Fragment {
             sharedPreferences= activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
             int useId=sharedPreferences.getInt(Common.userId,0);
             SaveFile saveFile=new SaveFile();
-            saveFile.setMeasureType("0");
+            saveFile.setMeasureType("2");
             saveFile.setName(Common.timeToString.format(new Date(System.currentTimeMillis())));
             saveFile.setStatTime(new Timestamp(System.currentTimeMillis()));
             saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
@@ -187,13 +186,7 @@ public class BatchStep1 extends Fragment {
             insert(sample3String,getThirdName,thirdType.getText().toString(),nowFile.getID(),sampleDB);
             //Sample 4
             insert(sample4String,getFourthName,fourthType.getText().toString(),nowFile.getID(),sampleDB);
-            switchFragment(new BatchStep2Main(),getFragmentManager());
-            if(tcpClient!=null)
-            {
-               tcpClient.cancelHomeTcpClient();
-            }
-            startMeasure=false;
-
+            switchFragment(new SensitivityStep2Main(),getFragmentManager());
         }
     }
 

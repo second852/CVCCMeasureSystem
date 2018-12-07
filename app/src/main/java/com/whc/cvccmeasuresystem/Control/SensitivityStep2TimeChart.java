@@ -23,18 +23,18 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.whc.cvccmeasuresystem.Model.Solution;
-
 import com.whc.cvccmeasuresystem.R;
-
-import static com.whc.cvccmeasuresystem.Common.Common.*;
-
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.whc.cvccmeasuresystem.Common.Common.DoubleToInt;
+import static com.whc.cvccmeasuresystem.Common.Common.description;
+import static com.whc.cvccmeasuresystem.Common.Common.*;
 
 
-public class BatchStep2Chart extends Fragment{
+
+public class SensitivityStep2TimeChart extends Fragment{
     private View view;
     private Activity activity;
     private LineChart[] lineCharts;

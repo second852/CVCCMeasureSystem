@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-
 import com.whc.cvccmeasuresystem.Common.SolutionAdapter;
 import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
@@ -19,10 +18,10 @@ import com.whc.cvccmeasuresystem.R;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import static com.whc.cvccmeasuresystem.Common.Common.*;
 
-public class BatchStep2Data extends Fragment{
+
+public class SensitivityStep2Data extends Fragment{
     private View view;
     private Activity activity;
     private ListView listData;

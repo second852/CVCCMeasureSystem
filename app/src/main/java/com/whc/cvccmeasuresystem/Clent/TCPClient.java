@@ -1,5 +1,6 @@
 package com.whc.cvccmeasuresystem.Clent;
 
+import android.app.Fragment;
 import android.graphics.Color;
 import android.os.Message;
 import android.util.Log;
@@ -12,10 +13,17 @@ import java.nio.charset.Charset;
 import android.os.Handler;
 
 import com.whc.cvccmeasuresystem.Control.BatchStep2Chart;
+import com.whc.cvccmeasuresystem.Control.BatchStep2Main;
+import com.whc.cvccmeasuresystem.Control.BatchStep2Set;
+import com.whc.cvccmeasuresystem.Control.SensitivityStep2ConChart;
+import com.whc.cvccmeasuresystem.Control.SensitivityStep2Main;
+import com.whc.cvccmeasuresystem.Control.SensitivityStep2Set;
+import com.whc.cvccmeasuresystem.Control.SensitivityStep2TimeChart;
 import com.whc.cvccmeasuresystem.R;
 
-import static com.whc.cvccmeasuresystem.Control.BatchStep2Main.currentPage;
-import static com.whc.cvccmeasuresystem.Control.BatchStep2Main.startMeasure;
+
+import static com.whc.cvccmeasuresystem.Common.Common.*;
+
 
 public class TCPClient {
 
@@ -27,15 +35,17 @@ public class TCPClient {
     private String measureDuration;
     private String measureTime;
     private Handler handlerMessage;
+    private Object object;
 
    private PrintWriter out;
    private BufferedReader in;
 
 
-    public TCPClient(String measureDuration, String measureTime, Handler handlerMessage) {
+    public TCPClient(String measureDuration, String measureTime, Handler handlerMessage, Object object) {
         this.measureDuration = measureDuration;
         this.measureTime = measureTime;
         this.handlerMessage = handlerMessage;
+        this.object = object;
     }
 
     public void sendMessage() {
@@ -43,6 +53,18 @@ public class TCPClient {
             out.print("D" + ',' + measureTime + ',' + measureDuration + ',');
             out.flush();
         }
+    }
+
+    public void cancelTcpClient()
+    {
+        mRun=false;
+        BatchStop();
+    }
+
+    public void cancelHomeTcpClient()
+    {
+        startMeasure=false;
+        mRun=false;
     }
 
 
@@ -82,10 +104,31 @@ public class TCPClient {
                     switch (str)
                     {
                         case "$D,Start,#":
+                            finishToSave=false;
+                            startMeasure=true;
+                            handlerMessage.sendEmptyMessage(1);
+
+                            if(object instanceof BatchStep2Set)
+                            {
+                                BatchStart();
+                            }else if(object instanceof SensitivityStep2Set)
+                            {
+                                SensitivityStart();
+                            }
+
                             break;
                         case "$D,End,#":
-                            mRun=false;
-                             break;
+
+
+                            if(object instanceof BatchStep2Set)
+                            {
+                                BatchStop();
+                            }else if(object instanceof SensitivityStep2Set)
+                            {
+                                SensitivityEnd();
+                            }
+                            break;
+
                         default:
                             if(i>times)
                             {
@@ -93,22 +136,12 @@ public class TCPClient {
                             }
                             message=new Message();
                             message.obj=str;
+                            message.what=3;
                             handlerMessage.sendMessage(message);
                             i++;
                             break;
                     }
                     Log.d("XXXXXxx", str + " Time :" + (System.currentTimeMillis() - startTime));
-                }
-
-                startMeasure=false;
-                switch (currentPage)
-                {
-                    case 1:
-                        BatchStep2Chart.message.setText(R.string.measure_stop);
-                        BatchStep2Chart.message.setTextColor(Color.RED);
-                        break;
-                    case 2:
-                        break;
                 }
                 socket.close();
                 Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + serverMessage + "'");
@@ -124,10 +157,63 @@ public class TCPClient {
 
         } catch (Exception e) {
             Log.e("TCP", "C: Error", e);
-
+            handlerMessage.sendEmptyMessage(4);
         }
 
     }
+
+
+    public void SensitivityStart()
+    {
+        if(currentPage==1)
+        {
+            SensitivityStep2TimeChart.message.setText(R.string.measure_start);
+            SensitivityStep2TimeChart.message.setTextColor(Color.BLUE);
+        }else if(currentPage==2){
+            SensitivityStep2ConChart.message.setText(R.string.measure_start);
+            SensitivityStep2ConChart.message.setTextColor(Color.BLUE);
+        }
+    }
+
+    public void SensitivityEnd()
+    {
+
+        if(currentPage==1)
+        {
+            SensitivityStep2TimeChart.message.setText(R.string.measure_stop);
+            SensitivityStep2TimeChart.message.setTextColor(Color.RED);
+        }else if(currentPage==2){
+            SensitivityStep2ConChart.message.setText(R.string.measure_stop);
+            SensitivityStep2ConChart.message.setTextColor(Color.RED);
+        }
+        startMeasure=false;
+        handlerMessage.sendEmptyMessage(2);
+    }
+
+
+
+    public  void BatchStart()
+    {
+
+        if(currentPage==1)
+        {
+            BatchStep2Chart.message.setText(R.string.measure_start);
+            BatchStep2Chart.message.setTextColor(Color.BLUE);
+        }
+    }
+
+    public void BatchStop()
+    {
+
+        if(currentPage==1)
+        {
+            BatchStep2Chart.message.setText(R.string.measure_stop);
+            BatchStep2Chart.message.setTextColor(Color.RED);
+        }
+        startMeasure=false;
+        handlerMessage.sendEmptyMessage(2);
+    }
+
 
 
     public byte[] readStream(InputStream inStream) throws Exception {

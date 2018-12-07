@@ -32,6 +32,7 @@ public class SignIn extends Fragment{
     private UserDB userDB;
     private BootstrapButton enter;
     private SharedPreferences sharedPreferences;
+    public static  boolean signIn;
 
     @Override
     public void onAttach(Context context) {
@@ -85,6 +86,7 @@ public class SignIn extends Fragment{
             {
                 userDB.insert(new User(name));
             }
+            signIn=true;
             User user=userDB.findUser(name);
             sharedPreferences.edit().putInt(userId, user.getId()).apply();
             Common.switchFragment(new ChoiceFunction(),getFragmentManager());

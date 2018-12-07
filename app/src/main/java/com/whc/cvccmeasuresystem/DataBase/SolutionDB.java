@@ -34,9 +34,10 @@ public class SolutionDB {
             solution=new Solution();
             solution.setID(cursor.getInt(0));
             solution.setConcentration(cursor.getString(1));
-            solution.setTime(new Timestamp(cursor.getLong(2)));
-            solution.setVoltage(cursor.getInt(3));
-            solution.setSampleID(cursor.getInt(4));
+            solution.setNumber(cursor.getString(2));
+            solution.setTime(new Timestamp(cursor.getLong(3)));
+            solution.setVoltage(cursor.getInt(4));
+            solution.setSampleID(cursor.getInt(5));
             solutions.add(solution);
         }
         cursor.close();
@@ -46,6 +47,7 @@ public class SolutionDB {
     public long insert(Solution solution) {
         ContentValues values = new ContentValues();
         values.put("concentration", solution.getConcentration());
+        values.put("number", solution.getNumber());
         values.put("time", solution.getTime().getTime());
         values.put("voltage", solution.getVoltage());
         values.put("sampleID", solution.getSampleID());
@@ -56,6 +58,7 @@ public class SolutionDB {
         ContentValues values = new ContentValues();
         values.put("id", solution.getID());
         values.put("concentration", solution.getConcentration());
+        values.put("number", solution.getNumber());
         values.put("time", solution.getTime().getTime());
         values.put("voltage", solution.getVoltage());
         values.put("sampleID", solution.getSampleID());
