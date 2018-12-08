@@ -1,8 +1,9 @@
 package com.whc.cvccmeasuresystem.Clent;
 
-import android.app.Fragment;
+
 import android.graphics.Color;
 import android.os.Message;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 
 
@@ -12,13 +13,13 @@ import java.net.Socket;
 import java.nio.charset.Charset;
 import android.os.Handler;
 
-import com.whc.cvccmeasuresystem.Control.BatchStep2Chart;
-import com.whc.cvccmeasuresystem.Control.BatchStep2Main;
-import com.whc.cvccmeasuresystem.Control.BatchStep2Set;
-import com.whc.cvccmeasuresystem.Control.SensitivityStep2ConChart;
-import com.whc.cvccmeasuresystem.Control.SensitivityStep2Main;
-import com.whc.cvccmeasuresystem.Control.SensitivityStep2Set;
-import com.whc.cvccmeasuresystem.Control.SensitivityStep2TimeChart;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Chart;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
+import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2ConChart;
+import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main;
+import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
+import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2TimeChart;
 import com.whc.cvccmeasuresystem.R;
 
 
@@ -36,6 +37,7 @@ public class TCPClient {
     private String measureTime;
     private Handler handlerMessage;
     private Object object;
+    private Socket socket;
 
    private PrintWriter out;
    private BufferedReader in;
@@ -46,9 +48,17 @@ public class TCPClient {
         this.measureTime = measureTime;
         this.handlerMessage = handlerMessage;
         this.object = object;
+        mRun = true;
     }
 
-    public void sendMessage() {
+    public void sendStartMessage() {
+        if (out != null && !out.checkError()) {
+            out.print("D" + ',' + measureTime + ',' + measureDuration + ',');
+            out.flush();
+        }
+    }
+
+    public void sendEndMessage() {
         if (out != null && !out.checkError()) {
             out.print("D" + ',' + measureTime + ',' + measureDuration + ',');
             out.flush();
@@ -58,7 +68,13 @@ public class TCPClient {
     public void cancelTcpClient()
     {
         mRun=false;
-        BatchStop();
+        if(object instanceof BatchStep2Set)
+        {
+            BatchStop();
+        }else if(object instanceof SensitivityStep2Set)
+        {
+            SensitivityEnd();
+        }
     }
 
     public void cancelHomeTcpClient()
@@ -71,7 +87,7 @@ public class TCPClient {
 
     public void run() {
 
-        mRun = true;
+
 
         try {
             //here you must put your computer's IP address.
@@ -80,13 +96,13 @@ public class TCPClient {
             Log.e("TCP Client", "C: Connecting...");
 
             //create a socket to make the connection with the server
-            Socket socket = new Socket(serverAddr, SERVERPORT);
+            socket = new Socket(serverAddr, SERVERPORT);
             socket.setKeepAlive(true);
             try {
 
                 //send the message to the server
                 out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-                sendMessage();
+                sendStartMessage();
                 Log.e("TCP Client", "C: Sent.");
                 Log.e("TCP Client", "C: Done.");
 
@@ -98,6 +114,12 @@ public class TCPClient {
                 int times=Integer.valueOf(measureTime)/Integer.valueOf(measureDuration);
                 Message message;
                 while (mRun) {
+
+                    if(!socket.isConnected())
+                    {
+                        return;
+                    }
+
                     long startTime = System.currentTimeMillis();
                     byte[] bytes = readStream(inTest);
                     String str = new String(bytes, Charset.forName("UTF-8"));
@@ -119,7 +141,7 @@ public class TCPClient {
                             break;
                         case "$D,End,#":
 
-
+                            mRun=false;
                             if(object instanceof BatchStep2Set)
                             {
                                 BatchStop();
@@ -165,11 +187,12 @@ public class TCPClient {
 
     public void SensitivityStart()
     {
-        if(currentPage==1)
+        Fragment fragment= SensitivityStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof  SensitivityStep2TimeChart)
         {
             SensitivityStep2TimeChart.message.setText(R.string.measure_start);
             SensitivityStep2TimeChart.message.setTextColor(Color.BLUE);
-        }else if(currentPage==2){
+        }else if(fragment instanceof  SensitivityStep2ConChart){
             SensitivityStep2ConChart.message.setText(R.string.measure_start);
             SensitivityStep2ConChart.message.setTextColor(Color.BLUE);
         }
@@ -177,25 +200,32 @@ public class TCPClient {
 
     public void SensitivityEnd()
     {
-
-        if(currentPage==1)
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mRun=false;
+        Fragment fragment= SensitivityStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof  SensitivityStep2TimeChart)
         {
             SensitivityStep2TimeChart.message.setText(R.string.measure_stop);
             SensitivityStep2TimeChart.message.setTextColor(Color.RED);
-        }else if(currentPage==2){
+        }else if(fragment instanceof  SensitivityStep2ConChart){
             SensitivityStep2ConChart.message.setText(R.string.measure_stop);
             SensitivityStep2ConChart.message.setTextColor(Color.RED);
         }
         startMeasure=false;
         handlerMessage.sendEmptyMessage(2);
+
     }
 
 
 
     public  void BatchStart()
     {
-
-        if(currentPage==1)
+        Fragment fragment= BatchStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof BatchStep2Chart)
         {
             BatchStep2Chart.message.setText(R.string.measure_start);
             BatchStep2Chart.message.setTextColor(Color.BLUE);
@@ -205,7 +235,14 @@ public class TCPClient {
     public void BatchStop()
     {
 
-        if(currentPage==1)
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mRun=false;
+        Fragment fragment= BatchStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof BatchStep2Chart)
         {
             BatchStep2Chart.message.setText(R.string.measure_stop);
             BatchStep2Chart.message.setTextColor(Color.RED);

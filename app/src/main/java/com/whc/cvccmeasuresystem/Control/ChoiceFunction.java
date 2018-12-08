@@ -5,17 +5,17 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
 
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep1;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
+import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
 import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
@@ -97,6 +97,8 @@ public class ChoiceFunction extends Fragment {
                     switchFragment(fragment,getFragmentManager());
                     break;
                 case 3:
+                    fragment=new HysteresisStep1();
+                    switchFragment(fragment,getFragmentManager());
                     break;
                 case 4:
                     break;

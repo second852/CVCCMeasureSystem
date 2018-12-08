@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control;
+package com.whc.cvccmeasuresystem.Control.Batch;
 
 import android.app.Activity;
 import android.content.Context;

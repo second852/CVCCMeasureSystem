@@ -252,51 +252,26 @@
 
         </LinearLayout>
 
+
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
             android:orientation="horizontal">
-
-            <com.beardedhen.androidbootstrap.AwesomeTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
-                android:gravity="center"
-                android:text="Expected \n measuring time :"
-                android:textSize="18sp"
-                app:bootstrapBrand="primary" />
-
-            <com.beardedhen.androidbootstrap.BootstrapEditText
-                android:id="@+id/measureTime"
-                android:text="2"
+            <com.beardedhen.androidbootstrap.BootstrapDropDown
+                android:id="@+id/loop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="20dp"
-                android:gravity="center"
-                android:hint="60"
-                android:inputType="number"
-                android:singleLine="true"
-                android:textColor="#000000"
-                android:textColorHint="#AAAAAA"
-                app:bootstrapBrand="primary"
-                app:bootstrapSize="md"
-                app:roundedCorners="true" />
-
-            <com.beardedhen.androidbootstrap.BootstrapButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="3dp"
-                android:textColor="#000000"
-                app:bootstrapBrand="regular"
+                app:bootstrapBrand="success"
+                app:bootstrapExpandDirection="up"
                 app:bootstrapSize="sm"
-                app:bootstrapText="min"
-                app:buttonMode="regular"
+                app:bootstrapText="Loop1"
+                app:dropdownResource="@array/loop"
                 app:roundedCorners="true"
-                app:showOutline="false" />
+                app:showOutline="true" />
         </LinearLayout>
 
         <LinearLayout

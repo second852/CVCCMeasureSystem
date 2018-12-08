@@ -12,6 +12,9 @@ import android.view.MenuItem;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
+import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main;
 import com.whc.cvccmeasuresystem.R;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         Fragment fragment = new BatchStep2Main();
         fragment=new SignIn();
+        fragment=new HysteresisStep1();
         switchFragment(fragment, getSupportFragmentManager());
     }
 

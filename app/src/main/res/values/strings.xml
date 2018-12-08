@@ -13,4 +13,12 @@
         <item>X</item>
     </string-array>
 
+    <string-array name="loop">
+        <item>Loop1</item>
+        <item>Loop2</item>
+        <item>Loop3</item>
+        <item>Loop4</item>
+        <item>Loop5</item>
+    </string-array>
+
 </resources>

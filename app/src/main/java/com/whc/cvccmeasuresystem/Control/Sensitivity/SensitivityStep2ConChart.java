@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control;
+package com.whc.cvccmeasuresystem.Control.Sensitivity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,6 +26,7 @@ import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.DoubleToInt;
@@ -34,12 +35,13 @@ import static com.whc.cvccmeasuresystem.Common.Common.*;
 
 
 
-public class SensitivityStep2TimeChart extends Fragment{
+public class SensitivityStep2ConChart extends Fragment{
     private View view;
     private Activity activity;
     private LineChart[] lineCharts;
     private int size;
     public  static  TextView message;
+
 
 
 
@@ -93,26 +95,60 @@ public class SensitivityStep2TimeChart extends Fragment{
             message.setTextColor(Color.RED);
         }
 
-        List<Solution> solutions=dataMap.get(sample1);
-//        Solution solution=new Solution();
-//        solution.setVoltage(200);
-//        solutions.add(solution);
-//        solutions.add(solution);
-        setLineChart(lineCharts[0],solutions,sample1.getName(),"sample1");
 
-        solutions=dataMap.get(sample2);
-        setLineChart(lineCharts[1],solutions,sample2.getName(),"sample2");
 
-        solutions=dataMap.get(sample3);
-        setLineChart(lineCharts[2],solutions,sample3.getName(),"sample3");
 
-        solutions=dataMap.get(sample4);
-        setLineChart(lineCharts[3],solutions,sample4.getName(),"sample4");
+
+        setLineChart(lineCharts[0],volCon.get(sample1),sample1.getName(),"sample1");
+
+
+        setLineChart(lineCharts[1],volCon.get(sample2),sample2.getName(),"sample2");
+//
+//
+        setLineChart(lineCharts[2],volCon.get(sample3),sample3.getName(),"sample3");
+//
+//
+        setLineChart(lineCharts[3],volCon.get(sample4),sample4.getName(),"sample4");
+    }
+
+    private String calculateSlop(List<Entry> entries,List<String> con,String name)
+    {
+
+        double s,r,xAverage=0.0,yAverage=0.0;
+        int size=entries.size();
+        if(size<=1)
+        {
+            return name;
+        }
+        //平均
+        for(int i=0;i<size;i++)
+        {
+            xAverage=xAverage+Double.valueOf(con.get(i));
+            yAverage=yAverage+entries.get(i).getY();
+        }
+        xAverage=xAverage/size;
+        yAverage=yAverage/size;
+        //斜率
+        double xDiff,yDiff,xyTotal=0.0,xTotal=0.0,yTotal=0.0;
+        for(int i=0;i<size;i++)
+        {
+            xDiff=Double.valueOf(con.get(i))-xAverage;
+            yDiff=entries.get(i).getY()-yAverage;
+            xyTotal=xyTotal+xDiff*yDiff;
+            xTotal=xTotal+xDiff*xDiff;
+            yTotal=yTotal+yDiff*yDiff;
+        }
+        s=xyTotal/xTotal;
+        r=xyTotal/(Math.sqrt(xTotal)*Math.sqrt(yTotal));
+        r=Math.sqrt(r);
+        r=r*100;
+        return name+"  "+((int)s)+"mV/pH"+"  "+((int)r)+"%";
     }
 
 
 
-    private void setLineChart(LineChart lineChart, List<Solution> solutions, String name,String describse) {
+    private void setLineChart(LineChart lineChart, HashMap<String,List<Solution>> solutions, String name,String s) {
+        String describe;
         List<Entry> entries = new ArrayList<Entry>();
         size=solutions.size();
         if(size<=0)
@@ -120,10 +156,25 @@ public class SensitivityStep2TimeChart extends Fragment{
             return;
         }
 
-        for (int i=0;i<solutions.size();i++) {
-            entries.add(new Entry(i, solutions.get(i).getVoltage()));
+
+        int i=0;
+        final List<String> ionType=new ArrayList<>();
+        for(String con:solutions.keySet())
+        {
+            int average=0;
+            List<Solution> ss=solutions.get(con);
+            int size=ss.size();
+            for(Solution solution:ss)
+            {
+                average=average+solution.getVoltage();
+            }
+            average=average/size;
+            entries.add(new Entry(i,average));
+            ionType.add(con);
+            i++;
         }
 
+        describe=calculateSlop(entries,ionType,s);
 
         LineDataSet dataSet = new LineDataSet(entries, name);
         dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -147,7 +198,7 @@ public class SensitivityStep2TimeChart extends Fragment{
             public String getFormattedValue(float value, AxisBase axis) {
                 try {
                     int index = (int) value;
-                    return getLabels(size).get(index);
+                    return ionType.get(index);
                 } catch (Exception e) {
                     return " ";
                 }
@@ -155,7 +206,7 @@ public class SensitivityStep2TimeChart extends Fragment{
         });
 
 
-        lineChart.setDescription(description(describse));
+        lineChart.setDescription(description(describe));
         lineChart.setDrawBorders(true);
         lineChart.setData(data);
         lineChart.setDragEnabled(true);
@@ -177,14 +228,6 @@ public class SensitivityStep2TimeChart extends Fragment{
         l.setTextColor(Color.parseColor("#000000"));
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
-    }
-
-    private List<String> getLabels(int size) {
-        List<String> chartLabels = new ArrayList<>();
-        for (int i = 0; i < (size+1); i++) {
-            chartLabels.add( (i+1) + "min");
-        }
-        return chartLabels;
     }
 
 

@@ -3,6 +3,10 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
+            keyAlias 'key'
+            keyPassword 'hearty852'
+            storeFile file('D:/second.jks')
+            storePassword 'hearty852'
         }
     }
     compileSdkVersion 26

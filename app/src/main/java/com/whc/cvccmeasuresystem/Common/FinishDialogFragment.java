@@ -8,10 +8,11 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.Html;
 import android.util.Log;
 
-import com.whc.cvccmeasuresystem.Control.BatchStep2Set;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Set;
+import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
 
 
 /**
@@ -57,14 +58,9 @@ public class FinishDialogFragment extends DialogFragment implements  DialogInter
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        String message=null;
-        String title=null;
+        String  title="Save the records";
+        String message="Do you want to Save the records?";
 
-        if(object instanceof BatchStep2Set)
-        {
-            title="Save the records";
-            message="Do you want to Save the records?";
-        }
 
 
         return new AlertDialog.Builder(getActivity())
@@ -85,6 +81,14 @@ public class FinishDialogFragment extends DialogFragment implements  DialogInter
                 {
                    BatchStep2Set batchStep2Set= (BatchStep2Set) object;
                    batchStep2Set.finishMeasure();
+                }else if(object instanceof SensitivityStep2Set)
+                {
+                    SensitivityStep2Set sensitivityStep2Set= (SensitivityStep2Set) object;
+                    sensitivityStep2Set.finishMeasure();
+                }else if(object instanceof HysteresisStep2Set)
+                {
+                    HysteresisStep2Set hysteresisStep2Set= (HysteresisStep2Set) object;
+                    hysteresisStep2Set.finishMeasure();
                 }
                 break;
             default:

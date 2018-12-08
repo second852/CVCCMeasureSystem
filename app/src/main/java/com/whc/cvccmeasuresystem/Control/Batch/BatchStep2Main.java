@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control;
+package com.whc.cvccmeasuresystem.Control.Batch;
 
 
 import android.app.Activity;
@@ -11,32 +11,36 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+
+
 import android.view.LayoutInflater;
+
 import android.view.View;
 import android.view.ViewGroup;
+
+
+
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItem;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
-import com.whc.cvccmeasuresystem.Clent.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
-import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
 
 
-public class SensitivityStep2Main extends Fragment {
+
+public class BatchStep2Main extends Fragment {
 
 
     private  Activity activity;
@@ -63,7 +67,8 @@ public class SensitivityStep2Main extends Fragment {
             activity=getActivity();
         }
 
-        activity.setTitle("Sensitivity Monitor Step2");
+        //init
+        activity.setTitle("Batch Monitor Step2");
         dataBase=new DataBase(activity);
         solutionDB=new SolutionDB(dataBase.getReadableDatabase());
         if(tcpClient==null)
@@ -81,10 +86,9 @@ public class SensitivityStep2Main extends Fragment {
         viewPagerTab =view.findViewById(R.id.viewPagerTab);
         priceViewPager =  view.findViewById(R.id.batchViewPager);
         FragmentPagerItems pages = new FragmentPagerItems(activity);
-        pages.add(FragmentPagerItem.of("Set", SensitivityStep2Set.class));
-        pages.add(FragmentPagerItem.of("Chart(V-T)", SensitivityStep2TimeChart.class));
-        pages.add(FragmentPagerItem.of("Chart(mV-Ion)", SensitivityStep2ConChart.class));
-        pages.add(FragmentPagerItem.of("Data", SensitivityStep2Data.class));
+        pages.add(FragmentPagerItem.of("Set", BatchStep2Set.class));
+        pages.add(FragmentPagerItem.of("Chart", BatchStep2Chart.class));
+        pages.add(FragmentPagerItem.of("Data", BatchStep2Data.class));
         adapter = new FragmentPagerItemAdapter(getFragmentManager(),pages);
         priceViewPager.setAdapter(adapter);
         priceViewPager.addOnPageChangeListener(new PageListener());
@@ -109,22 +113,22 @@ public class SensitivityStep2Main extends Fragment {
 
 
         //sample 1
-        int sampleID = sharedPreferences.getInt(sample1String, 0);
+        int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
         sample1 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample1,new ArrayList<Solution>());
         samples.add(sample1);
         //sample 2
-        sampleID = sharedPreferences.getInt(sample2String, 0);
+        sampleID = sharedPreferences.getInt(Common.sample2String, 0);
         sample2 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample2,new ArrayList<Solution>());
         samples.add(sample2);
         //sample 3
-        sampleID = sharedPreferences.getInt(sample3String, 0);
+        sampleID = sharedPreferences.getInt(Common.sample3String, 0);
         sample3 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample3,new ArrayList<Solution>());
         samples.add(sample3);
         //sample 4
-        sampleID = sharedPreferences.getInt(sample4String, 0);
+        sampleID = sharedPreferences.getInt(Common.sample4String, 0);
         sample4 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample4,new ArrayList<Solution>());
         samples.add(sample4);
@@ -140,21 +144,17 @@ public class SensitivityStep2Main extends Fragment {
         @Override
         public void onPageSelected(int position) {
             currentPage=position;
-            switch (position)
+            Fragment fragment=adapter.getPage(position);
+
+            if(fragment instanceof  BatchStep2Chart)
             {
-                case 1:
-                    SensitivityStep2TimeChart sensitivityStep2TimeChart= (SensitivityStep2TimeChart) adapter.getPage(1);
-                    sensitivityStep2TimeChart.setData();
-                    break;
-                case 2:
-                    SensitivityStep2ConChart sensitivityStep2ConChart= (SensitivityStep2ConChart) adapter.getPage(2);
-                    sensitivityStep2ConChart.setData();
-                    break;
-                case 3:
-                    SensitivityStep2Data sensitivityStep2Data= (SensitivityStep2Data) adapter.getPage(3);
-                    sensitivityStep2Data.setListView();
-                    break;
+                BatchStep2Chart batchStep2Chart= (BatchStep2Chart) fragment;
+                batchStep2Chart.setData();
+            }else if(fragment instanceof  BatchStep2Data){
+                BatchStep2Data batchStep2Data= (BatchStep2Data) fragment;
+                batchStep2Data.setListView();
             }
+
         }
 
         @Override
@@ -173,7 +173,7 @@ public class SensitivityStep2Main extends Fragment {
 
             if(msg.what==1)
             {
-                SensitivityStep2Main.priceViewPager.setCurrentItem(1);
+                BatchStep2Main.priceViewPager.setCurrentItem(1);
                 Common.showToast(  adapter.getPage(currentPage).getActivity(),"Measurement Start!");
                 return;
             }
@@ -233,26 +233,21 @@ public class SensitivityStep2Main extends Fragment {
 
 
 
-            dataMap.get(sample1).add(solution1);
-            dataMap.get(sample2).add(solution2);
-            dataMap.get(sample3).add(solution3);
-            dataMap.get(sample4).add(solution4);
+           dataMap.get(sample1).add(solution1);
+           dataMap.get(sample2).add(solution2);
+           dataMap.get(sample3).add(solution3);
+           dataMap.get(sample4).add(solution4);
 
 
-            switch (currentPage)
+            Fragment fragment=adapter.getPage(currentPage);
+
+            if(fragment instanceof  BatchStep2Chart)
             {
-                case 1:
-                    SensitivityStep2TimeChart sensitivityStep2TimeChart= (SensitivityStep2TimeChart) adapter.getPage(1);
-                    sensitivityStep2TimeChart.setData();
-                    break;
-                case 2:
-                    SensitivityStep2ConChart sensitivityStep2ConChart= (SensitivityStep2ConChart) adapter.getPage(1);
-                    sensitivityStep2ConChart.setData();
-                    break;
-                case 3:
-                    SensitivityStep2Data sensitivityStep2Data= (SensitivityStep2Data) adapter.getPage(2);
-                    sensitivityStep2Data.setListView();
-                    break;
+                BatchStep2Chart batchStep2Chart= (BatchStep2Chart) fragment;
+                batchStep2Chart.setData();
+            }else if(fragment instanceof  BatchStep2Data){
+                BatchStep2Data batchStep2Data= (BatchStep2Data) fragment;
+                batchStep2Data.setListView();
             }
         }
     };

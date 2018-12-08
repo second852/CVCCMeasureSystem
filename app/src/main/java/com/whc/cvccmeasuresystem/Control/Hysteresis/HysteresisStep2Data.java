@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control;
+package com.whc.cvccmeasuresystem.Control.Hysteresis;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,10 +18,10 @@ import com.whc.cvccmeasuresystem.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.*;
+import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
+import static com.whc.cvccmeasuresystem.Common.Common.samples;
 
-
-public class SensitivityStep2Data extends Fragment{
+public class HysteresisStep2Data extends Fragment{
     private View view;
     private Activity activity;
     private ListView listData;

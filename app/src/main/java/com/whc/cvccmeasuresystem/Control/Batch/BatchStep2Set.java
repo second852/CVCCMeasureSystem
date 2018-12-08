@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control;
+package com.whc.cvccmeasuresystem.Control.Batch;
 
 import android.app.Activity;
 import android.content.Context;
@@ -29,7 +29,6 @@ import com.whc.cvccmeasuresystem.R;
 
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
-import static com.whc.cvccmeasuresystem.Control.BatchStep2Main.*;
 
 
 public class BatchStep2Set extends Fragment {
@@ -104,7 +103,7 @@ public class BatchStep2Set extends Fragment {
     private Runnable measureThread = new Runnable() {
         @Override
         public void run() {
-            tcpClient=new TCPClient("1", mTime, handlerMessage,BatchStep2Set.this);
+            tcpClient=new TCPClient("1", mTime, BatchStep2Main.handlerMessage,BatchStep2Set.this);
             tcpClient.run();
         }
     };

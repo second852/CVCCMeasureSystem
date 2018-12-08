@@ -29,6 +29,7 @@
         app:stl_underlineColor="#00000000"
         app:stl_defaultTabTextSize="18sp"
         app:stl_underlineThickness="0dp"
+        app:stl_defaultTabTextAllCaps="false"
         />
     <android.support.v4.view.ViewPager
         android:id="@+id/batchViewPager"

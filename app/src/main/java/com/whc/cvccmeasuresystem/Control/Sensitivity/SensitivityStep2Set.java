@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control;
+package com.whc.cvccmeasuresystem.Control.Sensitivity;
 
 import android.app.Activity;
 import android.content.Context;
@@ -52,7 +52,7 @@ public class SensitivityStep2Set extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.batch_step2_set, container, false);
+        view = inflater.inflate(R.layout.hysteresis_step2_set, container, false);
         findViewById();
         setIon();
         return view;
@@ -206,8 +206,7 @@ public class SensitivityStep2Set extends Fragment {
                 solutionDB.insert(solutions);
             }
         }
-
-        Common.switchFragment(new BatchStep1(),getFragmentManager());
+        Common.switchFragment(new SensitivityStep1(),getFragmentManager());
         tcpClient=null;
     }
 
@@ -240,8 +239,8 @@ public class SensitivityStep2Set extends Fragment {
                 tcpClient.cancelHomeTcpClient();
                 tcpClient=null;
             }
-            BatchStep1 batchStep1=new BatchStep1();
-            Common.switchFragment(batchStep1,getFragmentManager());
+            SensitivityStep2Set sensitivityStep2Set=new SensitivityStep2Set();
+            Common.switchFragment(sensitivityStep2Set,getFragmentManager());
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control;
+package com.whc.cvccmeasuresystem.Control.Hysteresis;
 
 import android.app.Activity;
 import android.content.Context;
@@ -27,18 +27,28 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.*;
+import static com.whc.cvccmeasuresystem.Common.Common.needInt;
+import static com.whc.cvccmeasuresystem.Common.Common.needName;
+import static com.whc.cvccmeasuresystem.Common.Common.sample1String;
+import static com.whc.cvccmeasuresystem.Common.Common.sample2String;
+import static com.whc.cvccmeasuresystem.Common.Common.sample3String;
+import static com.whc.cvccmeasuresystem.Common.Common.sample4String;
+import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
+import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
+import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
+import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
 
-public class SensitivityStep1 extends Fragment {
+public class HysteresisStep1 extends Fragment {
 
     private View view;
     private Activity activity;
-    private BootstrapEditText firstName, secondName, thirdName, fourthName;
+    private BootstrapEditText firstName, secondName, thirdName, fourthName,point;
     private BootstrapDropDown firstType, secondType, thirdType, fourthType;
     private BootstrapButton next;
     private List<BootstrapText> bootstrapTexts;
     private SharedPreferences sharedPreferences;
+    public static int pointLoop;
 
 
     @Override
@@ -49,7 +59,7 @@ public class SensitivityStep1 extends Fragment {
         } else {
             activity = getActivity();
         }
-        activity.setTitle("Sensitivity Monitor Step1");
+        activity.setTitle("Hysteresis Monitor Step1");
         bootstrapTexts = Common.SolutionTypeBS(activity);
         ((AppCompatActivity)activity).getSupportActionBar().show();
     }
@@ -57,7 +67,7 @@ public class SensitivityStep1 extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.sensitivity_step1, container, false);
+        view = inflater.inflate(R.layout.hysteresis_step1, container, false);
         findViewById();
         return view;
     }
@@ -90,6 +100,7 @@ public class SensitivityStep1 extends Fragment {
         thirdType = view.findViewById(R.id.thirdType);
         fourthType = view.findViewById(R.id.fourthType);
         next = view.findViewById(R.id.next);
+        point=view.findViewById(R.id.point);
     }
 
     private class choiceSolutionType implements BootstrapDropDown.OnDropDownItemClickListener {
@@ -114,7 +125,7 @@ public class SensitivityStep1 extends Fragment {
             String getSecondName = secondName.getText().toString();
             String getThirdName = thirdName.getText().toString();
             String getFourthName = fourthName.getText().toString();
-
+            String getPoint=point.getText().toString();
             //first
             if (getFirstName == null) {
                 firstName.setError(needName);
@@ -159,6 +170,24 @@ public class SensitivityStep1 extends Fragment {
                 return;
             }
 
+            //point
+            if (getPoint == null) {
+                point.setError(needInt);
+                return;
+            }
+            getPoint=getPoint.trim();
+            if (getPoint.length() <= 0) {
+                point.setError(needInt);
+                return;
+            }
+            try {
+                pointLoop=new Integer(getPoint);
+            }catch (Exception e)
+            {
+                point.setError(needInt);
+                return;
+            }
+
 
             DataBase dataBase=new DataBase(activity);
             SaveFileDB saveFileDB=new SaveFileDB(dataBase.getReadableDatabase());
@@ -167,7 +196,7 @@ public class SensitivityStep1 extends Fragment {
             sharedPreferences= activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
             int useId=sharedPreferences.getInt(Common.userId,0);
             SaveFile saveFile=new SaveFile();
-            saveFile.setMeasureType("2");
+            saveFile.setMeasureType("0");
             saveFile.setName(Common.timeToString.format(new Date(System.currentTimeMillis())));
             saveFile.setStatTime(new Timestamp(System.currentTimeMillis()));
             saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
@@ -186,7 +215,13 @@ public class SensitivityStep1 extends Fragment {
             insert(sample3String,getThirdName,thirdType.getText().toString(),nowFile.getID(),sampleDB);
             //Sample 4
             insert(sample4String,getFourthName,fourthType.getText().toString(),nowFile.getID(),sampleDB);
-            switchFragment(new SensitivityStep2Main(),getFragmentManager());
+            switchFragment(new HysteresisStep2Main(),getFragmentManager());
+            if(tcpClient!=null)
+            {
+               tcpClient.cancelHomeTcpClient();
+            }
+            startMeasure=false;
+
         }
     }
 

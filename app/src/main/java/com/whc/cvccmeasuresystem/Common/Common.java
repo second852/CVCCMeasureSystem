@@ -56,7 +56,7 @@ public class Common {
     public static int measureTimes;
     public static TCPClient tcpClient;
     public static boolean finishToSave;
-
+    public static HashMap<Sample,HashMap<String,List<Solution>>> volCon;
 
 
 
@@ -120,6 +120,23 @@ public class Common {
             bootstrapTexts.add(text);
         }
         return bootstrapTexts;
+    }
+
+    public static List<BootstrapText> loopList(Activity activity) {
+        List<BootstrapText> bootstrapTexts = new ArrayList<>();
+        bootstrapTexts.add(createBootstrapText(activity,"Loop1"));
+        bootstrapTexts.add(createBootstrapText(activity,"Loop2"));
+        bootstrapTexts.add(createBootstrapText(activity,"Loop3"));
+        bootstrapTexts.add(createBootstrapText(activity,"Loop4"));
+        bootstrapTexts.add(createBootstrapText(activity,"Loop5"));
+        return bootstrapTexts;
+    }
+
+    public static  BootstrapText createBootstrapText(Activity activity,String s) {
+        BootstrapText text = new BootstrapText.Builder(activity)
+                .addText(s)
+                .build();
+        return text;
     }
 
 
