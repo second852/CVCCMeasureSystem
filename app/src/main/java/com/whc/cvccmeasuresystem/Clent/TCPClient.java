@@ -16,6 +16,10 @@ import android.os.Handler;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Chart;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Chart;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Data;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Set;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2ConChart;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
@@ -28,7 +32,7 @@ import static com.whc.cvccmeasuresystem.Common.Common.*;
 
 public class TCPClient {
 
-    private String serverMessage;
+
     public static final String SERVERIP = "192.168.4.1"; //your computer IP address
     public static final int SERVERPORT = 23;
     private boolean mRun = false;
@@ -40,7 +44,6 @@ public class TCPClient {
     private Socket socket;
 
    private PrintWriter out;
-   private BufferedReader in;
 
 
     public TCPClient(String measureDuration, String measureTime, Handler handlerMessage, Object object) {
@@ -68,6 +71,7 @@ public class TCPClient {
     public void cancelTcpClient()
     {
         mRun=false;
+        startMeasure=false;
         if(object instanceof BatchStep2Set)
         {
             BatchStop();
@@ -106,12 +110,11 @@ public class TCPClient {
                 Log.e("TCP Client", "C: Sent.");
                 Log.e("TCP Client", "C: Done.");
 
-                //receive the message which the server sends back
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 InputStream inTest = socket.getInputStream();
                 //in this while the client listens for the messages sent by the server
                 int i=0;
                 int times=Integer.valueOf(measureTime)/Integer.valueOf(measureDuration);
+                String str;
                 Message message;
                 while (mRun) {
 
@@ -122,7 +125,7 @@ public class TCPClient {
 
                     long startTime = System.currentTimeMillis();
                     byte[] bytes = readStream(inTest);
-                    String str = new String(bytes, Charset.forName("UTF-8"));
+                    str = new String(bytes, Charset.forName("UTF-8"));
                     switch (str)
                     {
                         case "$D,Start,#":
@@ -136,18 +139,26 @@ public class TCPClient {
                             }else if(object instanceof SensitivityStep2Set)
                             {
                                 SensitivityStart();
+                            }else if(object instanceof HysteresisStep2Set)
+                            {
+                                HysteresisStart();
                             }
 
                             break;
                         case "$D,End,#":
 
+                            indicateColor++;
                             mRun=false;
+                            startMeasure=false;
                             if(object instanceof BatchStep2Set)
                             {
                                 BatchStop();
                             }else if(object instanceof SensitivityStep2Set)
                             {
                                 SensitivityEnd();
+                            }else if(object instanceof HysteresisStep2Set)
+                            {
+                                 HysteresisEnd();
                             }
                             break;
 
@@ -155,6 +166,7 @@ public class TCPClient {
                             if(i>times)
                             {
                                 mRun=false;
+                                startMeasure=false;
                             }
                             message=new Message();
                             message.obj=str;
@@ -166,7 +178,7 @@ public class TCPClient {
                     Log.d("XXXXXxx", str + " Time :" + (System.currentTimeMillis() - startTime));
                 }
                 socket.close();
-                Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + serverMessage + "'");
+                Log.e("RESPONSE FROM SERVER", " END");
             } catch (Exception e) {
 
                 Log.e("TCP", "S: Error", e);
@@ -215,7 +227,6 @@ public class TCPClient {
             SensitivityStep2ConChart.message.setText(R.string.measure_stop);
             SensitivityStep2ConChart.message.setTextColor(Color.RED);
         }
-        startMeasure=false;
         handlerMessage.sendEmptyMessage(2);
 
     }
@@ -247,9 +258,29 @@ public class TCPClient {
             BatchStep2Chart.message.setText(R.string.measure_stop);
             BatchStep2Chart.message.setTextColor(Color.RED);
         }
-        startMeasure=false;
         handlerMessage.sendEmptyMessage(2);
     }
+
+
+    public void HysteresisStart()
+    {
+        Fragment fragment= HysteresisStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof HysteresisStep2Chart){
+            HysteresisStep2Chart.message.setText(R.string.measure_start);
+            HysteresisStep2Chart.message.setTextColor(Color.BLUE);
+        }
+    }
+
+    public void HysteresisEnd()
+    {
+        Fragment fragment= HysteresisStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof HysteresisStep2Chart){
+            HysteresisStep2Chart.message.setText(R.string.measure_stop);
+            HysteresisStep2Chart.message.setTextColor(Color.RED);
+        }
+    }
+
+
 
 
 

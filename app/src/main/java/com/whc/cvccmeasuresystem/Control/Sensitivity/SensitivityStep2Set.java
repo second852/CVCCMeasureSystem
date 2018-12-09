@@ -18,6 +18,7 @@ import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
+import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
@@ -52,7 +53,7 @@ public class SensitivityStep2Set extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.hysteresis_step2_set, container, false);
+        view = inflater.inflate(R.layout.batch_step2_set, container, false);
         findViewById();
         setIon();
         return view;
@@ -67,6 +68,38 @@ public class SensitivityStep2Set extends Fragment {
 
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        pageCon=new PageCon();
+        String ionOne = ion1.getText().toString();
+        String ionTwo = ion2.getText().toString();
+        String ionThree = ion3.getText().toString();
+        String ionFour = ion4.getText().toString();
+        String mType=measureTime.getText().toString();
+        if(ionOne!=null)
+        {
+            pageCon.setCon1(ionOne);
+        }
+        if(ionTwo!=null)
+        {
+            pageCon.setCon2(ionTwo);
+        }
+        if(ionTwo!=null)
+        {
+            pageCon.setCon3(ionThree);
+        }
+        if(ionTwo!=null)
+        {
+            pageCon.setCon4(ionFour);
+        }
+        if(mTime!=null)
+        {
+            pageCon.setExpTime(mType);
+        }
+
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         start.setOnClickListener(new startMeasure());
@@ -74,6 +107,29 @@ public class SensitivityStep2Set extends Fragment {
         finish.setOnClickListener(new finishFragment());
         step01.setOnClickListener(new step01OnClick());
         step03.setOnClickListener(new finishFragment());
+        if(pageCon!=null)
+        {
+            if(pageCon.getCon1()!=null)
+            {
+                ion1.setText(pageCon.getCon1());
+            }
+            if(pageCon.getCon2()!=null)
+            {
+                ion2.setText(pageCon.getCon2());
+            }
+            if(pageCon.getCon3()!=null)
+            {
+                ion3.setText(pageCon.getCon3());
+            }
+            if(pageCon.getCon4()!=null)
+            {
+                ion4.setText(pageCon.getCon4());
+            }
+            if(pageCon.getExpTime()!=null)
+            {
+                measureTime.setText(pageCon.getExpTime());
+            }
+        }
     }
 
 
@@ -206,6 +262,8 @@ public class SensitivityStep2Set extends Fragment {
                 solutionDB.insert(solutions);
             }
         }
+        oldFragment.remove(oldFragment.size()-1);
+        needSet=false;
         Common.switchFragment(new SensitivityStep1(),getFragmentManager());
         tcpClient=null;
     }
@@ -217,9 +275,10 @@ public class SensitivityStep2Set extends Fragment {
         public void onClick(View view) {
             if(startMeasure)
             {
-                Common.showToast(activity,meaureStartNotExist);
+                Common.showToast(activity, measureStartNotExist);
                 return;
             }
+            finishToSave=true;
             FinishDialogFragment aa= new FinishDialogFragment();
             aa.setObject(SensitivityStep2Set.this);
             aa.show(getFragmentManager(),"show");
@@ -231,7 +290,7 @@ public class SensitivityStep2Set extends Fragment {
         public void onClick(View view) {
             if(startMeasure)
             {
-                Common.showToast(activity,meaureStartNotExist);
+                Common.showToast(activity, measureStartNotExist);
                 return;
             }
             if(tcpClient!=null)

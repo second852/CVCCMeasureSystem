@@ -4,6 +4,7 @@ package com.whc.cvccmeasuresystem.Control.Batch;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -106,6 +107,7 @@ public class BatchStep2Main extends Fragment {
     private void setSample() {
         dataMap=new HashMap<>();
         samples=new ArrayList<>();
+        choiceColor=new ArrayList<>();
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
 
         dataBase = new DataBase(activity);
@@ -231,7 +233,7 @@ public class BatchStep2Main extends Fragment {
             solution4.setNumber(String.valueOf(measureTimes));
             measureTimes++;
 
-
+            choiceColor.add(Color.parseColor(arrayColor[indicateColor%arrayColor.length]));
 
            dataMap.get(sample1).add(solution1);
            dataMap.get(sample2).add(solution2);

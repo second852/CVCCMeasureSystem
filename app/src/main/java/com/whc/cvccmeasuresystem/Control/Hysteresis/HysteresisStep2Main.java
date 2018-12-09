@@ -4,6 +4,7 @@ package com.whc.cvccmeasuresystem.Control.Hysteresis;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,7 +23,6 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
-import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
@@ -30,17 +30,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static com.whc.cvccmeasuresystem.Common.Common.currentPage;
-import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
-import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4;
-import static com.whc.cvccmeasuresystem.Common.Common.samples;
-import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
-import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+import static com.whc.cvccmeasuresystem.Common.Common.*;
+
 
 
 public class HysteresisStep2Main extends Fragment {
@@ -50,12 +41,11 @@ public class HysteresisStep2Main extends Fragment {
     private SharedPreferences sharedPreferences;
     private SmartTabLayout viewPagerTab;
 
-    private static DataBase dataBase;
-    private static SolutionDB solutionDB;
-
+    private DataBase dataBase;
 
     public static ViewPager priceViewPager;
     public static FragmentPagerItemAdapter adapter;
+    public static int loopIndex;
 
 
     @Override
@@ -70,7 +60,6 @@ public class HysteresisStep2Main extends Fragment {
         //init
         activity.setTitle("Hysteresis Monitor Step2");
         dataBase = new DataBase(activity);
-        solutionDB = new SolutionDB(dataBase.getReadableDatabase());
         if (tcpClient == null) {
             startMeasure = false;
         } else {
@@ -105,7 +94,10 @@ public class HysteresisStep2Main extends Fragment {
     private void setSample() {
         dataMap = new HashMap<>();
         samples = new ArrayList<>();
+        choiceColor=new ArrayList<>();
+        indicateColor=0;
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+
 
         dataBase = new DataBase(activity);
         SampleDB sampleDB = new SampleDB(dataBase.getReadableDatabase());
@@ -219,6 +211,8 @@ public class HysteresisStep2Main extends Fragment {
             solution3.setNumber(String.valueOf(measureTimes));
             solution4.setNumber(String.valueOf(measureTimes));
             measureTimes++;
+
+            choiceColor.add(Color.parseColor(arrayColor[indicateColor%arrayColor.length]));
 
 
             dataMap.get(sample1).add(solution1);

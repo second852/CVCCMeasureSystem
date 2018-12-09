@@ -22,6 +22,9 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 
 import com.whc.cvccmeasuresystem.R;
@@ -98,21 +101,21 @@ public class BatchStep2Chart extends Fragment{
 //        solution.setVoltage(200);
 //        solutions.add(solution);
 //        solutions.add(solution);
-        setLineChart(lineCharts[0],solutions,sample1.getName(),"sample1");
+        setLineChart(lineCharts[0],solutions,sample1);
 
         solutions=dataMap.get(sample2);
-        setLineChart(lineCharts[1],solutions,sample2.getName(),"sample2");
+        setLineChart(lineCharts[1],solutions,sample2);
 
         solutions=dataMap.get(sample3);
-        setLineChart(lineCharts[2],solutions,sample3.getName(),"sample3");
+        setLineChart(lineCharts[2],solutions,sample3);
 
         solutions=dataMap.get(sample4);
-        setLineChart(lineCharts[3],solutions,sample4.getName(),"sample4");
+        setLineChart(lineCharts[3],solutions,sample4);
     }
 
 
 
-    private void setLineChart(LineChart lineChart, List<Solution> solutions, String name,String describse) {
+    private void setLineChart(LineChart lineChart, final List<Solution> solutions, final Sample sample) {
         List<Entry> entries = new ArrayList<Entry>();
         size=solutions.size();
         if(size<=0)
@@ -125,16 +128,22 @@ public class BatchStep2Chart extends Fragment{
         }
 
 
-        LineDataSet dataSet = new LineDataSet(entries, name);
+        LineDataSet dataSet = new LineDataSet(entries, sample.getName());
         dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-        dataSet.setDrawFilled(true);
-        dataSet.setColor(Color.parseColor("#000000"));
-        dataSet.setFillColor(Color.parseColor("#000000"));
-        dataSet.setCircleColor(Color.parseColor("#000000"));
+        dataSet.setDrawFilled(false);
         dataSet.setHighlightEnabled(false);
-        dataSet.setDrawValues(false);
         dataSet.setCircleRadius(3);
         dataSet.setDrawCircleHole(false);
+        dataSet.setDrawValues(true);
+        dataSet.setValueFormatter(new IValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                return sample.getIonType()+solutions.get((int) entry.getX()).getConcentration();
+            }
+        });
+        dataSet.setCircleColors(choiceColor);
+        dataSet.setValueTextSize(12f);
+        dataSet.setColors(choiceColor);
 
 
 
@@ -155,7 +164,7 @@ public class BatchStep2Chart extends Fragment{
         });
 
 
-        lineChart.setDescription(description(describse));
+        lineChart.setDescription(description(sample.getName()));
         lineChart.setDrawBorders(true);
         lineChart.setData(data);
         lineChart.setDragEnabled(true);
@@ -172,9 +181,7 @@ public class BatchStep2Chart extends Fragment{
                 return DoubleToInt(value)+"(mv)";
             }
         });
-        Legend l = lineChart.getLegend();
-        l.setFormSize(12f);
-        l.setTextColor(Color.parseColor("#000000"));
+        lineChart.getLegend().setEnabled(false);
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
     }

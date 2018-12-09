@@ -14,6 +14,7 @@ import android.widget.GridView;
 import android.widget.SimpleAdapter;
 
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep1;
+import com.whc.cvccmeasuresystem.Control.Dift.DriftStep1;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
 import com.whc.cvccmeasuresystem.R;
@@ -22,9 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.whc.cvccmeasuresystem.Common.Common.mainFunctionImage;
-import static com.whc.cvccmeasuresystem.Common.Common.mainFunctionName;
-import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
+import static com.whc.cvccmeasuresystem.Common.Common.*;
+
 
 public class ChoiceFunction extends Fragment {
 
@@ -85,22 +85,35 @@ public class ChoiceFunction extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             Fragment fragment;
+            solution1=null;
+            solution2=null;
+            solution3=null;
+            solution4=null;
+            pageCon=null;
+            oldFragment=new ArrayList<>();
+            needSet=false;
             switch (i){
                 case 0:
                     fragment=new BatchStep1();
                     switchFragment(fragment,getFragmentManager());
+                    oldFragment.add(CFName);
                     break;
                 case 1:
                     break;
                 case 2:
                     fragment=new SensitivityStep1();
                     switchFragment(fragment,getFragmentManager());
+                    oldFragment.add(CFName);
                     break;
                 case 3:
-                    fragment=new HysteresisStep1();
+                    fragment=new DriftStep1();
                     switchFragment(fragment,getFragmentManager());
+                    oldFragment.add(CFName);
                     break;
                 case 4:
+                    fragment=new HysteresisStep1();
+                    switchFragment(fragment,getFragmentManager());
+                    oldFragment.add(CFName);
                     break;
                 case 5:
                     break;

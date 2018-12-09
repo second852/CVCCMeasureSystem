@@ -22,7 +22,9 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.DoubleToInt;
+import static com.whc.cvccmeasuresystem.Common.Common.choiceColor;
 import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
 import static com.whc.cvccmeasuresystem.Common.Common.description;
 import static com.whc.cvccmeasuresystem.Common.Common.sample1;
@@ -120,38 +123,42 @@ public class HysteresisStep2Chart extends Fragment{
 
 
 
-    private void setLineChart(LineChart lineChart, List<Solution> solutions, Sample sample) {
+    private void setLineChart(LineChart lineChart, final List<Solution> solutions, final Sample sample) {
         size=solutions.size();
         if(size<=0)
         {
             return;
         }
 
-        List<ILineDataSet> lineDataSets=new ArrayList<>();
         List<Entry> entries = new ArrayList<Entry>();
         for (int i=0;i<solutions.size();i++) {
-            if(i%pointLoop==0&&i%pointLoop>0)
-            {
-                LineDataSet dataSet = new LineDataSet(entries,sample.getIonType()+solutions.get(i).getConcentration());
-                dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-                dataSet.setDrawFilled(true);
-                dataSet.setColor(Color.parseColor("#000000"));
-                dataSet.setFillColor(Color.parseColor("#000000"));
-                dataSet.setCircleColor(Color.parseColor("#000000"));
-                dataSet.setHighlightEnabled(false);
-                dataSet.setDrawValues(false);
-                dataSet.setCircleRadius(3);
-                dataSet.setDrawCircleHole(false);
-                lineDataSets.add(dataSet);
-                entries = new ArrayList<Entry>();
-            }
+
             entries.add(new Entry(i, solutions.get(i).getVoltage()));
         }
 
 
+        LineDataSet dataSet = new LineDataSet(entries,sample.getName());
+        dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+        dataSet.setHighlightEnabled(false);
+        dataSet.setCircleRadius(3);
+        dataSet.setDrawCircleHole(false);
+        dataSet.setValueFormatter(new IValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                return sample.getIonType()+solutions.get((int) entry.getX()).getConcentration();
+            }
+        });
+        dataSet.setCircleColors(choiceColor);
+        dataSet.setValueTextSize(12f);
+        dataSet.setColors(choiceColor);
+        dataSet.setDrawValues(true);
+        dataSet.setDrawFilled(false);
 
 
-        LineData data = new LineData(lineDataSets);
+
+
+
+        LineData data = new LineData(dataSet);
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setGranularity(1f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -186,8 +193,7 @@ public class HysteresisStep2Chart extends Fragment{
             }
         });
         Legend l = lineChart.getLegend();
-        l.setFormSize(12f);
-        l.setTextColor(Color.parseColor("#000000"));
+        l.setEnabled(false);
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
     }

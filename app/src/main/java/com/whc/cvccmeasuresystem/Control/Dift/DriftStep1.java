@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control.Hysteresis;
+package com.whc.cvccmeasuresystem.Control.Dift;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +16,7 @@ import com.beardedhen.androidbootstrap.BootstrapDropDown;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.beardedhen.androidbootstrap.BootstrapText;
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
@@ -27,19 +28,13 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.Hys1;
-import static com.whc.cvccmeasuresystem.Common.Common.Sen1;
-import static com.whc.cvccmeasuresystem.Common.Common.needInt;
+import static com.whc.cvccmeasuresystem.Common.Common.BS1;
 import static com.whc.cvccmeasuresystem.Common.Common.needName;
 import static com.whc.cvccmeasuresystem.Common.Common.needSet;
 import static com.whc.cvccmeasuresystem.Common.Common.oldFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1;
 import static com.whc.cvccmeasuresystem.Common.Common.sample1String;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2;
 import static com.whc.cvccmeasuresystem.Common.Common.sample2String;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3;
 import static com.whc.cvccmeasuresystem.Common.Common.sample3String;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4;
 import static com.whc.cvccmeasuresystem.Common.Common.sample4String;
 import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
 import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
@@ -47,16 +42,16 @@ import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
 import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
 
-public class HysteresisStep1 extends Fragment {
+public class DriftStep1 extends Fragment {
 
     private View view;
     private Activity activity;
-    private BootstrapEditText firstName, secondName, thirdName, fourthName,point;
+    private BootstrapEditText firstName, secondName, thirdName, fourthName;
     private BootstrapDropDown firstType, secondType, thirdType, fourthType;
     private BootstrapButton next;
     private List<BootstrapText> bootstrapTexts;
     private SharedPreferences sharedPreferences;
-    public static int pointLoop;
+    private Sample sample1,sample2,sample3,sample4;
 
 
     @Override
@@ -67,7 +62,7 @@ public class HysteresisStep1 extends Fragment {
         } else {
             activity = getActivity();
         }
-        activity.setTitle("Hysteresis Monitor Step1");
+        activity.setTitle("Drift Monitor Step1");
         bootstrapTexts = Common.SolutionTypeBS(activity);
         ((AppCompatActivity)activity).getSupportActionBar().show();
     }
@@ -75,7 +70,7 @@ public class HysteresisStep1 extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.hysteresis_step1, container, false);
+        view = inflater.inflate(R.layout.batch_step1, container, false);
         sharedPreferences= activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         findViewById();
         return view;
@@ -131,7 +126,6 @@ public class HysteresisStep1 extends Fragment {
             fourthName.setText(sample4.getName());
             fourthType.setText(sample4.getIonType());
         }
-        point.setText(String.valueOf(pointLoop));
     }
 
     private void setDropDownClick(BootstrapDropDown bootstrapDropDown) {
@@ -151,7 +145,6 @@ public class HysteresisStep1 extends Fragment {
         thirdType = view.findViewById(R.id.thirdType);
         fourthType = view.findViewById(R.id.fourthType);
         next = view.findViewById(R.id.next);
-        point=view.findViewById(R.id.point);
     }
 
     private class choiceSolutionType implements BootstrapDropDown.OnDropDownItemClickListener {
@@ -176,7 +169,7 @@ public class HysteresisStep1 extends Fragment {
             String getSecondName = secondName.getText().toString();
             String getThirdName = thirdName.getText().toString();
             String getFourthName = fourthName.getText().toString();
-            String getPoint=point.getText().toString();
+
             //first
             if (getFirstName == null) {
                 firstName.setError(needName);
@@ -221,24 +214,6 @@ public class HysteresisStep1 extends Fragment {
                 return;
             }
 
-            //point
-            if (getPoint == null) {
-                point.setError(needInt);
-                return;
-            }
-            getPoint=getPoint.trim();
-            if (getPoint.length() <= 0) {
-                point.setError(needInt);
-                return;
-            }
-            try {
-                pointLoop=new Integer(getPoint);
-            }catch (Exception e)
-            {
-                point.setError(needInt);
-                return;
-            }
-
 
             DataBase dataBase=new DataBase(activity);
             SaveFileDB saveFileDB=new SaveFileDB(dataBase.getReadableDatabase());
@@ -251,20 +226,19 @@ public class HysteresisStep1 extends Fragment {
                 update(sample2,getSecondName,secondType.getText().toString(),sampleDB);
                 update(sample3,getThirdName,thirdType.getText().toString(),sampleDB);
                 update(sample4,getFourthName,firstType.getText().toString(),sampleDB);
-            }else{
+
+            }else {
                 //insert File
                 int useId=sharedPreferences.getInt(Common.userId,0);
                 SaveFile saveFile=new SaveFile();
-                saveFile.setMeasureType("4");
+                saveFile.setMeasureType("0");
                 saveFile.setName(Common.timeToString.format(new Date(System.currentTimeMillis())));
                 saveFile.setStatTime(new Timestamp(System.currentTimeMillis()));
                 saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
                 saveFile.setUserId(useId);
                 saveFileDB.insert(saveFile);
-
                 SaveFile nowFile=saveFileDB.findOldSaveFile(saveFile.getName());
                 //insert
-
                 //Sample 1
                 insert(sample1String,getFirstName,firstType.getText().toString(),nowFile.getID(),sampleDB);
                 //Sample 2
@@ -275,17 +249,16 @@ public class HysteresisStep1 extends Fragment {
                 insert(sample4String,getFourthName,fourthType.getText().toString(),nowFile.getID(),sampleDB);
             }
 
-
-            switchFragment(new HysteresisStep2Main(),getFragmentManager());
-            oldFragment.add(Hys1);
+            switchFragment(new BatchStep2Main(),getFragmentManager());
+            oldFragment.add(BS1);
             if(tcpClient!=null)
             {
                tcpClient.cancelHomeTcpClient();
             }
             startMeasure=false;
-
         }
     }
+
 
     public void update(Sample sample,String name,String measureType,SampleDB sampleDB)
     {
@@ -293,6 +266,7 @@ public class HysteresisStep1 extends Fragment {
         sample.setIonType(measureType);
         sampleDB.update(sample);
     }
+
 
 
     public void insert(String saveName,String name,String measureType,int fileID,SampleDB sampleDB)

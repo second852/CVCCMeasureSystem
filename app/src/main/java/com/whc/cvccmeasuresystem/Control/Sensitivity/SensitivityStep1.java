@@ -58,6 +58,7 @@ public class SensitivityStep1 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.sensitivity_step1, container, false);
+        sharedPreferences= activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         findViewById();
         return view;
     }
@@ -70,7 +71,48 @@ public class SensitivityStep1 extends Fragment {
         setDropDownClick(secondType);
         setDropDownClick(thirdType);
         setDropDownClick(fourthType);
+        if(needSet)
+        {
+            setFileName();
+        }
         next.setOnClickListener(new nextStep());
+    }
+
+    private void setFileName() {
+        DataBase dataBase=new DataBase(activity);
+        SampleDB sampleDB=new SampleDB(dataBase.getReadableDatabase());
+        //sample 1
+        int sampleId=sharedPreferences.getInt(sample1String,0);
+        sample1=sampleDB.findOldSample(sampleId);
+        if(sample1!=null)
+        {
+            firstName.setText(sample1.getName());
+            firstType.setText(sample1.getIonType());
+        }
+        //sample 2
+        sampleId=sharedPreferences.getInt(sample2String,0);
+        sample2=sampleDB.findOldSample(sampleId);
+        if(sample2!=null)
+        {
+            secondName.setText(sample2.getName());
+            secondType.setText(sample2.getIonType());
+        }
+        //sample 3
+        sampleId=sharedPreferences.getInt(sample3String,0);
+        sample3=sampleDB.findOldSample(sampleId);
+        if(sample3!=null)
+        {
+            thirdName.setText(sample3.getName());
+            thirdType.setText(sample3.getIonType());
+        }
+        //sample 4
+        sampleId=sharedPreferences.getInt(sample4String,0);
+        sample4=sampleDB.findOldSample(sampleId);
+        if(sample4!=null)
+        {
+            fourthName.setText(sample4.getName());
+            fourthType.setText(sample4.getIonType());
+        }
     }
 
     private void setDropDownClick(BootstrapDropDown bootstrapDropDown) {
@@ -162,35 +204,57 @@ public class SensitivityStep1 extends Fragment {
 
             DataBase dataBase=new DataBase(activity);
             SaveFileDB saveFileDB=new SaveFileDB(dataBase.getReadableDatabase());
-
-            //insert File
-            sharedPreferences= activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-            int useId=sharedPreferences.getInt(Common.userId,0);
-            SaveFile saveFile=new SaveFile();
-            saveFile.setMeasureType("2");
-            saveFile.setName(Common.timeToString.format(new Date(System.currentTimeMillis())));
-            saveFile.setStatTime(new Timestamp(System.currentTimeMillis()));
-            saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
-            saveFile.setUserId(useId);
-            saveFileDB.insert(saveFile);
-
-            SaveFile nowFile=saveFileDB.findOldSaveFile(saveFile.getName());
-            //insert
-
             SampleDB sampleDB=new SampleDB(dataBase.getReadableDatabase());
-            //Sample 1
-            insert(sample1String,getFirstName,firstType.getText().toString(),nowFile.getID(),sampleDB);
-            //Sample 2
-            insert(sample2String,getSecondName,secondType.getText().toString(),nowFile.getID(),sampleDB);
-            //Sample 3
-            insert(sample3String,getThirdName,thirdType.getText().toString(),nowFile.getID(),sampleDB);
-            //Sample 4
-            insert(sample4String,getFourthName,fourthType.getText().toString(),nowFile.getID(),sampleDB);
+
+
+            if(needSet)
+            {
+                //update
+                update(sample1,getFirstName,firstType.getText().toString(),sampleDB);
+                update(sample2,getSecondName,secondType.getText().toString(),sampleDB);
+                update(sample3,getThirdName,thirdType.getText().toString(),sampleDB);
+                update(sample4,getFourthName,firstType.getText().toString(),sampleDB);
+
+            }else{
+                //insert File
+                int useId=sharedPreferences.getInt(Common.userId,0);
+                SaveFile saveFile=new SaveFile();
+                saveFile.setMeasureType("2");
+                saveFile.setName(Common.timeToString.format(new Date(System.currentTimeMillis())));
+                saveFile.setStatTime(new Timestamp(System.currentTimeMillis()));
+                saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
+                saveFile.setUserId(useId);
+                saveFileDB.insert(saveFile);
+
+                SaveFile nowFile=saveFileDB.findOldSaveFile(saveFile.getName());
+                //insert
+
+                //Sample 1
+                insert(sample1String,getFirstName,firstType.getText().toString(),nowFile.getID(),sampleDB);
+                //Sample 2
+                insert(sample2String,getSecondName,secondType.getText().toString(),nowFile.getID(),sampleDB);
+                //Sample 3
+                insert(sample3String,getThirdName,thirdType.getText().toString(),nowFile.getID(),sampleDB);
+                //Sample 4
+                insert(sample4String,getFourthName,fourthType.getText().toString(),nowFile.getID(),sampleDB);
+            }
+
             switchFragment(new SensitivityStep2Main(),getFragmentManager());
+            oldFragment.add(Sen1);
+            if(tcpClient!=null)
+            {
+                tcpClient.cancelHomeTcpClient();
+            }
+            startMeasure=false;
         }
     }
 
-
+    public void update(Sample sample,String name,String measureType,SampleDB sampleDB)
+    {
+        sample.setName(name);
+        sample.setIonType(measureType);
+        sampleDB.update(sample);
+    }
 
 
     public void insert(String saveName,String name,String measureType,int fileID,SampleDB sampleDB)

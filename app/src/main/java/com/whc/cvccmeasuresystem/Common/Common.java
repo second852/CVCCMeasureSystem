@@ -3,6 +3,7 @@ package com.whc.cvccmeasuresystem.Common;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +16,7 @@ import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.beardedhen.androidbootstrap.BootstrapText;
 import com.github.mikephil.charting.components.Description;
 import com.whc.cvccmeasuresystem.Clent.TCPClient;
+import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
@@ -43,8 +45,13 @@ public class Common {
     public static final String sample4String = "sample4";
     public static final String needIon = "Please input this concentration";
     public static final String needInt = "Please input this number";
-    public static final String meaureStartNotExist = "Measuring Now! Please pressure \"Stop\" !";
+    public static final String measureStartNotExist = "Measuring Now! Please pressure \"Stop\" !";
     public static final String fileNotSave = "File don't save! Please pressure \"Finish\" !";
+    public static final String CFName = "ChoiceFunction";
+    public static final String BS1 = "BatchStep1";
+    public static final String Sen1 = "SensitivityStep1";
+    public static final String Hys1 = "HysteresisStep1";
+
 
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;
@@ -57,6 +64,13 @@ public class Common {
     public static TCPClient tcpClient;
     public static boolean finishToSave;
     public static HashMap<Sample,HashMap<String,List<Solution>>> volCon;
+    public static List<Integer> choiceColor;
+    public static String[] arrayColor={"#007bff","#28a745","#fd7e14","#ffc107","#dc3545"};
+    public static int indicateColor;
+    public static PageCon pageCon;
+    public static List<String> oldFragment;
+    public static boolean needSet;
+
 
 
 

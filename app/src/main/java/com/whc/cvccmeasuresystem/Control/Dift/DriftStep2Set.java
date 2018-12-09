@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control.Hysteresis;
+package com.whc.cvccmeasuresystem.Control.Dift;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,14 +11,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 import com.beardedhen.androidbootstrap.BootstrapButton;
-import com.beardedhen.androidbootstrap.BootstrapDropDown;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
-import com.beardedhen.androidbootstrap.BootstrapText;
 import com.whc.cvccmeasuresystem.Clent.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep1;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
@@ -26,51 +25,38 @@ import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
-import java.util.List;
+import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
+import static com.whc.cvccmeasuresystem.Common.Common.finishToSave;
+import static com.whc.cvccmeasuresystem.Common.Common.measureStartNotExist;
+import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
+import static com.whc.cvccmeasuresystem.Common.Common.needInt;
+import static com.whc.cvccmeasuresystem.Common.Common.needSet;
+import static com.whc.cvccmeasuresystem.Common.Common.oldFragment;
+import static com.whc.cvccmeasuresystem.Common.Common.pageCon;
+import static com.whc.cvccmeasuresystem.Common.Common.sample1;
+import static com.whc.cvccmeasuresystem.Common.Common.sample2;
+import static com.whc.cvccmeasuresystem.Common.Common.sample3;
+import static com.whc.cvccmeasuresystem.Common.Common.sample4;
+import static com.whc.cvccmeasuresystem.Common.Common.solution1;
+import static com.whc.cvccmeasuresystem.Common.Common.solution2;
+import static com.whc.cvccmeasuresystem.Common.Common.solution3;
+import static com.whc.cvccmeasuresystem.Common.Common.solution4;
+import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
+import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
+import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
 
-import static com.whc.cvccmeasuresystem.Common.Common.*;
-import static com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main.loopIndex;
 
-
-public class HysteresisStep2Set extends Fragment {
+public class DriftStep2Set extends Fragment {
 
     private View view;
     private Activity activity;
     private BootstrapButton con1, con2, con3, con4, start,stop,finish,step01,step03;
-    private BootstrapEditText ion1, ion2, ion3, ion4;
-    private BootstrapDropDown loop;
-    private List<BootstrapText> bootstrapTexts;
-    public static String[] loopIonType={"7","4","7","10","7"};
+    private BootstrapEditText ion1, ion2, ion3, ion4, measureTime;
+    private String mTime;
 
 
 
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        pageCon=new PageCon();
-        String ionOne = ion1.getText().toString();
-        String ionTwo = ion2.getText().toString();
-        String ionThree = ion3.getText().toString();
-        String ionFour = ion4.getText().toString();
-        if(ionOne!=null)
-        {
-            pageCon.setCon1(ionOne);
-        }
-        if(ionTwo!=null)
-        {
-            pageCon.setCon2(ionTwo);
-        }
-        if(ionTwo!=null)
-        {
-            pageCon.setCon3(ionThree);
-        }
-        if(ionTwo!=null)
-        {
-            pageCon.setCon4(ionFour);
-        }
-
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -80,13 +66,12 @@ public class HysteresisStep2Set extends Fragment {
         } else {
             activity = getActivity();
         }
-        bootstrapTexts=loopList(activity);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.hysteresis_step2_set, container, false);
+        view = inflater.inflate(R.layout.batch_step2_set, container, false);
         findViewById();
         setIon();
         return view;
@@ -108,9 +93,6 @@ public class HysteresisStep2Set extends Fragment {
         finish.setOnClickListener(new finishFragment());
         step01.setOnClickListener(new step01OnClick());
         step03.setOnClickListener(new finishFragment());
-        loop.setOnDropDownItemClickListener(new changeLoop());
-        loop.setText(bootstrapTexts.get(loopIndex));
-
         if(pageCon!=null)
         {
             if(pageCon.getCon1()!=null)
@@ -129,11 +111,43 @@ public class HysteresisStep2Set extends Fragment {
             {
                 ion4.setText(pageCon.getCon4());
             }
-
+            if(pageCon.getExpTime()!=null)
+            {
+                measureTime.setText(pageCon.getExpTime());
+            }
         }
     }
 
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        pageCon=new PageCon();
+        String ionOne = ion1.getText().toString();
+        String ionTwo = ion2.getText().toString();
+        String ionThree = ion3.getText().toString();
+        String ionFour = ion4.getText().toString();
+        String mType=measureTime.getText().toString();
+        if(ionOne!=null)
+        {
+            pageCon.setCon1(ionOne);
+        }
+        if(ionTwo!=null)
+        {
+            pageCon.setCon2(ionTwo);
+        }
+        if(ionTwo!=null)
+        {
+            pageCon.setCon3(ionThree);
+        }
+        if(ionTwo!=null)
+        {
+            pageCon.setCon4(ionFour);
+        }
+        if(mTime!=null)
+        {
+            pageCon.setExpTime(mType);
+        }
+    }
 
     private void findViewById() {
         con1 = view.findViewById(R.id.con1);
@@ -144,39 +158,22 @@ public class HysteresisStep2Set extends Fragment {
         ion2 = view.findViewById(R.id.ion2);
         ion3 = view.findViewById(R.id.ion3);
         ion4 = view.findViewById(R.id.ion4);
+        measureTime = view.findViewById(R.id.measureTime);
         start = view.findViewById(R.id.start);
         stop=view.findViewById(R.id.stop);
         finish=view.findViewById(R.id.finish);
         step01=view.findViewById(R.id.step01);
         step03=view.findViewById(R.id.step03);
-        loop=view.findViewById(R.id.loop);
     }
 
 
     private Runnable measureThread = new Runnable() {
         @Override
         public void run() {
-            tcpClient=new TCPClient("1", String.valueOf(HysteresisStep1.pointLoop), HysteresisStep2Main.handlerMessage,HysteresisStep2Set.this);
+            tcpClient=new TCPClient("1", mTime, BatchStep2Main.handlerMessage,DriftStep2Set.this);
             tcpClient.run();
         }
     };
-
-    public void finishMeasure()
-    {
-        DataBase dataBase=new DataBase(activity);
-        SolutionDB solutionDB=new SolutionDB(dataBase.getReadableDatabase());
-        for(Sample sample:dataMap.keySet())
-        {
-            for (Solution solutions:dataMap.get(sample))
-            {
-                solutionDB.insert(solutions);
-            }
-        }
-        oldFragment.remove(oldFragment.size()-1);
-        needSet=false;
-        Common.switchFragment(new HysteresisStep1(),getFragmentManager());
-        tcpClient=null;
-    }
 
 
 
@@ -196,6 +193,7 @@ public class HysteresisStep2Set extends Fragment {
             String ionTwo = ion2.getText().toString();
             String ionThree = ion3.getText().toString();
             String ionFour = ion4.getText().toString();
+            mTime = measureTime.getText().toString();
             //one
             if (Common.checkViewIon(ion1, ionOne)) {
 
@@ -221,7 +219,23 @@ public class HysteresisStep2Set extends Fragment {
             }
             ionFour = ionFour.trim();
 
+            //measureTime
+            if (mTime == null) {
+                measureTime.setError(needInt);
+                return;
+            }
+            mTime = mTime.trim();
+            if (mTime.length() <= 0) {
+                measureTime.setError(needInt);
+                return;
+            }
+            try {
 
+                new Double(mTime);
+            } catch (Exception e) {
+                measureTime.setError(needInt);
+                return;
+            }
             //check Wifi
             WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(activity.WIFI_SERVICE);
             WifiInfo wifiInfo = wifiManager.getConnectionInfo();
@@ -230,14 +244,11 @@ public class HysteresisStep2Set extends Fragment {
                 Common.showToast(activity, "Please connect BCS_Device");
                 return;
             }
-            //connection
-
+            //conection
             solution1=new Solution(ionOne,sample1.getID());
             solution2=new Solution(ionTwo,sample2.getID());
             solution3=new Solution(ionThree,sample3.getID());
             solution4=new Solution(ionFour,sample4.getID());
-
-
             Common.showToast(activity,"Wifi Connecting");
             measureTimes=0;
             new Thread(measureThread).start();
@@ -255,6 +266,23 @@ public class HysteresisStep2Set extends Fragment {
         }
     }
 
+    public void finishMeasure()
+    {
+        DataBase dataBase=new DataBase(activity);
+        SolutionDB solutionDB=new SolutionDB(dataBase.getReadableDatabase());
+        for(Sample sample:dataMap.keySet())
+        {
+            for (Solution solutions:dataMap.get(sample))
+            {
+                solutionDB.insert(solutions);
+            }
+        }
+        needSet=false;
+        oldFragment.remove(oldFragment.size()-1);
+        switchFragment(new BatchStep1(),getFragmentManager());
+        tcpClient=null;
+    }
+
 
 
     private class finishFragment implements View.OnClickListener {
@@ -267,7 +295,7 @@ public class HysteresisStep2Set extends Fragment {
             }
             finishToSave=true;
             FinishDialogFragment aa= new FinishDialogFragment();
-            aa.setObject(HysteresisStep2Set.this);
+            aa.setObject(DriftStep2Set.this);
             aa.show(getFragmentManager(),"show");
         }
     }
@@ -285,23 +313,8 @@ public class HysteresisStep2Set extends Fragment {
                 tcpClient.cancelHomeTcpClient();
                 tcpClient=null;
             }
-            HysteresisStep1 hysteresisStep1=new HysteresisStep1();
-            Common.switchFragment(hysteresisStep1,getFragmentManager());
+            BatchStep1 batchStep1=new BatchStep1();
+            Common.switchFragment(batchStep1,getFragmentManager());
         }
     }
-
-    private class changeLoop implements BootstrapDropDown.OnDropDownItemClickListener {
-        @Override
-        public void onItemClick(ViewGroup parent, View v, int id) {
-            loopIndex=id;
-            loop.setText(bootstrapTexts.get(id));
-            ion1.setText(loopIonType[id]);
-            ion2.setText(loopIonType[id]);
-            ion3.setText(loopIonType[id]);
-            ion4.setText(loopIonType[id]);
-        }
-    }
-
-
-
 }

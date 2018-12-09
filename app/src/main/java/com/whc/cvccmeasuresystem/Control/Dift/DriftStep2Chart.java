@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control.Sensitivity;
+package com.whc.cvccmeasuresystem.Control.Dift;
 
 import android.app.Activity;
 import android.content.Context;
@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -32,12 +31,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.DoubleToInt;
+import static com.whc.cvccmeasuresystem.Common.Common.choiceColor;
+import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
 import static com.whc.cvccmeasuresystem.Common.Common.description;
-import static com.whc.cvccmeasuresystem.Common.Common.*;
+import static com.whc.cvccmeasuresystem.Common.Common.sample1;
+import static com.whc.cvccmeasuresystem.Common.Common.sample2;
+import static com.whc.cvccmeasuresystem.Common.Common.sample3;
+import static com.whc.cvccmeasuresystem.Common.Common.sample4;
+import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
 
 
-
-public class SensitivityStep2TimeChart extends Fragment{
+public class DriftStep2Chart extends Fragment{
     private View view;
     private Activity activity;
     private LineChart[] lineCharts;
@@ -130,12 +134,11 @@ public class SensitivityStep2TimeChart extends Fragment{
 
         LineDataSet dataSet = new LineDataSet(entries, sample.getName());
         dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+        dataSet.setDrawFilled(false);
         dataSet.setHighlightEnabled(false);
         dataSet.setCircleRadius(3);
         dataSet.setDrawCircleHole(false);
-        dataSet.setDrawFilled(false);
         dataSet.setDrawValues(true);
-
         dataSet.setValueFormatter(new IValueFormatter() {
             @Override
             public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
@@ -145,7 +148,6 @@ public class SensitivityStep2TimeChart extends Fragment{
         dataSet.setCircleColors(choiceColor);
         dataSet.setValueTextSize(12f);
         dataSet.setColors(choiceColor);
-
 
 
 
@@ -183,7 +185,6 @@ public class SensitivityStep2TimeChart extends Fragment{
                 return DoubleToInt(value)+"(mv)";
             }
         });
-
         lineChart.getLegend().setEnabled(false);
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
