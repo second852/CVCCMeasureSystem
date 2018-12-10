@@ -13,6 +13,7 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.AwesomeTextView;
 import com.whc.cvccmeasuresystem.Common.SolutionAdapter;
@@ -34,6 +35,7 @@ public class IonChannelStep2Data extends Fragment{
     private ListView listData;
     private ImageView sample1I,sample2I,sample3I,sample4I;
     private AwesomeTextView sample1N,sample2N,sample3N,sample4N;
+    public TextView senMessage;
 
 
     @Override
@@ -72,7 +74,7 @@ public class IonChannelStep2Data extends Fragment{
         sample4N=view.findViewById(R.id.sample4N);
         sample4I.setImageResource(R.drawable.lighte);
         sample4N.setText(sample4.getName());
-
+        senMessage=view.findViewById(R.id.senMessage);
         listData.setDividerHeight(0);
         return view;
     }
@@ -101,14 +103,20 @@ public class IonChannelStep2Data extends Fragment{
             {
                 sample1I.setImageResource(R.drawable.lighto);
                 sample1I.startAnimation(animation);
-                sample1N.setText(sample1.getName()+"\n Too High");
+                solution.setNoNormalV(true);
             }
             if(solution.getVoltage()<Integer.valueOf(sample1.getLimitLowVoltage()))
             {
                 sample1I.setImageResource(R.drawable.lighto);
                 sample1I.startAnimation(animation);
-                sample1N.setText(sample1.getName()+"\n Too Low");
+                solution.setNoNormalV(true);
             }
+
+            if(solution.isNoNormalV())
+            {
+                IonChannelStep2Main.errorSample.add(sample1String);
+            }
+
             solutions.add(solution);
         }
 
@@ -119,13 +127,18 @@ public class IonChannelStep2Data extends Fragment{
             {
                 sample2I.setImageResource(R.drawable.lighto);
                 sample2I.startAnimation(animation);
-                sample2N.setText(sample2.getName()+"\nToo High");
+                solution.setNoNormalV(true);
             }
             if(solution.getVoltage()<Integer.valueOf(sample2.getLimitLowVoltage()))
             {
                 sample2I.setImageResource(R.drawable.lighto);
                 sample2I.startAnimation(animation);
-                sample2N.setText(sample2.getName()+"\nToo Lower");
+                solution.setNoNormalV(true);
+            }
+
+            if(solution.isNoNormalV())
+            {
+                IonChannelStep2Main.errorSample.add(sample2String);
             }
             solutions.add(solution);
         }
@@ -137,13 +150,20 @@ public class IonChannelStep2Data extends Fragment{
             {
                 sample3I.setImageResource(R.drawable.lighto);
                 sample3I.startAnimation(animation);
-                sample3N.setText(sample3.getName()+"\nToo High");
+                sample3N.setText(sample3.getName());
+                solution.setNoNormalV(true);
             }
             if(solution.getVoltage()<Integer.valueOf(sample3.getLimitLowVoltage()))
             {
                 sample3I.setImageResource(R.drawable.lighto);
                 sample3I.startAnimation(animation);
-                sample3N.setText(sample3.getName()+"\nToo Low");
+                sample3N.setText(sample3.getName());
+                solution.setNoNormalV(true);
+            }
+
+            if(solution.isNoNormalV())
+            {
+                IonChannelStep2Main.errorSample.add(sample3String);
             }
             solutions.add(solution);
         }
@@ -155,13 +175,20 @@ public class IonChannelStep2Data extends Fragment{
             {
                 sample4I.setImageResource(R.drawable.lighto);
                 sample4I.startAnimation(animation);
-                sample4N.setText(sample4.getName()+"\nToo High");
+                sample4N.setText(sample4.getName());
+                solution.setNoNormalV(true);
             }
             if(solution.getVoltage()<Integer.valueOf(sample4.getLimitLowVoltage()))
             {
                 sample4I.setImageResource(R.drawable.lighto);
                 sample4I.startAnimation(animation);
-                sample4N.setText(sample4.getName()+"\nToo Low");
+                sample4N.setText(sample4.getName());
+                solution.setNoNormalV(true);
+            }
+
+            if(solution.isNoNormalV())
+            {
+                IonChannelStep2Main.errorSample.add(sample4String);
             }
             solutions.add(solution);
         }

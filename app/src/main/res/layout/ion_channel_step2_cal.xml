@@ -305,6 +305,19 @@
                     app:buttonMode="regular"
                     app:roundedCorners="true"
                     app:showOutline="false" />
+                <com.beardedhen.androidbootstrap.BootstrapButton
+                    android:id="@+id/clearF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="20dp"
+                    android:textColor="#000000"
+                    app:bootstrapBrand="warning"
+                    app:bootstrapSize="md"
+                    app:bootstrapText="clear"
+                    app:buttonMode="regular"
+                    app:roundedCorners="true"
+                    app:showOutline="false" />
             </LinearLayout>
         </LinearLayout>
 
@@ -538,6 +551,19 @@
                     app:bootstrapBrand="danger"
                     app:bootstrapSize="md"
                     app:bootstrapText="stop"
+                    app:buttonMode="regular"
+                    app:roundedCorners="true"
+                    app:showOutline="false" />
+                <com.beardedhen.androidbootstrap.BootstrapButton
+                    android:id="@+id/clearS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="20dp"
+                    android:textColor="#000000"
+                    app:bootstrapBrand="warning"
+                    app:bootstrapSize="md"
+                    app:bootstrapText="clear"
                     app:buttonMode="regular"
                     app:roundedCorners="true"
                     app:showOutline="false" />

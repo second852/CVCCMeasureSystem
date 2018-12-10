@@ -16,6 +16,7 @@ public class Sample {
     private String limitHighVoltage;
     private String limitLowVoltage;
 
+
     public String getSlope() {
         return slope;
     }

@@ -1,6 +1,7 @@
 package com.whc.cvccmeasuresystem.Common;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,6 +76,12 @@ public class SolutionAdapterIonChannel extends BaseAdapter {
             sampleIon.setText(sample.getIonType()+solution.getConcentration());
             sampleIVol.setText(String.valueOf(solution.getVoltage()));
             dateTime.setText(Common.timeToString.format(new Date(solution.getTime().getTime())));
+            if(solution.isNoNormalV())
+            {
+                sampleIVol.setTextColor(Color.RED);
+            }else {
+                sampleIVol.setTextColor(Color.BLACK);
+            }
         }
         times.setBackground(drawable);
         sampleName.setBackground(drawable);

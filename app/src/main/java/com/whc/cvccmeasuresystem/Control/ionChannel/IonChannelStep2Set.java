@@ -26,6 +26,8 @@ import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
+import java.util.HashMap;
+
 import static com.whc.cvccmeasuresystem.Common.Common.IonChannel2Set;
 import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
 import static com.whc.cvccmeasuresystem.Common.Common.finishToSave;
@@ -53,7 +55,7 @@ public class IonChannelStep2Set extends Fragment {
     private View view;
     private Activity activity;
     private BootstrapButton conF1, conF2, conF3, conF4, startF, stopF, step01;
-    private BootstrapButton conS1, conS2, conS3, conS4, startS, stopS, next, warring;
+    private BootstrapButton conS1, conS2, conS3, conS4, startS, stopS, next, warring,clearF,clearS;
     private BootstrapEditText ionF1, ionF2, ionF3, ionF4;
     private BootstrapEditText ionS1, ionS2, ionS3, ionS4;
 
@@ -157,6 +159,8 @@ public class IonChannelStep2Set extends Fragment {
         stopS.setOnClickListener(new stopMeasure());
         step01.setOnClickListener(new step01OnClick());
         warring.setOnClickListener(new waringOnClick());
+        clearF.setOnClickListener(new clearData());
+        clearS.setOnClickListener(new clearData());
     }
 
 
@@ -197,6 +201,9 @@ public class IonChannelStep2Set extends Fragment {
         step01 = view.findViewById(R.id.step01);
         next = view.findViewById(R.id.next);
         warring = view.findViewById(R.id.warning);
+
+        clearF=view.findViewById(R.id.clearF);
+        clearS=view.findViewById(R.id.clearS);
     }
 
 
@@ -216,6 +223,25 @@ public class IonChannelStep2Set extends Fragment {
             //防止重複量測
             if (startMeasure) {
                 Common.showToast(activity, "Please wait util this measurement stop ");
+                return;
+            }
+
+            if(IonChannelStep2Main.errorSample.size()>0)
+            {
+                StringBuilder stringBuilder=new StringBuilder();
+                stringBuilder.append("Data of");
+                for(String error:IonChannelStep2Main.errorSample)
+                {
+                    stringBuilder.append(error);
+                }
+                if(IonChannelStep2Main.errorSample.size()>1)
+                {
+                    stringBuilder.append("are unusual");
+                }else {
+                    stringBuilder.append("is unusual");
+                }
+                stringBuilder.append(",Please check limit data or sample,and pressure \"clear\"");
+                Common.showToast(activity,stringBuilder.toString());
                 return;
             }
 
@@ -471,6 +497,14 @@ public class IonChannelStep2Set extends Fragment {
             }
             switchFragment(new IonChannelStep2Limit(),getFragmentManager());
             oldFragment.add(IonChannel2Set);
+        }
+    }
+
+    private class clearData implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            dataMap=new HashMap<>();
+            Common.showToast(activity,"Data clear!");
         }
     }
 }

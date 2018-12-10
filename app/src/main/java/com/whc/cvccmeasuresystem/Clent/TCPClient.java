@@ -157,6 +157,9 @@ public class TCPClient {
                             }else if(object instanceof DriftStep2Set)
                             {
                                 DriftStart();
+                            }else if(object instanceof IonChannelStep2Set)
+                            {
+                                IonChannelStep2Start();
                             }
                             break;
                         case "$D,End,#":
@@ -175,6 +178,9 @@ public class TCPClient {
                             }else if(object instanceof DriftStep2Set)
                             {
                                 DriftEnd();
+                            }else if(object instanceof IonChannelStep2Set)
+                            {
+                                IonChannelStep2Stop();
                             }
                             break;
 
@@ -250,7 +256,16 @@ public class TCPClient {
 
     }
 
-
+    public  void IonChannelStep2Start()
+    {
+        Fragment fragment= IonChannelStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof IonChannelStep2Data)
+        {
+            IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
+            ionChannelStep2Data.senMessage.setTextColor(Color.RED);
+            ionChannelStep2Data.senMessage.setText(R.string.measure_stop);
+        }
+    }
 
     public void IonChannelStep2Stop()
     {
@@ -265,7 +280,9 @@ public class TCPClient {
         Fragment fragment= IonChannelStep2Main.adapter.getPage(currentPage);
         if(fragment instanceof IonChannelStep2Data)
         {
-
+            IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
+            ionChannelStep2Data.senMessage.setTextColor(Color.RED);
+            ionChannelStep2Data.senMessage.setText(R.string.measure_stop);
         }
         handlerMessage.sendEmptyMessage(2);
     }

@@ -6,12 +6,21 @@ import java.util.Comparator;
 
 public class Solution implements Serializable{
 
-    private int ID;//DB ID
-    private String number;// measure times
-    private String concentration;// pH7 for 7
-    private Timestamp time;//Time of read voltage
-    private Integer voltage;// read Voltage
-    private int sampleID;//  measure Sample
+    private int ID;//0 DB ID
+    private String number;//1 measure times
+    private String concentration;//2 pH7 for 7
+    private Timestamp time;//3 Time of read voltage
+    private Integer voltage;//4 read Voltage
+    private int sampleID;//5  measure Sample
+    private boolean noNormalV;//6 normal
+
+    public boolean isNoNormalV() {
+        return noNormalV;
+    }
+
+    public void setNoNormalV(boolean noNormalV) {
+        this.noNormalV = noNormalV;
+    }
 
     public Solution(String concentration, int sampleID) {
         this.concentration = concentration;

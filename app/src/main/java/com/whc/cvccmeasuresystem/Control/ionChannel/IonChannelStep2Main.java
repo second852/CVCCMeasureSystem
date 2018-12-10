@@ -33,6 +33,7 @@ import com.whc.cvccmeasuresystem.R;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.arrayColor;
 import static com.whc.cvccmeasuresystem.Common.Common.choiceColor;
@@ -54,59 +55,53 @@ import static com.whc.cvccmeasuresystem.Common.Common.volCon;
 public class IonChannelStep2Main extends Fragment {
 
 
-    private  Activity activity;
+    private Activity activity;
     private SharedPreferences sharedPreferences;
-    private  SmartTabLayout viewPagerTab;
-
-    private static DataBase dataBase;
-    private static SolutionDB solutionDB;
+    private SmartTabLayout viewPagerTab;
+    private DataBase dataBase;
 
 
     public static ViewPager priceViewPager;
     public static FragmentPagerItemAdapter adapter;
-
-
+    public static List<String> errorSample;
 
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof Activity)
-        {
-            activity=(Activity) context;
-        }else{
-            activity=getActivity();
+        if (context instanceof Activity) {
+            activity = (Activity) context;
+        } else {
+            activity = getActivity();
         }
 
         //init
         activity.setTitle("Ion Channel Monitor Step2");
-        dataBase=new DataBase(activity);
-        solutionDB=new SolutionDB(dataBase.getReadableDatabase());
-        if(tcpClient==null)
-        {
-            startMeasure=false;
-        }else{
-            startMeasure=true;
+        dataBase = new DataBase(activity);
+        if (tcpClient == null) {
+            startMeasure = false;
+        } else {
+            startMeasure = true;
         }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        dataMap=null;
-        volCon=null;
+        dataMap = null;
+        volCon = null;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final View view = inflater.inflate(R.layout.batch_step2_main, container, false);
-        viewPagerTab =view.findViewById(R.id.viewPagerTab);
-        priceViewPager =  view.findViewById(R.id.batchViewPager);
+        viewPagerTab = view.findViewById(R.id.viewPagerTab);
+        priceViewPager = view.findViewById(R.id.batchViewPager);
         FragmentPagerItems pages = new FragmentPagerItems(activity);
         pages.add(FragmentPagerItem.of("Set", IonChannelStep2Set.class));
         pages.add(FragmentPagerItem.of("Data", IonChannelStep2Data.class));
-        adapter = new FragmentPagerItemAdapter(getFragmentManager(),pages);
+        adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
         priceViewPager.setAdapter(adapter);
         priceViewPager.addOnPageChangeListener(new PageListener());
         viewPagerTab.setViewPager(priceViewPager);
@@ -121,8 +116,9 @@ public class IonChannelStep2Main extends Fragment {
     }
 
     private void setSample() {
-        dataMap=new HashMap<>();
-        samples=new ArrayList<>();
+        dataMap = new HashMap<>();
+        samples = new ArrayList<>();
+        errorSample=new ArrayList<>();
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         dataBase = new DataBase(activity);
         SampleDB sampleDB = new SampleDB(dataBase.getReadableDatabase());
@@ -131,22 +127,22 @@ public class IonChannelStep2Main extends Fragment {
         //sample 1
         int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
         sample1 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample1,new ArrayList<Solution>());
+        dataMap.put(sample1, new ArrayList<Solution>());
         samples.add(sample1);
         //sample 2
         sampleID = sharedPreferences.getInt(Common.sample2String, 0);
         sample2 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample2,new ArrayList<Solution>());
+        dataMap.put(sample2, new ArrayList<Solution>());
         samples.add(sample2);
         //sample 3
         sampleID = sharedPreferences.getInt(Common.sample3String, 0);
         sample3 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample3,new ArrayList<Solution>());
+        dataMap.put(sample3, new ArrayList<Solution>());
         samples.add(sample3);
         //sample 4
         sampleID = sharedPreferences.getInt(Common.sample4String, 0);
         sample4 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample4,new ArrayList<Solution>());
+        dataMap.put(sample4, new ArrayList<Solution>());
         samples.add(sample4);
     }
 
@@ -159,15 +155,14 @@ public class IonChannelStep2Main extends Fragment {
 
         @Override
         public void onPageSelected(int position) {
-            currentPage=position;
-            Fragment fragment=adapter.getPage(position);
+            currentPage = position;
+            Fragment fragment = adapter.getPage(position);
 
-            if(fragment instanceof  BatchStep2Chart)
-            {
-                BatchStep2Chart batchStep2Chart= (BatchStep2Chart) fragment;
+            if (fragment instanceof BatchStep2Chart) {
+                BatchStep2Chart batchStep2Chart = (BatchStep2Chart) fragment;
                 batchStep2Chart.setData();
-            }else if(fragment instanceof  BatchStep2Data){
-                BatchStep2Data batchStep2Data= (BatchStep2Data) fragment;
+            } else if (fragment instanceof BatchStep2Data) {
+                BatchStep2Data batchStep2Data = (BatchStep2Data) fragment;
                 batchStep2Data.setListView();
             }
 
@@ -185,54 +180,46 @@ public class IonChannelStep2Main extends Fragment {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             //data 處理
-            int currentPage=priceViewPager.getCurrentItem();
+            int currentPage = priceViewPager.getCurrentItem();
 
-            if(msg.what==1)
-            {
+            if (msg.what == 1) {
                 IonChannelStep2Main.priceViewPager.setCurrentItem(1);
-                Common.showToast(  adapter.getPage(currentPage).getActivity(),"Measurement Start!");
+                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
                 return;
             }
 
-            if(msg.what==2)
-            {
-                Common.showToast(  adapter.getPage(currentPage).getActivity(),"Measurement End!");
+            if (msg.what == 2) {
+                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
 
-            if(msg.what==4)
-            {
-                Common.showToast(adapter.getPage(currentPage).getActivity(),"Connecting fail! \n Please Reboot WiFi and \n Pressure \"Start\" again!");
+            if (msg.what == 4) {
+                Common.showToast(adapter.getPage(currentPage).getActivity(), "Connecting fail! \n Please Reboot WiFi and \n Pressure \"Start\" again!");
                 return;
             }
 
 
-
-
-            String result= (String) msg.obj;
-            String[] voltages=result.split(",");
+            String result = (String) msg.obj;
+            String[] voltages = result.split(",");
             try {
                 new Integer(voltages[2]);
-            }catch (Exception e)
-            {
+            } catch (Exception e) {
                 return;
             }
 
 
+            Solution solution1 = new Solution(Common.solution1.getConcentration(), sample1.getID());
+            Solution solution2 = new Solution(Common.solution2.getConcentration(), sample2.getID());
+            Solution solution3 = new Solution(Common.solution3.getConcentration(), sample3.getID());
+            Solution solution4 = new Solution(Common.solution4.getConcentration(), sample4.getID());
 
-            Solution solution1=new Solution(Common.solution1.getConcentration(),sample1.getID());
-            Solution solution2=new Solution(Common.solution2.getConcentration(),sample2.getID());
-            Solution solution3=new Solution(Common.solution3.getConcentration(),sample3.getID());
-            Solution solution4=new Solution(Common.solution4.getConcentration(),sample4.getID());
 
-
-            Timestamp timestamp=new Timestamp(System.currentTimeMillis());
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
             solution1.setVoltage(new Integer(voltages[1]));
             solution2.setVoltage(new Integer(voltages[2]));
             solution3.setVoltage(new Integer(voltages[3]));
             solution4.setVoltage(new Integer(voltages[4]));
-
 
 
             solution1.setTime(timestamp);
@@ -247,23 +234,20 @@ public class IonChannelStep2Main extends Fragment {
             solution4.setNumber(String.valueOf(measureTimes));
 
 
-           dataMap.get(sample1).add(solution1);
-           dataMap.get(sample2).add(solution2);
-           dataMap.get(sample3).add(solution3);
-           dataMap.get(sample4).add(solution4);
+            dataMap.get(sample1).add(solution1);
+            dataMap.get(sample2).add(solution2);
+            dataMap.get(sample3).add(solution3);
+            dataMap.get(sample4).add(solution4);
 
 
-            Fragment fragment=adapter.getPage(currentPage);
+            Fragment fragment = adapter.getPage(currentPage);
 
-            if(fragment instanceof  IonChannelStep2Data)
-            {
-                IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
+            if (fragment instanceof IonChannelStep2Data) {
+                IonChannelStep2Data ionChannelStep2Data = (IonChannelStep2Data) fragment;
                 ionChannelStep2Data.setListView();
             }
         }
     };
-
-
 
 
 }
