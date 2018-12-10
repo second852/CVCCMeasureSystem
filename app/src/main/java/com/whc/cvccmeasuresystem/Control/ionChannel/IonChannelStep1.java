@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control.Batch;
+package com.whc.cvccmeasuresystem.Control.ionChannel;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +16,7 @@ import com.beardedhen.androidbootstrap.BootstrapDropDown;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.beardedhen.androidbootstrap.BootstrapText;
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
@@ -27,11 +28,23 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+import static com.whc.cvccmeasuresystem.Common.Common.BS1;
+import static com.whc.cvccmeasuresystem.Common.Common.IonChannel1;
+import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
+import static com.whc.cvccmeasuresystem.Common.Common.needName;
+import static com.whc.cvccmeasuresystem.Common.Common.needSet;
+import static com.whc.cvccmeasuresystem.Common.Common.oldFragment;
+import static com.whc.cvccmeasuresystem.Common.Common.sample1String;
+import static com.whc.cvccmeasuresystem.Common.Common.sample2String;
+import static com.whc.cvccmeasuresystem.Common.Common.sample3String;
+import static com.whc.cvccmeasuresystem.Common.Common.sample4String;
+import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
+import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
+import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
+import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
-import static com.whc.cvccmeasuresystem.Common.Common.*;
 
-
-public class BatchStep1 extends Fragment {
+public class IonChannelStep1 extends Fragment {
 
     private View view;
     private Activity activity;
@@ -51,7 +64,7 @@ public class BatchStep1 extends Fragment {
         } else {
             activity = getActivity();
         }
-        activity.setTitle("Batch Monitor Step1");
+        activity.setTitle("Ion Channel Monitor Step1");
         bootstrapTexts = Common.SolutionTypeBS(activity);
         ((AppCompatActivity)activity).getSupportActionBar().show();
     }
@@ -59,7 +72,7 @@ public class BatchStep1 extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.batch_step1, container, false);
+        view = inflater.inflate(R.layout.ion_channel_step1, container, false);
         sharedPreferences= activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         findViewById();
         return view;
@@ -220,7 +233,7 @@ public class BatchStep1 extends Fragment {
                 //insert File
                 int useId=sharedPreferences.getInt(Common.userId,0);
                 SaveFile saveFile=new SaveFile();
-                saveFile.setMeasureType("0");
+                saveFile.setMeasureType("1");
                 saveFile.setName(Common.timeToString.format(new Date(System.currentTimeMillis())));
                 saveFile.setStatTime(new Timestamp(System.currentTimeMillis()));
                 saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
@@ -238,8 +251,8 @@ public class BatchStep1 extends Fragment {
                 insert(sample4String,getFourthName,fourthType.getText().toString(),nowFile.getID(),sampleDB);
             }
 
-            switchFragment(new BatchStep2Main(),getFragmentManager());
-            oldFragment.add(BS1);
+            switchFragment(new IonChannelStep2Main(),getFragmentManager());
+            oldFragment.add(IonChannel1);
             if(tcpClient!=null)
             {
                tcpClient.cancelHomeTcpClient();

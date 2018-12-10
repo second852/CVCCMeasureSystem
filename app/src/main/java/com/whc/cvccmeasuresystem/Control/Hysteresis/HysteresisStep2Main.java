@@ -68,6 +68,12 @@ public class HysteresisStep2Main extends Fragment {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        dataMap=null;
+        volCon=null;
+    }
+    @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final View view = inflater.inflate(R.layout.batch_step2_main, container, false);

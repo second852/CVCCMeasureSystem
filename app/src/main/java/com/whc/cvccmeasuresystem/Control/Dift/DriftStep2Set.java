@@ -16,6 +16,7 @@ import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.whc.cvccmeasuresystem.Clent.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
+import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep1;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
@@ -93,6 +94,7 @@ public class DriftStep2Set extends Fragment {
         finish.setOnClickListener(new finishFragment());
         step01.setOnClickListener(new step01OnClick());
         step03.setOnClickListener(new finishFragment());
+        measureTime.setText(String.valueOf(720));
         if(pageCon!=null)
         {
             if(pageCon.getCon1()!=null)
@@ -170,7 +172,7 @@ public class DriftStep2Set extends Fragment {
     private Runnable measureThread = new Runnable() {
         @Override
         public void run() {
-            tcpClient=new TCPClient("1", mTime, BatchStep2Main.handlerMessage,DriftStep2Set.this);
+            tcpClient=new TCPClient("1", mTime, DriftStep2Main.handlerMessage,DriftStep2Set.this);
             tcpClient.run();
         }
     };
@@ -258,11 +260,9 @@ public class DriftStep2Set extends Fragment {
     private class stopMeasure implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            if(tcpClient!=null)
-            {
-                tcpClient.cancelTcpClient();
-                tcpClient=null;
-            }
+            StopDialogFragment aa= new StopDialogFragment();
+            aa.setObject(DriftStep2Set.this);
+            aa.show(getFragmentManager(),"show");
         }
     }
 
@@ -279,7 +279,7 @@ public class DriftStep2Set extends Fragment {
         }
         needSet=false;
         oldFragment.remove(oldFragment.size()-1);
-        switchFragment(new BatchStep1(),getFragmentManager());
+        switchFragment(new DriftStep1(),getFragmentManager());
         tcpClient=null;
     }
 
@@ -313,8 +313,7 @@ public class DriftStep2Set extends Fragment {
                 tcpClient.cancelHomeTcpClient();
                 tcpClient=null;
             }
-            BatchStep1 batchStep1=new BatchStep1();
-            Common.switchFragment(batchStep1,getFragmentManager());
+            Common.switchFragment(new DriftStep1(),getFragmentManager());
         }
     }
 }

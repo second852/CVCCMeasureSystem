@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.logging.SimpleFormatter;
 
 import static com.beardedhen.androidbootstrap.font.FontAwesome.FA_CALCULATOR;
+import static com.beardedhen.androidbootstrap.font.FontAwesome.FA_LIGHTBULB_O;
+import static com.beardedhen.androidbootstrap.font.FontAwesome.FA_SAVE;
 import static com.beardedhen.androidbootstrap.font.FontAwesome.FA_SIGN_IN;
 
 public class Common {
@@ -51,6 +53,9 @@ public class Common {
     public static final String BS1 = "BatchStep1";
     public static final String Sen1 = "SensitivityStep1";
     public static final String Hys1 = "HysteresisStep1";
+    public static final String Drift1 = "Drift";
+    public static final String IonChannel1 = "IonChannel1";
+    public static final String IonChannel2Set = "IonChannel2Set";
 
 
     //measure constant
@@ -175,6 +180,29 @@ public class Common {
             return true;
         }
         return false;
+    }
+
+
+    //error true
+    public static String checkViewInteger(BootstrapEditText view, String s) {
+        //過濾是否空白
+        if (s == null) {
+            view.setError(needIon);
+            return null;
+        }
+        s = s.trim();
+        if (s.length() <= 0) {
+            view.setError(needIon);
+            return null;
+        }
+        //過濾 數字
+        try {
+            new Double(s);
+        } catch (Exception e) {
+            view.setError(needInt);
+            return null;
+        }
+        return s;
     }
 
     public static void showToast(Context context, String message) {

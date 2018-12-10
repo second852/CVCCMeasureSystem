@@ -15,8 +15,11 @@ import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.OutDialogFragment;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep1;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
+import com.whc.cvccmeasuresystem.Control.Dift.DriftStep1;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep1;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
 import com.whc.cvccmeasuresystem.R;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
@@ -105,27 +108,47 @@ public class MainActivity extends AppCompatActivity {
                 Common.showToast(MainActivity.this, fileNotSave);
                 return true;
             }
-            if (oldFragment.size() > 0) {
+            if (oldFragment!=null&&oldFragment.size() > 0) {
                 String name = oldFragment.get(oldFragment.size() - 1);
                 switch (name) {
                     case CFName:
                         Common.switchFragment(new ChoiceFunction(), getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
+                        tcpClient=null;
                         break;
                     case BS1:
                         Common.switchFragment(new BatchStep1(), getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
                         needSet=true;
+                        tcpClient=null;
                         break;
                     case Sen1:
                         Common.switchFragment(new SensitivityStep1(), getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
+                        tcpClient=null;
                         needSet=true;
                         break;
                     case Hys1:
                         Common.switchFragment(new HysteresisStep1(), getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
+                        tcpClient=null;
                         needSet=true;
+                        break;
+                    case Drift1:
+                        Common.switchFragment(new DriftStep1(), getSupportFragmentManager());
+                        oldFragment.remove(oldFragment.size() - 1);
+                        needSet=true;
+                        tcpClient=null;
+                        break;
+                    case IonChannel1:
+                        switchFragment(new IonChannelStep1(),getSupportFragmentManager());
+                        oldFragment.remove(oldFragment.size() - 1);
+                        needSet=true;
+                        tcpClient=null;
+                        break;
+                    case IonChannel2Set:
+                        switchFragment(new IonChannelStep2Main(),getSupportFragmentManager());
+                        oldFragment.remove(oldFragment.size() - 1);
                         break;
                 }
 

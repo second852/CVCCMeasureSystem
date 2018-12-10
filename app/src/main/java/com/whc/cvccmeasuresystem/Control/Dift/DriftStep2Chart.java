@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,9 +110,12 @@ public class DriftStep2Chart extends Fragment{
 
         solutions=dataMap.get(sample2);
         setLineChart(lineCharts[1],solutions,sample2);
+        Log.d("xxx ZZZZZZZZZ 1",solutions.size()+" ");
+
 
         solutions=dataMap.get(sample3);
         setLineChart(lineCharts[2],solutions,sample3);
+        Log.d("xxx ZZZZZZZZZ 2",solutions.size()+" ");
 
         solutions=dataMap.get(sample4);
         setLineChart(lineCharts[3],solutions,sample4);

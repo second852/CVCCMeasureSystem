@@ -58,13 +58,13 @@ public class SensitivityStep2ConChart extends Fragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.batch_step2_chart, container, false);
+        view = inflater.inflate(R.layout.sensitivity_step2_chart_con, container, false);
         lineCharts=new LineChart[4];
-        lineCharts[0]=view.findViewById(R.id.charLine1);
-        lineCharts[1]=view.findViewById(R.id.charLine2);
-        lineCharts[2]=view.findViewById(R.id.charLine3);
-        lineCharts[3]=view.findViewById(R.id.charLine4);
-        message=view.findViewById(R.id.message);
+        lineCharts[0]=view.findViewById(R.id.senCharLine1);
+        lineCharts[1]=view.findViewById(R.id.senCharLine2);
+        lineCharts[2]=view.findViewById(R.id.senCharLine3);
+        lineCharts[3]=view.findViewById(R.id.senCharLine4);
+        message=view.findViewById(R.id.senMessage);
         return view;
     }
 

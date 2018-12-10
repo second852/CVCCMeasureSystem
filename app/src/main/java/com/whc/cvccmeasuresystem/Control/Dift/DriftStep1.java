@@ -28,18 +28,8 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.BS1;
-import static com.whc.cvccmeasuresystem.Common.Common.needName;
-import static com.whc.cvccmeasuresystem.Common.Common.needSet;
-import static com.whc.cvccmeasuresystem.Common.Common.oldFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1String;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2String;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3String;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4String;
-import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
-import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+import static com.whc.cvccmeasuresystem.Common.Common.*;
+
 
 
 public class DriftStep1 extends Fragment {
@@ -231,7 +221,7 @@ public class DriftStep1 extends Fragment {
                 //insert File
                 int useId=sharedPreferences.getInt(Common.userId,0);
                 SaveFile saveFile=new SaveFile();
-                saveFile.setMeasureType("0");
+                saveFile.setMeasureType("3");
                 saveFile.setName(Common.timeToString.format(new Date(System.currentTimeMillis())));
                 saveFile.setStatTime(new Timestamp(System.currentTimeMillis()));
                 saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
@@ -249,13 +239,15 @@ public class DriftStep1 extends Fragment {
                 insert(sample4String,getFourthName,fourthType.getText().toString(),nowFile.getID(),sampleDB);
             }
 
-            switchFragment(new BatchStep2Main(),getFragmentManager());
-            oldFragment.add(BS1);
+            switchFragment(new DriftStep2Main(),getFragmentManager());
+            oldFragment.add(Drift1);
             if(tcpClient!=null)
             {
                tcpClient.cancelHomeTcpClient();
+                tcpClient=null;
             }
             startMeasure=false;
+            indicateColor=0;
         }
     }
 

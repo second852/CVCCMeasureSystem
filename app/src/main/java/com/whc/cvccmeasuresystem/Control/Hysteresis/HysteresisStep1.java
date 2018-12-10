@@ -29,6 +29,7 @@ import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.Hys1;
 import static com.whc.cvccmeasuresystem.Common.Common.Sen1;
+import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
 import static com.whc.cvccmeasuresystem.Common.Common.needInt;
 import static com.whc.cvccmeasuresystem.Common.Common.needName;
 import static com.whc.cvccmeasuresystem.Common.Common.needSet;
@@ -281,8 +282,10 @@ public class HysteresisStep1 extends Fragment {
             if(tcpClient!=null)
             {
                tcpClient.cancelHomeTcpClient();
+                tcpClient=null;
             }
             startMeasure=false;
+            indicateColor=0;
 
         }
     }

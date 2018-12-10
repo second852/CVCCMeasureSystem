@@ -17,6 +17,7 @@ import com.whc.cvccmeasuresystem.Control.Batch.BatchStep1;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep1;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep1;
 import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
@@ -99,6 +100,9 @@ public class ChoiceFunction extends Fragment {
                     oldFragment.add(CFName);
                     break;
                 case 1:
+                    fragment=new IonChannelStep1();
+                    switchFragment(fragment,getFragmentManager());
+                    oldFragment.add(CFName);
                     break;
                 case 2:
                     fragment=new SensitivityStep1();

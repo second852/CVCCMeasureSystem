@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control.Dift;
+package com.whc.cvccmeasuresystem.Control.ionChannel;
 
 
 import android.app.Activity;
@@ -21,6 +21,9 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItem;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Chart;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Data;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
@@ -31,12 +34,24 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static com.whc.cvccmeasuresystem.Common.Common.arrayColor;
+import static com.whc.cvccmeasuresystem.Common.Common.choiceColor;
+import static com.whc.cvccmeasuresystem.Common.Common.currentPage;
+import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
+import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
+import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
+import static com.whc.cvccmeasuresystem.Common.Common.sample1;
+import static com.whc.cvccmeasuresystem.Common.Common.sample2;
+import static com.whc.cvccmeasuresystem.Common.Common.sample3;
+import static com.whc.cvccmeasuresystem.Common.Common.sample4;
+import static com.whc.cvccmeasuresystem.Common.Common.samples;
+import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
+import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
+import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+import static com.whc.cvccmeasuresystem.Common.Common.volCon;
 
-import static com.whc.cvccmeasuresystem.Common.Common.*;
 
-
-
-public class DriftStep2Main extends Fragment {
+public class IonChannelStep2Main extends Fragment {
 
 
     private  Activity activity;
@@ -64,7 +79,7 @@ public class DriftStep2Main extends Fragment {
         }
 
         //init
-        activity.setTitle("Drift Monitor Step2");
+        activity.setTitle("Ion Channel Monitor Step2");
         dataBase=new DataBase(activity);
         solutionDB=new SolutionDB(dataBase.getReadableDatabase());
         if(tcpClient==null)
@@ -89,9 +104,8 @@ public class DriftStep2Main extends Fragment {
         viewPagerTab =view.findViewById(R.id.viewPagerTab);
         priceViewPager =  view.findViewById(R.id.batchViewPager);
         FragmentPagerItems pages = new FragmentPagerItems(activity);
-        pages.add(FragmentPagerItem.of("Set", DriftStep2Set.class));
-        pages.add(FragmentPagerItem.of("Chart", DriftStep2Chart.class));
-        pages.add(FragmentPagerItem.of("Data", DriftStep2Data.class));
+        pages.add(FragmentPagerItem.of("Set", IonChannelStep2Set.class));
+        pages.add(FragmentPagerItem.of("Data", IonChannelStep2Data.class));
         adapter = new FragmentPagerItemAdapter(getFragmentManager(),pages);
         priceViewPager.setAdapter(adapter);
         priceViewPager.addOnPageChangeListener(new PageListener());
@@ -109,9 +123,7 @@ public class DriftStep2Main extends Fragment {
     private void setSample() {
         dataMap=new HashMap<>();
         samples=new ArrayList<>();
-        choiceColor=new ArrayList<>();
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-
         dataBase = new DataBase(activity);
         SampleDB sampleDB = new SampleDB(dataBase.getReadableDatabase());
 
@@ -150,13 +162,13 @@ public class DriftStep2Main extends Fragment {
             currentPage=position;
             Fragment fragment=adapter.getPage(position);
 
-            if(fragment instanceof  DriftStep2Chart)
+            if(fragment instanceof  BatchStep2Chart)
             {
-                DriftStep2Chart driftStep2Chart= (DriftStep2Chart) fragment;
-                driftStep2Chart.setData();
-            }else if(fragment instanceof  DriftStep2Data){
-                DriftStep2Data driftStep2Data= (DriftStep2Data) fragment;
-                driftStep2Data.setListView();
+                BatchStep2Chart batchStep2Chart= (BatchStep2Chart) fragment;
+                batchStep2Chart.setData();
+            }else if(fragment instanceof  BatchStep2Data){
+                BatchStep2Data batchStep2Data= (BatchStep2Data) fragment;
+                batchStep2Data.setListView();
             }
 
         }
@@ -177,7 +189,7 @@ public class DriftStep2Main extends Fragment {
 
             if(msg.what==1)
             {
-                DriftStep2Main.priceViewPager.setCurrentItem(1);
+                IonChannelStep2Main.priceViewPager.setCurrentItem(1);
                 Common.showToast(  adapter.getPage(currentPage).getActivity(),"Measurement Start!");
                 return;
             }
@@ -233,9 +245,7 @@ public class DriftStep2Main extends Fragment {
             solution2.setNumber(String.valueOf(measureTimes));
             solution3.setNumber(String.valueOf(measureTimes));
             solution4.setNumber(String.valueOf(measureTimes));
-            measureTimes++;
 
-            choiceColor.add(Color.parseColor(arrayColor[indicateColor%arrayColor.length]));
 
            dataMap.get(sample1).add(solution1);
            dataMap.get(sample2).add(solution2);
@@ -245,13 +255,10 @@ public class DriftStep2Main extends Fragment {
 
             Fragment fragment=adapter.getPage(currentPage);
 
-            if(fragment instanceof  DriftStep2Chart)
+            if(fragment instanceof  IonChannelStep2Data)
             {
-                DriftStep2Chart driftStep2Chart= (DriftStep2Chart) fragment;
-                driftStep2Chart.setData();
-            }else if(fragment instanceof  DriftStep2Data){
-                DriftStep2Data driftStep2Data= (DriftStep2Data) fragment;
-                driftStep2Data.setListView();
+                IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
+                ionChannelStep2Data.setListView();
             }
         }
     };

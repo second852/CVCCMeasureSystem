@@ -264,6 +264,7 @@ public class BatchStep2Set extends Fragment {
             }
         }
         needSet=false;
+        pageCon=null;
         oldFragment.remove(oldFragment.size()-1);
         switchFragment(new BatchStep1(),getFragmentManager());
         tcpClient=null;

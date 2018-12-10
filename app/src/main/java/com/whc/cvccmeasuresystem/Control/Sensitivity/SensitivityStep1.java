@@ -244,7 +244,9 @@ public class SensitivityStep1 extends Fragment {
             if(tcpClient!=null)
             {
                 tcpClient.cancelHomeTcpClient();
+                tcpClient=null;
             }
+            indicateColor=0;
             startMeasure=false;
         }
     }

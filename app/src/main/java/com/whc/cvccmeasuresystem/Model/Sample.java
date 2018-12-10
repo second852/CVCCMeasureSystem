@@ -12,7 +12,33 @@ public class Sample {
     private String name;//1 sample name
     private String ionType;//2 solution type Common-SolutionType
     private int fileID;//3 file measure id
+    private String slope;
+    private String limitHighVoltage;
+    private String limitLowVoltage;
 
+    public String getSlope() {
+        return slope;
+    }
+
+    public void setSlope(String slope) {
+        this.slope = slope;
+    }
+
+    public String getLimitHighVoltage() {
+        return limitHighVoltage;
+    }
+
+    public void setLimitHighVoltage(String limitHighVoltage) {
+        this.limitHighVoltage = limitHighVoltage;
+    }
+
+    public String getLimitLowVoltage() {
+        return limitLowVoltage;
+    }
+
+    public void setLimitLowVoltage(String limitLowVoltage) {
+        this.limitLowVoltage = limitLowVoltage;
+    }
 
     public int getID() {
         return ID;

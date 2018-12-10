@@ -95,6 +95,13 @@ public class SensitivityStep2Main extends Fragment {
         setSample();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        dataMap=null;
+        volCon=null;
+    }
+
     private void setSample() {
         dataMap=new HashMap<>();
         samples=new ArrayList<>();

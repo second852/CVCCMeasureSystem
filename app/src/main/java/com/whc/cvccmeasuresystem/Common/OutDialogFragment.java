@@ -32,7 +32,7 @@ public class OutDialogFragment extends DialogFragment implements  DialogInterfac
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         String message="";
-        String title="Do you exist?";
+        String title="Do you want to exist?";
 
         return new AlertDialog.Builder(getActivity())
                 .setTitle(Html.fromHtml(title))

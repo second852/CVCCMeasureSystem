@@ -35,6 +35,9 @@ public class SampleDB {
             sample.setName(cursor.getString(1));
             sample.setIonType(cursor.getString(2));
             sample.setFileID(cursor.getInt(3));
+            sample.setSlope(cursor.getString(4));
+            sample.setLimitHighVoltage(cursor.getString(5));
+            sample.setLimitLowVoltage(cursor.getString(6));
             samples.add(sample);
         }
         cursor.close();
@@ -53,6 +56,9 @@ public class SampleDB {
             sample.setName(cursor.getString(1));
             sample.setIonType(cursor.getString(2));
             sample.setFileID(cursor.getInt(3));
+            sample.setSlope(cursor.getString(4));
+            sample.setLimitHighVoltage(cursor.getString(5));
+            sample.setLimitLowVoltage(cursor.getString(6));
         }
         cursor.close();
         return sample;
@@ -69,6 +75,9 @@ public class SampleDB {
             sample.setName(cursor.getString(1));
             sample.setIonType(cursor.getString(2));
             sample.setFileID(cursor.getInt(3));
+            sample.setSlope(cursor.getString(4));
+            sample.setLimitHighVoltage(cursor.getString(5));
+            sample.setLimitLowVoltage(cursor.getString(6));
         }
         cursor.close();
         return sample;
@@ -80,6 +89,9 @@ public class SampleDB {
         values.put("name", sample.getName());
         values.put("ionType", sample.getIonType());
         values.put("fileID", sample.getFileID());
+        values.put("slope", sample.getSlope());
+        values.put("limitHighVoltage", sample.getLimitHighVoltage());
+        values.put("limitLowVoltage", sample.getLimitLowVoltage());
         return db.insert(TABLE_NAME, null, values);
     }
 
@@ -89,6 +101,9 @@ public class SampleDB {
         values.put("name", sample.getName());
         values.put("ionType", sample.getIonType());
         values.put("fileID", sample.getFileID());
+        values.put("slope", sample.getSlope());
+        values.put("limitHighVoltage", sample.getLimitHighVoltage());
+        values.put("limitLowVoltage", sample.getLimitLowVoltage());
         String whereClause = "id = ?;";
         String[] whereArgs = {Integer.toString(sample.getID())};
         return db.update(TABLE_NAME, values, whereClause, whereArgs);

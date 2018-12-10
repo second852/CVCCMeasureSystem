@@ -16,6 +16,11 @@ import android.os.Handler;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Chart;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
+import com.whc.cvccmeasuresystem.Control.Dift.DriftStep1;
+import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Chart;
+import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Data;
+import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Main;
+import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Set;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Chart;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Data;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
@@ -24,6 +29,9 @@ import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2ConChart;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2TimeChart;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Data;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Set;
 import com.whc.cvccmeasuresystem.R;
 
 
@@ -63,8 +71,7 @@ public class TCPClient {
 
     public void sendEndMessage() {
         if (out != null && !out.checkError()) {
-            out.print("D" + ',' + measureTime + ',' + measureDuration + ',');
-            out.flush();
+            out.print("S" + ',' + measureTime + ',' + measureDuration + ',');
         }
     }
 
@@ -78,6 +85,12 @@ public class TCPClient {
         }else if(object instanceof SensitivityStep2Set)
         {
             SensitivityEnd();
+        }else if(object instanceof IonChannelStep2Set)
+        {
+
+        }else if(object instanceof DriftStep2Set)
+        {
+            DriftEnd();
         }
     }
 
@@ -132,7 +145,6 @@ public class TCPClient {
                             finishToSave=false;
                             startMeasure=true;
                             handlerMessage.sendEmptyMessage(1);
-
                             if(object instanceof BatchStep2Set)
                             {
                                 BatchStart();
@@ -142,12 +154,13 @@ public class TCPClient {
                             }else if(object instanceof HysteresisStep2Set)
                             {
                                 HysteresisStart();
+                            }else if(object instanceof DriftStep2Set)
+                            {
+                                DriftStart();
                             }
-
                             break;
                         case "$D,End,#":
 
-                            indicateColor++;
                             mRun=false;
                             startMeasure=false;
                             if(object instanceof BatchStep2Set)
@@ -159,6 +172,9 @@ public class TCPClient {
                             }else if(object instanceof HysteresisStep2Set)
                             {
                                  HysteresisEnd();
+                            }else if(object instanceof DriftStep2Set)
+                            {
+                                DriftEnd();
                             }
                             break;
 
@@ -212,12 +228,15 @@ public class TCPClient {
 
     public void SensitivityEnd()
     {
+        sendEndMessage();
+        indicateColor++;
+        mRun=false;
+        startMeasure=false;
         try {
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mRun=false;
         Fragment fragment= SensitivityStep2Main.adapter.getPage(currentPage);
         if(fragment instanceof  SensitivityStep2TimeChart)
         {
@@ -233,6 +252,24 @@ public class TCPClient {
 
 
 
+    public void IonChannelStep2Stop()
+    {
+        sendEndMessage();
+        mRun=false;
+        startMeasure=false;
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Fragment fragment= IonChannelStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof IonChannelStep2Data)
+        {
+
+        }
+        handlerMessage.sendEmptyMessage(2);
+    }
+
     public  void BatchStart()
     {
         Fragment fragment= BatchStep2Main.adapter.getPage(currentPage);
@@ -245,13 +282,15 @@ public class TCPClient {
 
     public void BatchStop()
     {
-
+        sendEndMessage();
+        indicateColor++;
+        mRun=false;
+        startMeasure=false;
         try {
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mRun=false;
         Fragment fragment= BatchStep2Main.adapter.getPage(currentPage);
         if(fragment instanceof BatchStep2Chart)
         {
@@ -273,6 +312,10 @@ public class TCPClient {
 
     public void HysteresisEnd()
     {
+        sendEndMessage();
+        indicateColor++;
+        mRun=false;
+        startMeasure=false;
         Fragment fragment= HysteresisStep2Main.adapter.getPage(currentPage);
         if(fragment instanceof HysteresisStep2Chart){
             HysteresisStep2Chart.message.setText(R.string.measure_stop);
@@ -281,7 +324,36 @@ public class TCPClient {
     }
 
 
+    public void DriftStart()
+    {
+        Fragment fragment= DriftStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof DriftStep2Chart)
+        {
+            DriftStep2Chart.message.setText(R.string.measure_start);
+            DriftStep2Chart.message.setTextColor(Color.BLUE);
+        }
+    }
 
+    public void DriftEnd()
+    {
+
+        sendEndMessage();
+        indicateColor++;
+        mRun=false;
+        startMeasure=false;
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Fragment fragment= DriftStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof DriftStep2Chart)
+        {
+            DriftStep2Chart.message.setText(R.string.measure_stop);
+            DriftStep2Chart.message.setTextColor(Color.RED);
+        }
+        handlerMessage.sendEmptyMessage(2);
+    }
 
 
     public byte[] readStream(InputStream inStream) throws Exception {
