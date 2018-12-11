@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,25 +17,28 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.AwesomeTextView;
-import com.github.mikephil.charting.data.Entry;
-import com.whc.cvccmeasuresystem.Common.SolutionAdapter;
 import com.whc.cvccmeasuresystem.Common.SolutionAdapterIonChannel;
 import com.whc.cvccmeasuresystem.Common.SolutionAdapterSlope;
-import com.whc.cvccmeasuresystem.Control.MainActivity;
-import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
-import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
+import static com.whc.cvccmeasuresystem.Common.Common.sample1;
+import static com.whc.cvccmeasuresystem.Common.Common.sample1String;
+import static com.whc.cvccmeasuresystem.Common.Common.sample2;
+import static com.whc.cvccmeasuresystem.Common.Common.sample2String;
+import static com.whc.cvccmeasuresystem.Common.Common.sample3;
+import static com.whc.cvccmeasuresystem.Common.Common.sample3String;
+import static com.whc.cvccmeasuresystem.Common.Common.sample4;
+import static com.whc.cvccmeasuresystem.Common.Common.sample4String;
+import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
 
-import static com.whc.cvccmeasuresystem.Common.Common.*;
 
-
-public class IonChannelStep2Data extends Fragment{
+public class IonChannelStep3Data extends Fragment{
     private View view;
     private Activity activity;
     private ListView listData,listSlope;

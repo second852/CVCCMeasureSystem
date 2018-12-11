@@ -17,8 +17,10 @@ import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.whc.cvccmeasuresystem.Clent.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
+import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep1;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Set;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
@@ -26,6 +28,7 @@ import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.whc.cvccmeasuresystem.Common.Common.IonChannel2Set;
@@ -161,6 +164,7 @@ public class IonChannelStep2Set extends Fragment {
         warring.setOnClickListener(new waringOnClick());
         clearF.setOnClickListener(new clearData());
         clearS.setOnClickListener(new clearData());
+        next.setOnClickListener(new nextStep());
     }
 
 
@@ -229,10 +233,10 @@ public class IonChannelStep2Set extends Fragment {
             if(IonChannelStep2Main.errorSample.size()>0)
             {
                 StringBuilder stringBuilder=new StringBuilder();
-                stringBuilder.append("Data of");
+                stringBuilder.append("Data of ");
                 for(String error:IonChannelStep2Main.errorSample)
                 {
-                    stringBuilder.append(error);
+                    stringBuilder.append(error+" ");
                 }
                 if(IonChannelStep2Main.errorSample.size()>1)
                 {
@@ -332,7 +336,7 @@ public class IonChannelStep2Set extends Fragment {
                 Common.showToast(activity, "Please connect BCS_Device");
                 return;
             }
-            //conection
+            //connection
             solution1 = new Solution(ionOne, sample1.getID());
             solution2 = new Solution(ionTwo, sample2.getID());
             solution3 = new Solution(ionThree, sample3.getID());
@@ -346,42 +350,13 @@ public class IonChannelStep2Set extends Fragment {
     private class stopMeasure implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            if (tcpClient != null) {
-                tcpClient.cancelTcpClient();
-                tcpClient = null;
-            }
-        }
-    }
-
-    public void finishMeasure() {
-        DataBase dataBase = new DataBase(activity);
-        SolutionDB solutionDB = new SolutionDB(dataBase.getReadableDatabase());
-        for (Sample sample : dataMap.keySet()) {
-            for (Solution solutions : dataMap.get(sample)) {
-                solutionDB.insert(solutions);
-            }
-        }
-        needSet = false;
-        pageCon = null;
-        oldFragment.remove(oldFragment.size() - 1);
-        switchFragment(new BatchStep1(), getFragmentManager());
-        tcpClient = null;
-    }
-
-
-    private class finishFragment implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            if (startMeasure) {
-                Common.showToast(activity, measureStartNotExist);
-                return;
-            }
-            finishToSave = true;
-            FinishDialogFragment aa = new FinishDialogFragment();
+            StopDialogFragment aa= new StopDialogFragment();
             aa.setObject(IonChannelStep2Set.this);
-            aa.show(getFragmentManager(), "show");
+            aa.show(getFragmentManager(),"show");
         }
     }
+
+
 
     private class step01OnClick implements View.OnClickListener {
         @Override
@@ -407,6 +382,25 @@ public class IonChannelStep2Set extends Fragment {
             //防止重複量測
             if (startMeasure) {
                 Common.showToast(activity, "Please wait util this measurement stop ");
+                return;
+            }
+
+            if(IonChannelStep2Main.errorSample.size()>0)
+            {
+                StringBuilder stringBuilder=new StringBuilder();
+                stringBuilder.append("Data of ");
+                for(String error:IonChannelStep2Main.errorSample)
+                {
+                    stringBuilder.append(error+" ");
+                }
+                if(IonChannelStep2Main.errorSample.size()>1)
+                {
+                    stringBuilder.append("are unusual");
+                }else {
+                    stringBuilder.append("is unusual");
+                }
+                stringBuilder.append(",Please check limit data or sample,and pressure \"clear\"");
+                Common.showToast(activity,stringBuilder.toString());
                 return;
             }
 
@@ -438,6 +432,54 @@ public class IonChannelStep2Set extends Fragment {
                 return;
             }
             ionFour = ionFour.trim();
+
+            //sample1
+            if(sample1.getLimitLowVoltage()==null)
+            {
+                Common.showToast(activity,"Sample 1 not set lower voltage");
+                return;
+            }
+            if(sample1.getLimitHighVoltage()==null)
+            {
+                Common.showToast(activity,"Sample 1 not set upper voltage");
+                return;
+            }
+
+            //sample2
+            if(sample2.getLimitLowVoltage()==null)
+            {
+                Common.showToast(activity,"Sample 2 not set lower voltage");
+                return;
+            }
+            if(sample2.getLimitHighVoltage()==null)
+            {
+                Common.showToast(activity,"Sample 2 not set upper voltage");
+                return;
+            }
+
+            //sample3
+            if(sample3.getLimitLowVoltage()==null)
+            {
+                Common.showToast(activity,"Sample 3 not set lower voltage");
+                return;
+            }
+            if(sample3.getLimitHighVoltage()==null)
+            {
+                Common.showToast(activity,"Sample 3 not set upper voltage");
+                return;
+            }
+
+            //sample4
+            if(sample4.getLimitLowVoltage()==null)
+            {
+                Common.showToast(activity,"Sample 4 not set lower voltage");
+                return;
+            }
+            if(sample4.getLimitHighVoltage()==null)
+            {
+                Common.showToast(activity,"Sample 4 not set upper voltage");
+                return;
+            }
 
             //check Wifi
             WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(activity.WIFI_SERVICE);
@@ -503,8 +545,45 @@ public class IonChannelStep2Set extends Fragment {
     private class clearData implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            dataMap=new HashMap<>();
+            dataMap.put(sample1,new ArrayList<Solution>());
+            dataMap.put(sample2,new ArrayList<Solution>());
+            dataMap.put(sample3,new ArrayList<Solution>());
+            dataMap.put(sample4,new ArrayList<Solution>());
+            IonChannelStep2Data fragment= (IonChannelStep2Data) IonChannelStep2Main.adapter.getPage(1);
+            if(fragment!=null)
+            {
+                fragment.setListView();
+            }
+            IonChannelStep2Main.errorSample=new ArrayList<>();
             Common.showToast(activity,"Data clear!");
+        }
+    }
+
+    private class nextStep implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            if(sample1.getLimitHighVoltage()==null)
+            {
+                Common.showToast(activity,"Limit need to set!");
+                return;
+            }
+
+            if(sample1.getSlope()==null)
+            {
+                Common.showToast(activity,"Calibrating  isn't complete");
+                return;
+            }
+
+            SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
+            for(Sample sample:dataMap.keySet())
+            {
+                for(Solution solution:dataMap.get(sample))
+                {
+                    solutionDB.insert(solution);
+                }
+            }
+            oldFragment.add(IonChannel2Set);
+            switchFragment(new IonChannelStep3Main(),getFragmentManager());
         }
     }
 }

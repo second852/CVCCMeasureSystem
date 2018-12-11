@@ -43,13 +43,14 @@ public class TCPClient {
 
     public static final String SERVERIP = "192.168.4.1"; //your computer IP address
     public static final int SERVERPORT = 23;
-    private boolean mRun = false;
+    public boolean mRun = false;
 
     private String measureDuration;
     private String measureTime;
     private Handler handlerMessage;
     private Object object;
-    private Socket socket;
+    public Socket socket;
+    private InputStream in;
 
    private PrintWriter out;
 
@@ -72,27 +73,16 @@ public class TCPClient {
     public void sendEndMessage() {
         if (out != null && !out.checkError()) {
             out.print("S" + ',' + measureTime + ',' + measureDuration + ',');
+            out.flush();
+        }
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public void cancelTcpClient()
-    {
-        mRun=false;
-        startMeasure=false;
-        if(object instanceof BatchStep2Set)
-        {
-            BatchStop();
-        }else if(object instanceof SensitivityStep2Set)
-        {
-            SensitivityEnd();
-        }else if(object instanceof IonChannelStep2Set)
-        {
 
-        }else if(object instanceof DriftStep2Set)
-        {
-            DriftEnd();
-        }
-    }
 
     public void cancelHomeTcpClient()
     {
@@ -123,7 +113,7 @@ public class TCPClient {
                 Log.e("TCP Client", "C: Sent.");
                 Log.e("TCP Client", "C: Done.");
 
-                InputStream inTest = socket.getInputStream();
+                in = socket.getInputStream();
                 //in this while the client listens for the messages sent by the server
                 int i=0;
                 int times=Integer.valueOf(measureTime)/Integer.valueOf(measureDuration);
@@ -131,13 +121,15 @@ public class TCPClient {
                 Message message;
                 while (mRun) {
 
-                    if(!socket.isConnected())
+                    if(in==null)
                     {
-                        return;
+                        mRun=false;
+                        startMeasure=false;
+                        break;
                     }
 
                     long startTime = System.currentTimeMillis();
-                    byte[] bytes = readStream(inTest);
+                    byte[] bytes = readStream(in);
                     str = new String(bytes, Charset.forName("UTF-8"));
                     switch (str)
                     {
@@ -145,43 +137,12 @@ public class TCPClient {
                             finishToSave=false;
                             startMeasure=true;
                             handlerMessage.sendEmptyMessage(1);
-                            if(object instanceof BatchStep2Set)
-                            {
-                                BatchStart();
-                            }else if(object instanceof SensitivityStep2Set)
-                            {
-                                SensitivityStart();
-                            }else if(object instanceof HysteresisStep2Set)
-                            {
-                                HysteresisStart();
-                            }else if(object instanceof DriftStep2Set)
-                            {
-                                DriftStart();
-                            }else if(object instanceof IonChannelStep2Set)
-                            {
-                                IonChannelStep2Start();
-                            }
                             break;
                         case "$D,End,#":
 
                             mRun=false;
                             startMeasure=false;
-                            if(object instanceof BatchStep2Set)
-                            {
-                                BatchStop();
-                            }else if(object instanceof SensitivityStep2Set)
-                            {
-                                SensitivityEnd();
-                            }else if(object instanceof HysteresisStep2Set)
-                            {
-                                 HysteresisEnd();
-                            }else if(object instanceof DriftStep2Set)
-                            {
-                                DriftEnd();
-                            }else if(object instanceof IonChannelStep2Set)
-                            {
-                                IonChannelStep2Stop();
-                            }
+                            handlerMessage.sendEmptyMessage(2);
                             break;
 
                         default:
@@ -199,7 +160,6 @@ public class TCPClient {
                     }
                     Log.d("XXXXXxx", str + " Time :" + (System.currentTimeMillis() - startTime));
                 }
-                socket.close();
                 Log.e("RESPONSE FROM SERVER", " END");
             } catch (Exception e) {
 
@@ -218,164 +178,13 @@ public class TCPClient {
 
     }
 
-
-    public void SensitivityStart()
-    {
-        Fragment fragment= SensitivityStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof  SensitivityStep2TimeChart)
-        {
-            SensitivityStep2TimeChart.message.setText(R.string.measure_start);
-            SensitivityStep2TimeChart.message.setTextColor(Color.BLUE);
-        }else if(fragment instanceof  SensitivityStep2ConChart){
-            SensitivityStep2ConChart.message.setText(R.string.measure_start);
-            SensitivityStep2ConChart.message.setTextColor(Color.BLUE);
-        }
-    }
-
-    public void SensitivityEnd()
-    {
-        sendEndMessage();
-        indicateColor++;
-        mRun=false;
-        startMeasure=false;
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Fragment fragment= SensitivityStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof  SensitivityStep2TimeChart)
-        {
-            SensitivityStep2TimeChart.message.setText(R.string.measure_stop);
-            SensitivityStep2TimeChart.message.setTextColor(Color.RED);
-        }else if(fragment instanceof  SensitivityStep2ConChart){
-            SensitivityStep2ConChart.message.setText(R.string.measure_stop);
-            SensitivityStep2ConChart.message.setTextColor(Color.RED);
-        }
-        handlerMessage.sendEmptyMessage(2);
-
-    }
-
-    public  void IonChannelStep2Start()
-    {
-        Fragment fragment= IonChannelStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof IonChannelStep2Data)
-        {
-            IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
-            ionChannelStep2Data.senMessage.setTextColor(Color.RED);
-            ionChannelStep2Data.senMessage.setText(R.string.measure_stop);
-        }
-    }
-
-    public void IonChannelStep2Stop()
-    {
-        sendEndMessage();
-        mRun=false;
-        startMeasure=false;
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Fragment fragment= IonChannelStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof IonChannelStep2Data)
-        {
-            IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
-            ionChannelStep2Data.senMessage.setTextColor(Color.RED);
-            ionChannelStep2Data.senMessage.setText(R.string.measure_stop);
-        }
-        handlerMessage.sendEmptyMessage(2);
-    }
-
-    public  void BatchStart()
-    {
-        Fragment fragment= BatchStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof BatchStep2Chart)
-        {
-            BatchStep2Chart.message.setText(R.string.measure_start);
-            BatchStep2Chart.message.setTextColor(Color.BLUE);
-        }
-    }
-
-    public void BatchStop()
-    {
-        sendEndMessage();
-        indicateColor++;
-        mRun=false;
-        startMeasure=false;
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Fragment fragment= BatchStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof BatchStep2Chart)
-        {
-            BatchStep2Chart.message.setText(R.string.measure_stop);
-            BatchStep2Chart.message.setTextColor(Color.RED);
-        }
-        handlerMessage.sendEmptyMessage(2);
-    }
-
-
-    public void HysteresisStart()
-    {
-        Fragment fragment= HysteresisStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof HysteresisStep2Chart){
-            HysteresisStep2Chart.message.setText(R.string.measure_start);
-            HysteresisStep2Chart.message.setTextColor(Color.BLUE);
-        }
-    }
-
-    public void HysteresisEnd()
-    {
-        sendEndMessage();
-        indicateColor++;
-        mRun=false;
-        startMeasure=false;
-        Fragment fragment= HysteresisStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof HysteresisStep2Chart){
-            HysteresisStep2Chart.message.setText(R.string.measure_stop);
-            HysteresisStep2Chart.message.setTextColor(Color.RED);
-        }
-    }
-
-
-    public void DriftStart()
-    {
-        Fragment fragment= DriftStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof DriftStep2Chart)
-        {
-            DriftStep2Chart.message.setText(R.string.measure_start);
-            DriftStep2Chart.message.setTextColor(Color.BLUE);
-        }
-    }
-
-    public void DriftEnd()
-    {
-
-        sendEndMessage();
-        indicateColor++;
-        mRun=false;
-        startMeasure=false;
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Fragment fragment= DriftStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof DriftStep2Chart)
-        {
-            DriftStep2Chart.message.setText(R.string.measure_stop);
-            DriftStep2Chart.message.setTextColor(Color.RED);
-        }
-        handlerMessage.sendEmptyMessage(2);
-    }
-
-
     public byte[] readStream(InputStream inStream) throws Exception {
         int count = 0;
         while (count == 0) {
+            if(socket.isClosed())
+            {
+                break;
+            }
             count = inStream.available();
         }
         byte[] b = new byte[count];

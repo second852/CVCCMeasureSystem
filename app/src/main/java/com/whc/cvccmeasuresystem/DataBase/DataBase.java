@@ -18,7 +18,7 @@ public class DataBase extends SQLiteOpenHelper {
 
     private static final String Table_Sample =
             "CREATE TABLE Sample ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL," +
-                    "ionType TEXT, fileID INTEGER, slope TEXT , limitHighVoltage Text ,limitLowVoltage Text);";
+                    "ionType TEXT, fileID INTEGER , limitHighVoltage Text ,limitLowVoltage Text,slope TEXT,unit Text,intercept Text,standardDeviation TEXT,differenceX TEXT,differenceY TEXT,R TEXT);";
 
     private static final String Table_Solution =
             "CREATE TABLE Solution ( id INTEGER PRIMARY KEY AUTOINCREMENT, concentration TEXT NOT NULL," +

@@ -1,6 +1,6 @@
 package com.whc.cvccmeasuresystem.Model;
 
-import java.util.Objects;
+
 
 /**
  * Created by Wang on 2018/12/4.
@@ -12,10 +12,63 @@ public class Sample {
     private String name;//1 sample name
     private String ionType;//2 solution type Common-SolutionType
     private int fileID;//3 file measure id
-    private String slope;
     private String limitHighVoltage;
     private String limitLowVoltage;
+    private String slope;
+    private String intercept;
+    private String standardDeviation;
+    private String differenceX;
+    private String differenceY;
+    private String R;
+    private String unit;
 
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public String getR() {
+        return R;
+    }
+
+    public void setR(String r) {
+        R = r;
+    }
+
+    public String getIntercept() {
+        return intercept;
+    }
+
+    public void setIntercept(String intercept) {
+        this.intercept = intercept;
+    }
+
+    public String getStandardDeviation() {
+        return standardDeviation;
+    }
+
+    public void setStandardDeviation(String standardDeviation) {
+        this.standardDeviation = standardDeviation;
+    }
+
+    public String getDifferenceX() {
+        return differenceX;
+    }
+
+    public void setDifferenceX(String differenceX) {
+        this.differenceX = differenceX;
+    }
+
+    public String getDifferenceY() {
+        return differenceY;
+    }
+
+    public void setDifferenceY(String differenceY) {
+        this.differenceY = differenceY;
+    }
 
     public String getSlope() {
         return slope;

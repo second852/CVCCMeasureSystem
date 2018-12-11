@@ -4,6 +4,8 @@ package com.whc.cvccmeasuresystem.DataBase;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
 import com.whc.cvccmeasuresystem.Model.User;
 
 import java.util.ArrayList;
@@ -15,9 +17,9 @@ public class UserDB {
     private String TABLE_NAME="User";
 
 
-    public UserDB(SQLiteDatabase db)
+    public UserDB(SQLiteOpenHelper sq)
     {
-        this.db=db;
+        this.db=sq.getReadableDatabase();
     }
 
     public List<User> getAll() {

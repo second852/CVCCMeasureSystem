@@ -19,14 +19,14 @@ import com.whc.cvccmeasuresystem.Clent.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
 
 import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
+import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
+import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Set;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
-
-
 
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
@@ -36,12 +36,9 @@ public class BatchStep2Set extends Fragment {
 
     private View view;
     private Activity activity;
-    private BootstrapButton con1, con2, con3, con4, start,stop,finish,step01,step03;
+    private BootstrapButton con1, con2, con3, con4, start, stop, finish, step01, step03;
     private BootstrapEditText ion1, ion2, ion3, ion4, measureTime;
     private String mTime;
-
-
-
 
 
     @Override
@@ -79,26 +76,20 @@ public class BatchStep2Set extends Fragment {
         finish.setOnClickListener(new finishFragment());
         step01.setOnClickListener(new step01OnClick());
         step03.setOnClickListener(new finishFragment());
-        if(pageCon!=null)
-        {
-            if(pageCon.getCon1()!=null)
-            {
+        if (pageCon != null) {
+            if (pageCon.getCon1() != null) {
                 ion1.setText(pageCon.getCon1());
             }
-            if(pageCon.getCon2()!=null)
-            {
+            if (pageCon.getCon2() != null) {
                 ion2.setText(pageCon.getCon2());
             }
-            if(pageCon.getCon3()!=null)
-            {
+            if (pageCon.getCon3() != null) {
                 ion3.setText(pageCon.getCon3());
             }
-            if(pageCon.getCon4()!=null)
-            {
+            if (pageCon.getCon4() != null) {
                 ion4.setText(pageCon.getCon4());
             }
-            if(pageCon.getExpTime()!=null)
-            {
+            if (pageCon.getExpTime() != null) {
                 measureTime.setText(pageCon.getExpTime());
             }
         }
@@ -107,30 +98,25 @@ public class BatchStep2Set extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        pageCon=new PageCon();
+        pageCon = new PageCon();
         String ionOne = ion1.getText().toString();
         String ionTwo = ion2.getText().toString();
         String ionThree = ion3.getText().toString();
         String ionFour = ion4.getText().toString();
-        String mType=measureTime.getText().toString();
-        if(ionOne!=null)
-        {
+        String mType = measureTime.getText().toString();
+        if (ionOne != null) {
             pageCon.setCon1(ionOne);
         }
-        if(ionTwo!=null)
-        {
+        if (ionTwo != null) {
             pageCon.setCon2(ionTwo);
         }
-        if(ionTwo!=null)
-        {
+        if (ionTwo != null) {
             pageCon.setCon3(ionThree);
         }
-        if(ionTwo!=null)
-        {
+        if (ionTwo != null) {
             pageCon.setCon4(ionFour);
         }
-        if(mTime!=null)
-        {
+        if (mTime != null) {
             pageCon.setExpTime(mType);
         }
     }
@@ -146,22 +132,20 @@ public class BatchStep2Set extends Fragment {
         ion4 = view.findViewById(R.id.ion4);
         measureTime = view.findViewById(R.id.measureTime);
         start = view.findViewById(R.id.start);
-        stop=view.findViewById(R.id.stop);
-        finish=view.findViewById(R.id.finish);
-        step01=view.findViewById(R.id.step01);
-        step03=view.findViewById(R.id.step03);
+        stop = view.findViewById(R.id.stop);
+        finish = view.findViewById(R.id.finish);
+        step01 = view.findViewById(R.id.step01);
+        step03 = view.findViewById(R.id.step03);
     }
 
 
     private Runnable measureThread = new Runnable() {
         @Override
         public void run() {
-            tcpClient=new TCPClient("1", mTime, BatchStep2Main.handlerMessage,BatchStep2Set.this);
+            tcpClient = new TCPClient("1", mTime, BatchStep2Main.handlerMessage, BatchStep2Set.this);
             tcpClient.run();
         }
     };
-
-
 
 
     private class startMeasure implements View.OnClickListener {
@@ -169,9 +153,8 @@ public class BatchStep2Set extends Fragment {
         public void onClick(View view) {
 
             //防止重複量測
-            if(startMeasure)
-            {
-                Common.showToast(activity,"Please wait util this measurement stop ");
+            if (startMeasure) {
+                Common.showToast(activity, "Please wait util this measurement stop ");
                 return;
             }
 
@@ -231,12 +214,12 @@ public class BatchStep2Set extends Fragment {
                 return;
             }
             //conection
-            solution1=new Solution(ionOne,sample1.getID());
-            solution2=new Solution(ionTwo,sample2.getID());
-            solution3=new Solution(ionThree,sample3.getID());
-            solution4=new Solution(ionFour,sample4.getID());
-            Common.showToast(activity,"Wifi Connecting");
-            measureTimes=0;
+            solution1 = new Solution(ionOne, sample1.getID());
+            solution2 = new Solution(ionTwo, sample2.getID());
+            solution3 = new Solution(ionThree, sample3.getID());
+            solution4 = new Solution(ionFour, sample4.getID());
+            Common.showToast(activity, "Wifi Connecting");
+            measureTimes = 0;
             new Thread(measureThread).start();
         }
     }
@@ -244,64 +227,55 @@ public class BatchStep2Set extends Fragment {
     private class stopMeasure implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            if(tcpClient!=null)
-            {
-                tcpClient.cancelTcpClient();
-                tcpClient=null;
-            }
+            StopDialogFragment aa= new StopDialogFragment();
+            aa.setObject(BatchStep2Set.this);
+            aa.show(getFragmentManager(),"show");
         }
     }
 
-    public void finishMeasure()
-    {
-        DataBase dataBase=new DataBase(activity);
-        SolutionDB solutionDB=new SolutionDB(dataBase.getReadableDatabase());
-        for(Sample sample:dataMap.keySet())
-        {
-            for (Solution solutions:dataMap.get(sample))
-            {
+    public void finishMeasure() {
+        DataBase dataBase = new DataBase(activity);
+        SolutionDB solutionDB = new SolutionDB(dataBase);
+        for (Sample sample : dataMap.keySet()) {
+            for (Solution solutions : dataMap.get(sample)) {
                 solutionDB.insert(solutions);
             }
         }
-        needSet=false;
-        pageCon=null;
-        oldFragment.remove(oldFragment.size()-1);
-        switchFragment(new BatchStep1(),getFragmentManager());
-        tcpClient=null;
+        needSet = false;
+        pageCon = null;
+        oldFragment.remove(oldFragment.size() - 1);
+        switchFragment(new BatchStep1(), getFragmentManager());
+        tcpClient = null;
     }
-
 
 
     private class finishFragment implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            if(startMeasure)
-            {
+            if (startMeasure) {
                 Common.showToast(activity, measureStartNotExist);
                 return;
             }
-            finishToSave=true;
-            FinishDialogFragment aa= new FinishDialogFragment();
+            finishToSave = true;
+            FinishDialogFragment aa = new FinishDialogFragment();
             aa.setObject(BatchStep2Set.this);
-            aa.show(getFragmentManager(),"show");
+            aa.show(getFragmentManager(), "show");
         }
     }
 
     private class step01OnClick implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            if(startMeasure)
-            {
+            if (startMeasure) {
                 Common.showToast(activity, measureStartNotExist);
                 return;
             }
-            if(tcpClient!=null)
-            {
+            if (tcpClient != null) {
                 tcpClient.cancelHomeTcpClient();
-                tcpClient=null;
+                tcpClient = null;
             }
-            BatchStep1 batchStep1=new BatchStep1();
-            Common.switchFragment(batchStep1,getFragmentManager());
+            BatchStep1 batchStep1 = new BatchStep1();
+            Common.switchFragment(batchStep1, getFragmentManager());
         }
     }
 }

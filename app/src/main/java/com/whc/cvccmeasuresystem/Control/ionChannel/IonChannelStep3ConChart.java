@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control.Sensitivity;
+package com.whc.cvccmeasuresystem.Control.ionChannel;
 
 import android.app.Activity;
 import android.content.Context;
@@ -34,16 +34,20 @@ import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.DoubleToInt;
 import static com.whc.cvccmeasuresystem.Common.Common.description;
-import static com.whc.cvccmeasuresystem.Common.Common.*;
+import static com.whc.cvccmeasuresystem.Common.Common.sample1;
+import static com.whc.cvccmeasuresystem.Common.Common.sample2;
+import static com.whc.cvccmeasuresystem.Common.Common.sample3;
+import static com.whc.cvccmeasuresystem.Common.Common.sample4;
+import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
+import static com.whc.cvccmeasuresystem.Common.Common.volCon;
 
 
-
-public class SensitivityStep2ConChart extends Fragment{
+public class IonChannelStep3ConChart extends Fragment{
     private View view;
     private Activity activity;
     private LineChart[] lineCharts;
     private int size;
-    public  static  TextView message;
+    public TextView message;
     public SampleDB sampleDB;
 
 
@@ -117,74 +121,11 @@ public class SensitivityStep2ConChart extends Fragment{
         setLineChart(lineCharts[3],volCon.get(sample4),sample4.getName(),"sample4",sample4);
     }
 
-    private String calculateSlop(List<Entry> entries,List<String> con,String name,Sample sample)
-    {
-
-        double s,r,xAverage=0.0,yAverage=0.0,b,diffX,diffY;
-        int size=entries.size();
-        if(size<=1)
-        {
-            return name;
-        }
-        //平均
-        for(int i=0;i<size;i++)
-        {
-            xAverage=xAverage+Double.valueOf(con.get(i));
-            yAverage=yAverage+entries.get(i).getY();
-        }
-        xAverage=xAverage/size;
-        yAverage=yAverage/size;
-        //斜率
-        double xDiff,yDiff,xyTotal=0.0,xTotal=0.0,yTotal=0.0;
-        for(int i=0;i<size;i++)
-        {
-            xDiff=Double.valueOf(con.get(i))-xAverage;
-            yDiff=entries.get(i).getY()-yAverage;
-            xyTotal=xyTotal+xDiff*yDiff;
-            xTotal=xTotal+xDiff*xDiff;
-            yTotal=yTotal+yDiff*yDiff;
-        }
-        //斜率
-        s=xyTotal/xTotal;
-        sample.setSlope(String.valueOf(s));
-        //線性度
-        r=xyTotal/(Math.sqrt(xTotal)*Math.sqrt(yTotal));
-        r=Math.sqrt(r);
-        r=r*100;
-        sample.setR(String.valueOf(r));
-        //截距
-        b=yAverage-s*xAverage;
-        //標準差
-        double diffResult=0.0;
-        if(size>3)
-        {
-            for(int i=0;i<size;i++)
-            {
-                diffResult= diffResult+Math.pow(entries.get(i).getY()-(b+s*Double.valueOf(con.get(i))),2);
-            }
-            diffResult=diffResult/(size-2);
-            diffResult=Math.sqrt(diffResult);
-            sample.setStandardDeviation(String.valueOf(diffResult));
-        }else {
-            sample.setStandardDeviation("0");
-        }
-        //誤差係數X
-        diffX=s/(Math.sqrt(xTotal));
-        sample.setDifferenceX(String.valueOf(diffX));
-        //誤差係數Y
-        diffY=Math.pow(xAverage,2)/xTotal;
-        diffY=diffY+(1/size);
-        diffY=diffResult/Math.sqrt(diffY);
-        sample.setDifferenceY(String.valueOf(diffY));
-        sample.setUnit("mV/pH");
-        sampleDB.update(sample);
-        return name+"  "+((int)s)+"mV/pH"+"  "+((int)r)+"%";
-    }
 
 
 
-    private void setLineChart(LineChart lineChart, HashMap<String,List<Solution>> solutions, String name, String s, Sample sample) {
-        String describe;
+
+    private void setLineChart(LineChart lineChart, List<Solution> solutions, String name,Sample sample) {
         List<Entry> entries = new ArrayList<Entry>();
         size=solutions.size();
         if(size<=0)
@@ -192,25 +133,16 @@ public class SensitivityStep2ConChart extends Fragment{
             return;
         }
 
-
         int i=0;
-        final List<String> ionType=new ArrayList<>();
-        for(String con:solutions.keySet())
+        float b,a,con;
+        for(Solution solution:solutions)
         {
-            int average=0;
-            List<Solution> ss=solutions.get(con);
-            int size=ss.size();
-            for(Solution solution:ss)
-            {
-                average=average+solution.getVoltage();
-            }
-            average=average/size;
-            entries.add(new Entry(i,average));
-            ionType.add(con);
-            i++;
+            b=Float.valueOf(sample.getIntercept())+Float.valueOf(sample.getDifferenceY());
+            a=(Float.valueOf(sample.getSlope())+Float.valueOf(sample.getDifferenceY()));
+            con=(solution.getVoltage()/a)-b;
+            solution.setConcentration(String.valueOf(con));
+            entries.add(new Entry(i,con));
         }
-
-        describe=calculateSlop(entries,ionType,s,sample);
 
         LineDataSet dataSet = new LineDataSet(entries, name);
         dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -240,9 +172,7 @@ public class SensitivityStep2ConChart extends Fragment{
                 }
             }
         });
-
-
-        lineChart.setDescription(description(describe));
+        lineChart.setDescription(description(" "));
         lineChart.setDrawBorders(true);
         lineChart.setData(data);
         lineChart.setDragEnabled(true);

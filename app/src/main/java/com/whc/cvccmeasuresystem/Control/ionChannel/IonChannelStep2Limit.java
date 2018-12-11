@@ -199,11 +199,12 @@ public class IonChannelStep2Limit extends Fragment {
 
 
             DataBase dataBase=new DataBase(activity);
-            SampleDB sampleDB=new SampleDB(dataBase.getReadableDatabase());
+            SampleDB sampleDB=new SampleDB(dataBase);
             sampleDB.update(sample1);
             sampleDB.update(sample2);
             sampleDB.update(sample3);
             sampleDB.update(sample4);
+            IonChannelStep2Main.initParameter=false;
             Common.switchFragment(new IonChannelStep2Main(),getFragmentManager());
         }
     }

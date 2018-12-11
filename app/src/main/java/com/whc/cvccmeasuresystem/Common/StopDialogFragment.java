@@ -17,6 +17,8 @@ import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Set;
 import com.whc.cvccmeasuresystem.Control.MainActivity;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Set;
 
 import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
 
@@ -25,7 +27,7 @@ import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
  * Created by Wang on 2018/1/3.
  */
 
-public class StopDialogFragment extends DialogFragment implements  DialogInterface.OnClickListener{
+public class StopDialogFragment extends DialogFragment implements DialogInterface.OnClickListener {
 
 
     private Object object;
@@ -41,8 +43,8 @@ public class StopDialogFragment extends DialogFragment implements  DialogInterfa
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        String message="";
-        String title="Do you want to stop measuring?";
+        String message = "";
+        String title = "Do you want to stop measuring?";
 
         return new AlertDialog.Builder(getActivity())
                 .setTitle(Html.fromHtml(title))
@@ -58,39 +60,22 @@ public class StopDialogFragment extends DialogFragment implements  DialogInterfa
     public void onClick(DialogInterface dialog, int which) {
         switch (which) {
             case DialogInterface.BUTTON_POSITIVE:
-                if(object instanceof BatchStep2Set)
-                {
-                    if(tcpClient!=null)
-                    {
-                        tcpClient.BatchStop();
-                    }else{
-                        BatchStep2Main.handlerMessage.sendEmptyMessage(2);
-                    }
+                if (object instanceof BatchStep2Set) {
 
-                }else if(object instanceof SensitivityStep2Set)
-                {
-                    if(tcpClient!=null)
-                    {
-                        tcpClient.SensitivityEnd();
-                    }else{
-                        SensitivityStep2Main.handlerMessage.sendEmptyMessage(2);
-                    }
-                }else if(object instanceof HysteresisStep2Set)
-                {
-                    if(tcpClient!=null)
-                    {
-                        tcpClient.HysteresisEnd();
-                    }else{
-                        HysteresisStep2Main.handlerMessage.sendEmptyMessage(2);
-                    }
-                }else if(object instanceof DriftStep2Set)
-                {
-                   if(tcpClient!=null)
-                   {
-                       tcpClient.DriftEnd();
-                   }else {
-                       DriftStep2Main.handlerMessage.sendEmptyMessage(2);
-                   }
+                    BatchStep2Main.handlerMessage.sendEmptyMessage(2);
+
+                } else if (object instanceof SensitivityStep2Set) {
+
+                    SensitivityStep2Main.handlerMessage.sendEmptyMessage(2);
+
+                } else if (object instanceof HysteresisStep2Set) {
+
+                    HysteresisStep2Main.handlerMessage.sendEmptyMessage(2);
+
+                } else if (object instanceof DriftStep2Set) {
+                    DriftStep2Main.handlerMessage.sendEmptyMessage(2);
+                }else if (object instanceof IonChannelStep2Set) {
+                    IonChannelStep2Main.handlerMessage.sendEmptyMessage(2);
                 }
                 break;
             default:

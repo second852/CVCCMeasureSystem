@@ -53,7 +53,7 @@ public class SignIn extends Fragment{
         userName=view.findViewById(R.id.userName);
         enter=view.findViewById(R.id.enter);
         DataBase dataBase=new DataBase(activity);
-        userDB=new UserDB(dataBase.getReadableDatabase());
+        userDB=new UserDB(dataBase);
         return view;
     }
 

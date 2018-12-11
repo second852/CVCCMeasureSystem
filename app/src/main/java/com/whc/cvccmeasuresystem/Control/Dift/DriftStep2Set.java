@@ -269,7 +269,7 @@ public class DriftStep2Set extends Fragment {
     public void finishMeasure()
     {
         DataBase dataBase=new DataBase(activity);
-        SolutionDB solutionDB=new SolutionDB(dataBase.getReadableDatabase());
+        SolutionDB solutionDB=new SolutionDB(dataBase);
         for(Sample sample:dataMap.keySet())
         {
             for (Solution solutions:dataMap.get(sample))

@@ -26,6 +26,7 @@ import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -106,7 +107,7 @@ public class HysteresisStep2Main extends Fragment {
 
 
         dataBase = new DataBase(activity);
-        SampleDB sampleDB = new SampleDB(dataBase.getReadableDatabase());
+        SampleDB sampleDB = new SampleDB(dataBase);
 
 
         //sample 1
@@ -167,12 +168,14 @@ public class HysteresisStep2Main extends Fragment {
             int currentPage = priceViewPager.getCurrentItem();
 
             if (msg.what == 1) {
+                HysteresisStart();
                 HysteresisStep2Main.priceViewPager.setCurrentItem(1);
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
                 return;
             }
 
             if (msg.what == 2) {
+                HysteresisEnd();
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
@@ -237,5 +240,35 @@ public class HysteresisStep2Main extends Fragment {
         }
     };
 
+    public static  void HysteresisStart()
+    {
+        Fragment fragment= HysteresisStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof HysteresisStep2Chart){
+            HysteresisStep2Chart.message.setText(R.string.measure_start);
+            HysteresisStep2Chart.message.setTextColor(Color.BLUE);
+        }
+    }
 
+    public static void HysteresisEnd()
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                tcpClient.sendEndMessage();
+            }
+        }).start();
+        indicateColor++;
+        tcpClient.mRun=false;
+        startMeasure=false;
+        try {
+            tcpClient.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Fragment fragment= HysteresisStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof HysteresisStep2Chart){
+            HysteresisStep2Chart.message.setText(R.string.measure_stop);
+            HysteresisStep2Chart.message.setTextColor(Color.RED);
+        }
+    }
 }

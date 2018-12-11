@@ -21,14 +21,12 @@ public class SolutionAdapter extends BaseAdapter {
 
     private Context context;
     private List<Solution> solutions;
-    private DataBase dataBase;
     private SampleDB sampleDB;
 
     public SolutionAdapter(Context context, List<Solution> solutions) {
         this.context = context;
         this.solutions = solutions;
-        dataBase=new DataBase(context);
-        sampleDB=new SampleDB(dataBase.getReadableDatabase());
+        sampleDB=new SampleDB(new DataBase(context));
     }
 
     @Override

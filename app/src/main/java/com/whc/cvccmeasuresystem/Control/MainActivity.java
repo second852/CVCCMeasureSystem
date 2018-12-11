@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         Fragment fragment = new BatchStep2Main();
         fragment = new SignIn();
-//        fragment=new HysteresisStep1();
+//        fragment=new IonChannelStep2Main();
         switchFragment(fragment, getSupportFragmentManager());
     }
 
@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
                     case IonChannel2Set:
                         switchFragment(new IonChannelStep2Main(),getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
+                        IonChannelStep2Main.initParameter=false;
                         break;
                 }
 

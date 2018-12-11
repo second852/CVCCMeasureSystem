@@ -58,6 +58,7 @@ public class Common {
     public static final String IonChannel2Set = "IonChannel2Set";
 
 
+
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;
     public static HashMap<Sample,List<Solution>> dataMap;

@@ -30,6 +30,7 @@ import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import static com.whc.cvccmeasuresystem.Common.Common.currentPage;
 import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
 import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
 import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
+import static com.whc.cvccmeasuresystem.Common.Common.needSet;
 import static com.whc.cvccmeasuresystem.Common.Common.sample1;
 import static com.whc.cvccmeasuresystem.Common.Common.sample2;
 import static com.whc.cvccmeasuresystem.Common.Common.sample3;
@@ -64,6 +66,7 @@ public class IonChannelStep2Main extends Fragment {
     public static ViewPager priceViewPager;
     public static FragmentPagerItemAdapter adapter;
     public static List<String> errorSample;
+    public static boolean initParameter;
 
 
     @Override
@@ -78,19 +81,8 @@ public class IonChannelStep2Main extends Fragment {
         //init
         activity.setTitle("Ion Channel Monitor Step2");
         dataBase = new DataBase(activity);
-        if (tcpClient == null) {
-            startMeasure = false;
-        } else {
-            startMeasure = true;
-        }
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        dataMap = null;
-        volCon = null;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -112,7 +104,10 @@ public class IonChannelStep2Main extends Fragment {
     public void onStart() {
         super.onStart();
         //set Page
-        setSample();
+        if(initParameter)
+        {
+            setSample();
+        }
     }
 
     private void setSample() {
@@ -121,7 +116,7 @@ public class IonChannelStep2Main extends Fragment {
         errorSample=new ArrayList<>();
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         dataBase = new DataBase(activity);
-        SampleDB sampleDB = new SampleDB(dataBase.getReadableDatabase());
+        SampleDB sampleDB = new SampleDB(dataBase);
 
 
         //sample 1
@@ -157,7 +152,6 @@ public class IonChannelStep2Main extends Fragment {
         public void onPageSelected(int position) {
             currentPage = position;
             Fragment fragment = adapter.getPage(position);
-
             if (fragment instanceof BatchStep2Chart) {
                 BatchStep2Chart batchStep2Chart = (BatchStep2Chart) fragment;
                 batchStep2Chart.setData();
@@ -183,12 +177,14 @@ public class IonChannelStep2Main extends Fragment {
             int currentPage = priceViewPager.getCurrentItem();
 
             if (msg.what == 1) {
+                IonChannelStep2Start();
                 IonChannelStep2Main.priceViewPager.setCurrentItem(1);
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
                 return;
             }
 
             if (msg.what == 2) {
+                IonChannelStep2Stop();
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
@@ -240,7 +236,7 @@ public class IonChannelStep2Main extends Fragment {
             dataMap.get(sample4).add(solution4);
 
 
-            Fragment fragment = adapter.getPage(currentPage);
+            Fragment fragment = adapter.getPage(1);
 
             if (fragment instanceof IonChannelStep2Data) {
                 IonChannelStep2Data ionChannelStep2Data = (IonChannelStep2Data) fragment;
@@ -250,4 +246,33 @@ public class IonChannelStep2Main extends Fragment {
     };
 
 
+    public static void IonChannelStep2Start()
+    {
+        Fragment fragment= IonChannelStep2Main.adapter.getPage(1);
+        if(fragment instanceof IonChannelStep2Data)
+        {
+            IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
+            ionChannelStep2Data.senMessage.setTextColor(Color.BLUE);
+            ionChannelStep2Data.senMessage.setText(R.string.measure_start);
+        }
+    }
+
+    public static void IonChannelStep2Stop()
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                tcpClient.sendEndMessage();
+            }
+        }).start();
+        tcpClient.mRun=false;
+        startMeasure=false;
+        Fragment fragment= IonChannelStep2Main.adapter.getPage(1);
+        if(fragment instanceof IonChannelStep2Data)
+        {
+            IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
+            ionChannelStep2Data.senMessage.setTextColor(Color.RED);
+            ionChannelStep2Data.senMessage.setText(R.string.measure_stop);
+        }
+    }
 }

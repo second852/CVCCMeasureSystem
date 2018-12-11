@@ -22,14 +22,12 @@ public class SolutionAdapterIonChannel extends BaseAdapter {
 
     private Context context;
     private List<Solution> solutions;
-    private DataBase dataBase;
     private SampleDB sampleDB;
 
     public SolutionAdapterIonChannel(Context context, List<Solution> solutions) {
         this.context = context;
         this.solutions = solutions;
-        dataBase=new DataBase(context);
-        sampleDB=new SampleDB(dataBase.getReadableDatabase());
+        sampleDB=new SampleDB(new DataBase(context));
     }
 
     @Override
@@ -67,6 +65,7 @@ public class SolutionAdapterIonChannel extends BaseAdapter {
             sampleIon.setText("Ion");
             sampleIVol.setText("mV");
             dateTime.setText("DateTime");
+            sampleIVol.setTextColor(Color.BLACK);
         }else {
             drawable=context.getResources().getDrawable(R.drawable.show_date_model_2);
             Solution solution=solutions.get(position);

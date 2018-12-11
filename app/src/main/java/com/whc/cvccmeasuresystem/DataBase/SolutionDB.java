@@ -4,6 +4,7 @@ package com.whc.cvccmeasuresystem.DataBase;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 
 import com.whc.cvccmeasuresystem.Model.Solution;
@@ -19,9 +20,9 @@ public class SolutionDB {
     private String TABLE_NAME="Solution";
 
 
-    public SolutionDB(SQLiteDatabase db)
+    public SolutionDB(SQLiteOpenHelper sq)
     {
-        this.db=db;
+        this.db=sq.getReadableDatabase();
     }
 
     public List<Solution> getAll() {

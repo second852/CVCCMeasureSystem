@@ -1,4 +1,4 @@
-package com.whc.cvccmeasuresystem.Control.Dift;
+package com.whc.cvccmeasuresystem.Control.ionChannel;
 
 
 import android.app.Activity;
@@ -23,20 +23,27 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
-import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
+import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
+import static com.whc.cvccmeasuresystem.Common.Common.currentPage;
+import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
+import static com.whc.cvccmeasuresystem.Common.Common.sample1;
+import static com.whc.cvccmeasuresystem.Common.Common.sample2;
+import static com.whc.cvccmeasuresystem.Common.Common.sample3;
+import static com.whc.cvccmeasuresystem.Common.Common.sample4;
+import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
+import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
+import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
 
-import static com.whc.cvccmeasuresystem.Common.Common.*;
-
-
-public class DriftStep2Main extends Fragment {
+public class IonChannelStep3Main extends Fragment {
 
 
     private Activity activity;
@@ -47,6 +54,9 @@ public class DriftStep2Main extends Fragment {
 
     public static ViewPager priceViewPager;
     public static FragmentPagerItemAdapter adapter;
+    public static List<String> errorSample;
+    public static HashMap<Sample,List<Solution>> dataMap;
+    public static List<Sample> samples;
 
 
     @Override
@@ -59,21 +69,10 @@ public class DriftStep2Main extends Fragment {
         }
 
         //init
-        activity.setTitle("Drift Monitor Step2");
+        activity.setTitle("Ion Channel Monitor Step2");
         dataBase = new DataBase(activity);
-        if (tcpClient == null) {
-            startMeasure = false;
-        } else {
-            startMeasure = true;
-        }
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        dataMap = null;
-        volCon = null;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -82,9 +81,10 @@ public class DriftStep2Main extends Fragment {
         viewPagerTab = view.findViewById(R.id.viewPagerTab);
         priceViewPager = view.findViewById(R.id.batchViewPager);
         FragmentPagerItems pages = new FragmentPagerItems(activity);
-        pages.add(FragmentPagerItem.of("Set", DriftStep2Set.class));
-        pages.add(FragmentPagerItem.of("Chart", DriftStep2Chart.class));
-        pages.add(FragmentPagerItem.of("Data", DriftStep2Data.class));
+        pages.add(FragmentPagerItem.of("Set", IonChannelStep3Set.class));
+        pages.add(FragmentPagerItem.of("Chart(V-T)", IonChannelStep3TimeChart.class));
+        pages.add(FragmentPagerItem.of("Chart(Ion-T)",IonChannelStep3ConChart.class));
+        pages.add(FragmentPagerItem.of("Data", IonChannelStep3Data.class));
         adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
         priceViewPager.setAdapter(adapter);
         priceViewPager.addOnPageChangeListener(new PageListener());
@@ -95,16 +95,14 @@ public class DriftStep2Main extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        //set Page
         setSample();
     }
 
     private void setSample() {
         dataMap = new HashMap<>();
         samples = new ArrayList<>();
-        choiceColor = new ArrayList<>();
+        errorSample=new ArrayList<>();
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-
         dataBase = new DataBase(activity);
         SampleDB sampleDB = new SampleDB(dataBase);
 
@@ -143,14 +141,6 @@ public class DriftStep2Main extends Fragment {
             currentPage = position;
             Fragment fragment = adapter.getPage(position);
 
-            if (fragment instanceof DriftStep2Chart) {
-                DriftStep2Chart driftStep2Chart = (DriftStep2Chart) fragment;
-                driftStep2Chart.setData();
-            } else if (fragment instanceof DriftStep2Data) {
-                DriftStep2Data driftStep2Data = (DriftStep2Data) fragment;
-                driftStep2Data.setListView();
-            }
-
         }
 
         @Override
@@ -168,14 +158,14 @@ public class DriftStep2Main extends Fragment {
             int currentPage = priceViewPager.getCurrentItem();
 
             if (msg.what == 1) {
-                DriftStart();
-                DriftStep2Main.priceViewPager.setCurrentItem(1);
+                IonChannelStep2Start();
+                IonChannelStep3Main.priceViewPager.setCurrentItem(1);
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
                 return;
             }
 
             if (msg.what == 2) {
-                DriftEnd();
+                IonChannelStep2Stop();
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
@@ -219,9 +209,7 @@ public class DriftStep2Main extends Fragment {
             solution2.setNumber(String.valueOf(measureTimes));
             solution3.setNumber(String.valueOf(measureTimes));
             solution4.setNumber(String.valueOf(measureTimes));
-            measureTimes++;
 
-            choiceColor.add(Color.parseColor(arrayColor[indicateColor % arrayColor.length]));
 
             dataMap.get(sample1).add(solution1);
             dataMap.get(sample2).add(solution2);
@@ -229,50 +217,43 @@ public class DriftStep2Main extends Fragment {
             dataMap.get(sample4).add(solution4);
 
 
-            Fragment fragment = adapter.getPage(currentPage);
+            Fragment fragment = adapter.getPage(1);
 
-            if (fragment instanceof DriftStep2Chart) {
-                DriftStep2Chart driftStep2Chart = (DriftStep2Chart) fragment;
-                driftStep2Chart.setData();
-            } else if (fragment instanceof DriftStep2Data) {
-                DriftStep2Data driftStep2Data = (DriftStep2Data) fragment;
-                driftStep2Data.setListView();
+            if (fragment instanceof IonChannelStep2Data) {
+                IonChannelStep2Data ionChannelStep2Data = (IonChannelStep2Data) fragment;
+                ionChannelStep2Data.setListView();
             }
         }
     };
 
-    public static void DriftStart()
+
+    public static void IonChannelStep2Start()
     {
-        Fragment fragment= DriftStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof DriftStep2Chart)
+        Fragment fragment= IonChannelStep3Main.adapter.getPage(1);
+        if(fragment instanceof IonChannelStep2Data)
         {
-            DriftStep2Chart.message.setText(R.string.measure_start);
-            DriftStep2Chart.message.setTextColor(Color.BLUE);
+            IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
+            ionChannelStep2Data.senMessage.setTextColor(Color.BLUE);
+            ionChannelStep2Data.senMessage.setText(R.string.measure_start);
         }
     }
 
-    public static void DriftEnd()
+    public static void IonChannelStep2Stop()
     {
-
         new Thread(new Runnable() {
             @Override
             public void run() {
                 tcpClient.sendEndMessage();
             }
         }).start();
-        indicateColor++;
         tcpClient.mRun=false;
         startMeasure=false;
-        try {
-            tcpClient.socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Fragment fragment= DriftStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof DriftStep2Chart)
+        Fragment fragment= IonChannelStep3Main.adapter.getPage(1);
+        if(fragment instanceof IonChannelStep2Data)
         {
-            DriftStep2Chart.message.setText(R.string.measure_stop);
-            DriftStep2Chart.message.setTextColor(Color.RED);
+            IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
+            ionChannelStep2Data.senMessage.setTextColor(Color.RED);
+            ionChannelStep2Data.senMessage.setText(R.string.measure_stop);
         }
     }
 }

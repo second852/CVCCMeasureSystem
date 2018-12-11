@@ -114,21 +114,23 @@
         </LinearLayout>
     </LinearLayout>
     <ListView
-        android:id="@+id/listData"
+        android:layout_marginTop="10dp"
+        android:id="@+id/listSlope"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="#f5f5f5"
         android:dividerHeight="0dp"
         >
     </ListView>
     <ListView
-        android:id="@+id/listSlope"
+        android:layout_marginTop="20dp"
+        android:id="@+id/listData"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="#f5f5f5"
         android:dividerHeight="0dp"
         >

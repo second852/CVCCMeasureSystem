@@ -4,6 +4,7 @@ package com.whc.cvccmeasuresystem.DataBase;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 import com.whc.cvccmeasuresystem.Model.SaveFile;
 
@@ -18,9 +19,9 @@ public class SaveFileDB {
     private String TABLE_NAME="SaveFile";
 
 
-    public SaveFileDB(SQLiteDatabase db)
+    public SaveFileDB(SQLiteOpenHelper sq)
     {
-        this.db=db;
+        this.db=sq.getReadableDatabase();
     }
 
     public List<SaveFile> getAll() {

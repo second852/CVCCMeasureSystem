@@ -33,12 +33,13 @@ import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
-
+import static com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main.startMeasure;
 
 
 public class BatchStep2Main extends Fragment {
@@ -71,7 +72,7 @@ public class BatchStep2Main extends Fragment {
         //init
         activity.setTitle("Batch Monitor Step2");
         dataBase=new DataBase(activity);
-        solutionDB=new SolutionDB(dataBase.getReadableDatabase());
+        solutionDB=new SolutionDB(dataBase);
         if(tcpClient==null)
         {
             startMeasure=false;
@@ -118,7 +119,7 @@ public class BatchStep2Main extends Fragment {
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
 
         dataBase = new DataBase(activity);
-        SampleDB sampleDB = new SampleDB(dataBase.getReadableDatabase());
+        SampleDB sampleDB = new SampleDB(dataBase);
 
 
         //sample 1
@@ -183,13 +184,15 @@ public class BatchStep2Main extends Fragment {
             if(msg.what==1)
             {
                 BatchStep2Main.priceViewPager.setCurrentItem(1);
-                Common.showToast(  adapter.getPage(currentPage).getActivity(),"Measurement Start!");
+                Common.showToast(adapter.getPage(currentPage).getActivity(),"Measurement Start!");
+                BatchStart();
                 return;
             }
 
             if(msg.what==2)
             {
-                Common.showToast(  adapter.getPage(currentPage).getActivity(),"Measurement End!");
+                BatchStop();
+                Common.showToast(adapter.getPage(currentPage).getActivity(),"Measurement End!");
                 return;
             }
 
@@ -261,7 +264,39 @@ public class BatchStep2Main extends Fragment {
         }
     };
 
+    public static void BatchStart()
+    {
+        Fragment fragment= BatchStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof BatchStep2Chart)
+        {
+            BatchStep2Chart.message.setText(R.string.measure_start);
+            BatchStep2Chart.message.setTextColor(Color.BLUE);
+        }
+    }
 
+    public static void BatchStop()
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                tcpClient.sendEndMessage();
+            }
+        }).start();
+        indicateColor++;
+        tcpClient.mRun=false;
+        startMeasure=false;
+        try {
+            tcpClient.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Fragment fragment= BatchStep2Main.adapter.getPage(currentPage);
+        if(fragment instanceof BatchStep2Chart)
+        {
+            BatchStep2Chart.message.setText(R.string.measure_stop);
+            BatchStep2Chart.message.setTextColor(Color.RED);
+        }
+    }
 
 
 }

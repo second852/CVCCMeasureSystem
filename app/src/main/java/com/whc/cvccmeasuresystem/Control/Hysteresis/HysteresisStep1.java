@@ -99,7 +99,7 @@ public class HysteresisStep1 extends Fragment {
 
     private void setFileName() {
         DataBase dataBase=new DataBase(activity);
-        SampleDB sampleDB=new SampleDB(dataBase.getReadableDatabase());
+        SampleDB sampleDB=new SampleDB(dataBase);
         //sample 1
         int sampleId=sharedPreferences.getInt(sample1String,0);
         sample1=sampleDB.findOldSample(sampleId);
@@ -242,8 +242,8 @@ public class HysteresisStep1 extends Fragment {
 
 
             DataBase dataBase=new DataBase(activity);
-            SaveFileDB saveFileDB=new SaveFileDB(dataBase.getReadableDatabase());
-            SampleDB sampleDB=new SampleDB(dataBase.getReadableDatabase());
+            SaveFileDB saveFileDB=new SaveFileDB(dataBase);
+            SampleDB sampleDB=new SampleDB(dataBase);
 
             if(needSet)
             {

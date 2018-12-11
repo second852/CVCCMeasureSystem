@@ -16,6 +16,8 @@ import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.whc.cvccmeasuresystem.Clent.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
+import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Set;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
@@ -23,6 +25,8 @@ import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
+
+import java.io.IOException;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
 
@@ -243,18 +247,16 @@ public class SensitivityStep2Set extends Fragment {
     private class stopMeasure implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            if(tcpClient!=null)
-            {
-                tcpClient.cancelTcpClient();
-                tcpClient=null;
-            }
+            StopDialogFragment aa= new StopDialogFragment();
+            aa.setObject(SensitivityStep2Set.this);
+            aa.show(getFragmentManager(),"show");
         }
     }
 
     public void finishMeasure()
     {
         DataBase dataBase=new DataBase(activity);
-        SolutionDB solutionDB=new SolutionDB(dataBase.getReadableDatabase());
+        SolutionDB solutionDB=new SolutionDB(dataBase);
         for(Sample sample:dataMap.keySet())
         {
             for (Solution solutions:dataMap.get(sample))
