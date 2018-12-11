@@ -20,6 +20,7 @@ import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep1;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 import com.whc.cvccmeasuresystem.R;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         Fragment fragment = new BatchStep2Main();
         fragment = new SignIn();
-//        fragment=new IonChannelStep2Main();
+        fragment=new IonChannelStep3Main();
         switchFragment(fragment, getSupportFragmentManager());
     }
 

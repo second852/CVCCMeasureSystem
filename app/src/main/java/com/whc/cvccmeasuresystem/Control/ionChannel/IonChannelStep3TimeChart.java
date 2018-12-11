@@ -133,9 +133,9 @@ public class IonChannelStep3TimeChart extends Fragment{
         dataSet.setDrawCircleHole(false);
         dataSet.setDrawFilled(false);
         dataSet.setDrawValues(false);
-        dataSet.setCircleColors(choiceColor);
+//        dataSet.setCircleColors(choiceColor);
         dataSet.setValueTextSize(12f);
-        dataSet.setColors(choiceColor);
+//        dataSet.setColors(choiceColor);
 
 
         LineData data = new LineData(dataSet);

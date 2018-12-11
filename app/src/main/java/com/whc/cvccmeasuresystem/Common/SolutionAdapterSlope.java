@@ -65,14 +65,23 @@ public class SolutionAdapterSlope extends BaseAdapter {
             name2.setText("Name");
             slope2.setText("Slope");
         }else {
+            int index=this.index[position];
             drawable=context.getResources().getDrawable(R.drawable.show_date_model_2);
-            Sample sample1=Common.samples.get(position);
-            List<Solution> solutions=Common.dataMap.get(sample1);
-            Sample sample2=Common.samples.get(position+1);
-            name1.setText(sample1.getName());
-            slope1.setText( calculateSlop(solutions,sample1));
-            name2.setText(sample2.getName());
-            slope2.setText( calculateSlop(solutions,sample2));
+            switch (index)
+            {
+                case 0:
+                    name1.setText(Common.sample1.getName());
+                    slope1.setText(calculateSlop(Common.sample1));
+                    name2.setText(Common.sample2.getName());
+                    slope2.setText(calculateSlop(Common.sample2));
+                    break;
+                case 1:
+                    name1.setText(Common.sample3.getName());
+                    slope1.setText(calculateSlop(Common.sample3));
+                    name2.setText(Common.sample4.getName());
+                    slope2.setText(calculateSlop(Common.sample4));
+                    break;
+            }
         }
         name1.setBackground(drawable);
         slope1.setBackground(drawable);
@@ -81,9 +90,9 @@ public class SolutionAdapterSlope extends BaseAdapter {
         return itemView;
     }
 
-    private String calculateSlop(List<Solution> solutions, Sample sample)
+    private String calculateSlop(Sample sample)
     {
-
+        List<Solution> solutions=Common.dataMap.get(sample);
         double s,r,xAverage=0.0,yAverage=0.0,b,diffX,diffY;
         int size=solutions.size();
         if(size<=1)
@@ -113,11 +122,11 @@ public class SolutionAdapterSlope extends BaseAdapter {
         sample.setSlope(String.valueOf(s));
         //線性度
         r=xyTotal/(Math.sqrt(xTotal)*Math.sqrt(yTotal));
-        r=Math.sqrt(r);
         r=r*100;
         sample.setR(String.valueOf(r));
         //截距
         b=yAverage-s*xAverage;
+        sample.setIntercept(String.valueOf(b));
         //標準差
         double diffResult=0.0;
         if(size>3)
@@ -133,13 +142,16 @@ public class SolutionAdapterSlope extends BaseAdapter {
             sample.setStandardDeviation("0");
         }
         //誤差係數X
-        diffX=s/(Math.sqrt(xTotal));
+        diffX=diffResult/(Math.sqrt(xTotal));
         sample.setDifferenceX(String.valueOf(diffX));
         //誤差係數Y
         diffY=Math.pow(xAverage,2)/xTotal;
-        diffY=diffY+(1/size);
-        diffY=diffResult/Math.sqrt(diffY);
+        diffY=diffY+(double)1/size;
+        System.out.println("誤差係數Y"+diffY);
+        diffY=Math.pow(diffResult,2)*diffY;
+        diffY=Math.sqrt(diffY);
         sample.setDifferenceY(String.valueOf(diffY));
+        sample.setUnit("mV/pH");
         sampleDB.update(sample);
         return ((int)s)+"mV/pH";
     }

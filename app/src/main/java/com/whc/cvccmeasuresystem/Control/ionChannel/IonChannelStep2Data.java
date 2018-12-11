@@ -44,7 +44,7 @@ public class IonChannelStep2Data extends Fragment{
     private AwesomeTextView sample1N,sample2N,sample3N,sample4N;
     public TextView senMessage;
     public SampleDB sampleDB;
-    public Integer[] index={0,1,3};
+    public Integer[] index={0,0,1};
 
 
     @Override
@@ -133,7 +133,18 @@ public class IonChannelStep2Data extends Fragment{
 
         List<Solution> solutions=new ArrayList<>();
         solutions.add(new Solution());
+
+        ///////////////////////////////////////
+//        Solution solution1=new Solution();
+//        solution1.setVoltage(2000);
+//        solution1.setConcentration("4");
+//        Solution solution2=new Solution();
+//        solution2.setVoltage(2000);
+//        solution2.setConcentration("4");
+        ///////////////
         List<Solution> sampleSolution=dataMap.get(sample1);
+
+
         for(Solution solution:sampleSolution)
         {
             if(solution.getVoltage()>Integer.valueOf(sample1.getLimitHighVoltage()))

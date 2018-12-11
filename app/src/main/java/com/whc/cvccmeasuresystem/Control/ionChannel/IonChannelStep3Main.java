@@ -4,7 +4,6 @@ package com.whc.cvccmeasuresystem.Control.ionChannel;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,6 +11,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -112,6 +112,9 @@ public class IonChannelStep3Main extends Fragment {
         sample1 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample1, new ArrayList<Solution>());
         samples.add(sample1);
+        Log.d("XXXXX",sample1.getStandardDeviation()+" "+sample1.getR());
+        Log.d("XXXXX",sample1.getDifferenceX()+" "+sample1.getDifferenceY());
+        Log.d("XXXXX",sample1.getIntercept()+" "+sample1.getSlope());
         //sample 2
         sampleID = sharedPreferences.getInt(Common.sample2String, 0);
         sample2 = sampleDB.findOldSample(sampleID);
@@ -140,7 +143,19 @@ public class IonChannelStep3Main extends Fragment {
         public void onPageSelected(int position) {
             currentPage = position;
             Fragment fragment = adapter.getPage(position);
-
+            if(fragment instanceof IonChannelStep3TimeChart)
+            {
+                IonChannelStep3TimeChart ionChannelStep3TimeChart= (IonChannelStep3TimeChart) fragment;
+                ionChannelStep3TimeChart.setData();
+            }else if(fragment instanceof  IonChannelStep3ConChart)
+            {
+                IonChannelStep3ConChart ionChannelStep3ConChart= (IonChannelStep3ConChart) fragment;
+                ionChannelStep3ConChart.setData();
+            }else if(fragment instanceof IonChannelStep3Data)
+            {
+                IonChannelStep3Data ionChannelStep3Data= (IonChannelStep3Data) fragment;
+                ionChannelStep3Data.setListView();
+            }
         }
 
         @Override
@@ -158,14 +173,14 @@ public class IonChannelStep3Main extends Fragment {
             int currentPage = priceViewPager.getCurrentItem();
 
             if (msg.what == 1) {
-                IonChannelStep2Start();
+                IonChannelStep3Start();
                 IonChannelStep3Main.priceViewPager.setCurrentItem(1);
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
                 return;
             }
 
             if (msg.what == 2) {
-                IonChannelStep2Stop();
+                IonChannelStep3Stop();
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
@@ -185,10 +200,10 @@ public class IonChannelStep3Main extends Fragment {
             }
 
 
-            Solution solution1 = new Solution(Common.solution1.getConcentration(), sample1.getID());
-            Solution solution2 = new Solution(Common.solution2.getConcentration(), sample2.getID());
-            Solution solution3 = new Solution(Common.solution3.getConcentration(), sample3.getID());
-            Solution solution4 = new Solution(Common.solution4.getConcentration(), sample4.getID());
+            Solution solution1 = new Solution(sample1.getID());
+            Solution solution2 = new Solution(sample2.getID());
+            Solution solution3 = new Solution(sample3.getID());
+            Solution solution4 = new Solution(sample4.getID());
 
 
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -210,6 +225,11 @@ public class IonChannelStep3Main extends Fragment {
             solution3.setNumber(String.valueOf(measureTimes));
             solution4.setNumber(String.valueOf(measureTimes));
 
+            solution1.setConcentration(Common.calculateCon(sample1,solution1.getVoltage()));
+            solution2.setConcentration(Common.calculateCon(sample2,solution2.getVoltage()));
+            solution3.setConcentration(Common.calculateCon(sample3,solution3.getVoltage()));
+            solution4.setConcentration(Common.calculateCon(sample4,solution4.getVoltage()));
+
 
             dataMap.get(sample1).add(solution1);
             dataMap.get(sample2).add(solution2);
@@ -217,28 +237,44 @@ public class IonChannelStep3Main extends Fragment {
             dataMap.get(sample4).add(solution4);
 
 
-            Fragment fragment = adapter.getPage(1);
-
-            if (fragment instanceof IonChannelStep2Data) {
-                IonChannelStep2Data ionChannelStep2Data = (IonChannelStep2Data) fragment;
-                ionChannelStep2Data.setListView();
+            Fragment fragment = adapter.getPage(currentPage);
+            if(fragment instanceof IonChannelStep3TimeChart)
+            {
+                IonChannelStep3TimeChart ionChannelStep3TimeChart= (IonChannelStep3TimeChart) fragment;
+                ionChannelStep3TimeChart.setData();
+            }else if(fragment instanceof  IonChannelStep3ConChart)
+            {
+                IonChannelStep3ConChart ionChannelStep3ConChart= (IonChannelStep3ConChart) fragment;
+                ionChannelStep3ConChart.setData();
+            }else if(fragment instanceof IonChannelStep3Data)
+            {
+                IonChannelStep3Data ionChannelStep3Data= (IonChannelStep3Data) fragment;
+                ionChannelStep3Data.setListView();
             }
+
         }
     };
 
 
-    public static void IonChannelStep2Start()
+    public static void IonChannelStep3Start()
     {
-        Fragment fragment= IonChannelStep3Main.adapter.getPage(1);
-        if(fragment instanceof IonChannelStep2Data)
+        Fragment fragment = adapter.getPage(currentPage);
+        if(fragment instanceof IonChannelStep3TimeChart)
         {
-            IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
-            ionChannelStep2Data.senMessage.setTextColor(Color.BLUE);
-            ionChannelStep2Data.senMessage.setText(R.string.measure_start);
+            IonChannelStep3TimeChart ionChannelStep3TimeChart= (IonChannelStep3TimeChart) fragment;
+            ionChannelStep3TimeChart.setData();
+        }else if(fragment instanceof  IonChannelStep3ConChart)
+        {
+            IonChannelStep3ConChart ionChannelStep3ConChart= (IonChannelStep3ConChart) fragment;
+            ionChannelStep3ConChart.setData();
+        }else if(fragment instanceof IonChannelStep3Data)
+        {
+            IonChannelStep3Data ionChannelStep3Data= (IonChannelStep3Data) fragment;
+            ionChannelStep3Data.setListView();
         }
     }
 
-    public static void IonChannelStep2Stop()
+    public static void IonChannelStep3Stop()
     {
         new Thread(new Runnable() {
             @Override
@@ -248,12 +284,19 @@ public class IonChannelStep3Main extends Fragment {
         }).start();
         tcpClient.mRun=false;
         startMeasure=false;
-        Fragment fragment= IonChannelStep3Main.adapter.getPage(1);
-        if(fragment instanceof IonChannelStep2Data)
+        Fragment fragment = adapter.getPage(currentPage);
+        if(fragment instanceof IonChannelStep3TimeChart)
         {
-            IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
-            ionChannelStep2Data.senMessage.setTextColor(Color.RED);
-            ionChannelStep2Data.senMessage.setText(R.string.measure_stop);
+            IonChannelStep3TimeChart ionChannelStep3TimeChart= (IonChannelStep3TimeChart) fragment;
+            ionChannelStep3TimeChart.setData();
+        }else if(fragment instanceof  IonChannelStep3ConChart)
+        {
+            IonChannelStep3ConChart ionChannelStep3ConChart= (IonChannelStep3ConChart) fragment;
+            ionChannelStep3ConChart.setData();
+        }else if(fragment instanceof IonChannelStep3Data)
+        {
+            IonChannelStep3Data ionChannelStep3Data= (IonChannelStep3Data) fragment;
+            ionChannelStep3Data.setListView();
         }
     }
 }

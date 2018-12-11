@@ -7,6 +7,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ import static com.whc.cvccmeasuresystem.Common.Common.sample1;
 import static com.whc.cvccmeasuresystem.Common.Common.sample2;
 import static com.whc.cvccmeasuresystem.Common.Common.sample3;
 import static com.whc.cvccmeasuresystem.Common.Common.sample4;
+import static com.whc.cvccmeasuresystem.Common.Common.samples;
 import static com.whc.cvccmeasuresystem.Common.Common.solution1;
 import static com.whc.cvccmeasuresystem.Common.Common.solution2;
 import static com.whc.cvccmeasuresystem.Common.Common.solution3;
@@ -584,6 +586,7 @@ public class IonChannelStep2Set extends Fragment {
             }
             oldFragment.add(IonChannel2Set);
             switchFragment(new IonChannelStep3Main(),getFragmentManager());
+
         }
     }
 }

@@ -29,7 +29,6 @@ import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.DoubleToInt;
@@ -39,7 +38,6 @@ import static com.whc.cvccmeasuresystem.Common.Common.sample2;
 import static com.whc.cvccmeasuresystem.Common.Common.sample3;
 import static com.whc.cvccmeasuresystem.Common.Common.sample4;
 import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.volCon;
 
 
 public class IonChannelStep3ConChart extends Fragment{
@@ -109,16 +107,16 @@ public class IonChannelStep3ConChart extends Fragment{
 
 
 
-        setLineChart(lineCharts[0],volCon.get(sample1),sample1.getName(),"sample1",sample1);
+        setLineChart(lineCharts[0],IonChannelStep3Main.dataMap.get(sample1),"sample1",sample1);
 
 
-        setLineChart(lineCharts[1],volCon.get(sample2),sample2.getName(),"sample2",sample2);
+        setLineChart(lineCharts[1],IonChannelStep3Main.dataMap.get(sample2),"sample2",sample2);
 //
 //
-        setLineChart(lineCharts[2],volCon.get(sample3),sample3.getName(),"sample3",sample3);
+        setLineChart(lineCharts[2],IonChannelStep3Main.dataMap.get(sample3),"sample3",sample3);
 //
 //
-        setLineChart(lineCharts[3],volCon.get(sample4),sample4.getName(),"sample4",sample4);
+        setLineChart(lineCharts[3],IonChannelStep3Main.dataMap.get(sample4),"sample4",sample4);
     }
 
 
@@ -134,14 +132,10 @@ public class IonChannelStep3ConChart extends Fragment{
         }
 
         int i=0;
-        float b,a,con;
         for(Solution solution:solutions)
         {
-            b=Float.valueOf(sample.getIntercept())+Float.valueOf(sample.getDifferenceY());
-            a=(Float.valueOf(sample.getSlope())+Float.valueOf(sample.getDifferenceY()));
-            con=(solution.getVoltage()/a)-b;
-            solution.setConcentration(String.valueOf(con));
-            entries.add(new Entry(i,con));
+            entries.add(new Entry(i,Float.valueOf(solution.getConcentration())));
+            i++;
         }
 
         LineDataSet dataSet = new LineDataSet(entries, name);
@@ -166,7 +160,7 @@ public class IonChannelStep3ConChart extends Fragment{
             public String getFormattedValue(float value, AxisBase axis) {
                 try {
                     int index = (int) value;
-                    return ionType.get(index);
+                    return getLabels(size).get(index);
                 } catch (Exception e) {
                     return " ";
                 }
@@ -194,6 +188,14 @@ public class IonChannelStep3ConChart extends Fragment{
         l.setTextColor(Color.parseColor("#000000"));
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
+    }
+
+    private List<String> getLabels(int size) {
+        List<String> chartLabels = new ArrayList<>();
+        for (int i = 0; i < (size+1); i++) {
+            chartLabels.add( (i+1) + "min");
+        }
+        return chartLabels;
     }
 
 

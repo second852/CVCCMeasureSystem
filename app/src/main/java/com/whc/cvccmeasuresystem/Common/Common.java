@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.beardedhen.androidbootstrap.BootstrapText;
 import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.data.Entry;
 import com.whc.cvccmeasuresystem.Clent.TCPClient;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Sample;
@@ -43,7 +44,7 @@ public class Common {
     public static SimpleDateFormat timeToString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ");
     public static final String sample1String = "sample1";
     public static final String sample2String = "sample2";
-    public static final String sample3String= "sample3";
+    public static final String sample3String = "sample3";
     public static final String sample4String = "sample4";
     public static final String needIon = "Please input this concentration";
     public static final String needInt = "Please input this number";
@@ -58,30 +59,23 @@ public class Common {
     public static final String IonChannel2Set = "IonChannel2Set";
 
 
-
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;
-    public static HashMap<Sample,List<Solution>> dataMap;
+    public static HashMap<Sample, List<Solution>> dataMap;
     public static boolean startMeasure;
-    public static Solution solution1,solution2,solution3,solution4;
+    public static Solution solution1, solution2, solution3, solution4;
     public static int currentPage;
     public static List<Sample> samples;
     public static int measureTimes;
     public static TCPClient tcpClient;
     public static boolean finishToSave;
-    public static HashMap<Sample,HashMap<String,List<Solution>>> volCon;
+    public static HashMap<Sample, HashMap<String, List<Solution>>> volCon;
     public static List<Integer> choiceColor;
-    public static String[] arrayColor={"#007bff","#28a745","#fd7e14","#ffc107","#dc3545"};
+    public static String[] arrayColor = {"#007bff", "#28a745", "#fd7e14", "#ffc107", "#dc3545"};
     public static int indicateColor;
     public static PageCon pageCon;
     public static List<String> oldFragment;
     public static boolean needSet;
-
-
-
-
-
-
 
 
     public static HashMap<String, String> MeasureType() {
@@ -95,13 +89,21 @@ public class Common {
     }
 
 
+    public static String calculateCon(Sample sample, Integer Voltage) {
+        float b, a, con;
+        b = Float.valueOf(sample.getIntercept()) + Float.valueOf(sample.getDifferenceY());
+        a = (Float.valueOf(sample.getSlope()) + Float.valueOf(sample.getDifferenceY()));
+        con = (Voltage - b)/ a;
+        return String.valueOf(con);
+    }
+
 
     public static Description description(String name) {
-        Description description= new Description();
+        Description description = new Description();
         description.setText(name);
         description.setTextSize(14f);
         description.setTextAlign(Paint.Align.LEFT);
-        description.setPosition(250,140);
+        description.setPosition(250, 140);
         return description;
     }
 
@@ -144,15 +146,15 @@ public class Common {
 
     public static List<BootstrapText> loopList(Activity activity) {
         List<BootstrapText> bootstrapTexts = new ArrayList<>();
-        bootstrapTexts.add(createBootstrapText(activity,"Loop1"));
-        bootstrapTexts.add(createBootstrapText(activity,"Loop2"));
-        bootstrapTexts.add(createBootstrapText(activity,"Loop3"));
-        bootstrapTexts.add(createBootstrapText(activity,"Loop4"));
-        bootstrapTexts.add(createBootstrapText(activity,"Loop5"));
+        bootstrapTexts.add(createBootstrapText(activity, "Loop1"));
+        bootstrapTexts.add(createBootstrapText(activity, "Loop2"));
+        bootstrapTexts.add(createBootstrapText(activity, "Loop3"));
+        bootstrapTexts.add(createBootstrapText(activity, "Loop4"));
+        bootstrapTexts.add(createBootstrapText(activity, "Loop5"));
         return bootstrapTexts;
     }
 
-    public static  BootstrapText createBootstrapText(Activity activity,String s) {
+    public static BootstrapText createBootstrapText(Activity activity, String s) {
         BootstrapText text = new BootstrapText.Builder(activity)
                 .addText(s)
                 .build();

@@ -22,6 +22,11 @@ public class Solution implements Serializable{
         this.noNormalV = noNormalV;
     }
 
+
+    public Solution(int sampleID) {
+        this.sampleID = sampleID;
+    }
+
     public Solution(String concentration, int sampleID) {
         this.concentration = concentration;
         this.sampleID = sampleID;
