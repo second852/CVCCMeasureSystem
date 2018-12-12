@@ -4,6 +4,7 @@ package com.whc.cvccmeasuresystem.Control.ionChannel;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,6 +22,8 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItem;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
+import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.Model.Sample;
@@ -32,7 +35,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.whc.cvccmeasuresystem.Common.Common.arrayColor;
+import static com.whc.cvccmeasuresystem.Common.Common.choiceColor;
 import static com.whc.cvccmeasuresystem.Common.Common.currentPage;
+import static com.whc.cvccmeasuresystem.Common.Common.finishToSave;
+import static com.whc.cvccmeasuresystem.Common.Common.finishToSave1;
+import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
+import static com.whc.cvccmeasuresystem.Common.Common.measureStartNotExist;
 import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
 import static com.whc.cvccmeasuresystem.Common.Common.sample1;
 import static com.whc.cvccmeasuresystem.Common.Common.sample2;
@@ -57,6 +66,7 @@ public class IonChannelStep3Main extends Fragment {
     public static List<String> errorSample;
     public static HashMap<Sample,List<Solution>> dataMap;
     public static List<Sample> samples;
+    public static boolean noInitParameter;
 
 
     @Override
@@ -69,7 +79,7 @@ public class IonChannelStep3Main extends Fragment {
         }
 
         //init
-        activity.setTitle("Ion Channel Monitor Step2");
+        activity.setTitle("Ion Channel Monitor Step3");
         dataBase = new DataBase(activity);
     }
 
@@ -95,6 +105,10 @@ public class IonChannelStep3Main extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        if(noInitParameter)
+        {
+            return;
+        }
         setSample();
     }
 
@@ -102,6 +116,8 @@ public class IonChannelStep3Main extends Fragment {
         dataMap = new HashMap<>();
         samples = new ArrayList<>();
         errorSample=new ArrayList<>();
+        indicateColor=0;
+        choiceColor=new ArrayList<>();
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         dataBase = new DataBase(activity);
         SampleDB sampleDB = new SampleDB(dataBase);
@@ -112,9 +128,9 @@ public class IonChannelStep3Main extends Fragment {
         sample1 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample1, new ArrayList<Solution>());
         samples.add(sample1);
-        Log.d("XXXXX",sample1.getStandardDeviation()+" "+sample1.getR());
-        Log.d("XXXXX",sample1.getDifferenceX()+" "+sample1.getDifferenceY());
-        Log.d("XXXXX",sample1.getIntercept()+" "+sample1.getSlope());
+//        Log.d("XXXXX",sample1.getStandardDeviation()+" "+sample1.getR());
+//        Log.d("XXXXX",sample1.getDifferenceX()+" "+sample1.getDifferenceY());
+//        Log.d("XXXXX",sample1.getIntercept()+" "+sample1.getSlope());
         //sample 2
         sampleID = sharedPreferences.getInt(Common.sample2String, 0);
         sample2 = sampleDB.findOldSample(sampleID);
@@ -130,6 +146,7 @@ public class IonChannelStep3Main extends Fragment {
         sample4 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample4, new ArrayList<Solution>());
         samples.add(sample4);
+        finishToSave1=false;
     }
 
 
@@ -155,6 +172,10 @@ public class IonChannelStep3Main extends Fragment {
             {
                 IonChannelStep3Data ionChannelStep3Data= (IonChannelStep3Data) fragment;
                 ionChannelStep3Data.setListView();
+            }else if(fragment instanceof IonChannelStep3Set)
+            {
+                IonChannelStep3Set ionChannelStep3Set= (IonChannelStep3Set) fragment;
+                ionChannelStep3Set.setImage();
             }
         }
 
@@ -230,12 +251,14 @@ public class IonChannelStep3Main extends Fragment {
             solution3.setConcentration(Common.calculateCon(sample3,solution3.getVoltage()));
             solution4.setConcentration(Common.calculateCon(sample4,solution4.getVoltage()));
 
+            measureTimes++;
+
+            choiceColor.add(Color.parseColor(arrayColor[indicateColor % arrayColor.length]));
 
             dataMap.get(sample1).add(solution1);
             dataMap.get(sample2).add(solution2);
             dataMap.get(sample3).add(solution3);
             dataMap.get(sample4).add(solution4);
-
 
             Fragment fragment = adapter.getPage(currentPage);
             if(fragment instanceof IonChannelStep3TimeChart)
@@ -250,6 +273,10 @@ public class IonChannelStep3Main extends Fragment {
             {
                 IonChannelStep3Data ionChannelStep3Data= (IonChannelStep3Data) fragment;
                 ionChannelStep3Data.setListView();
+            }else if(fragment instanceof IonChannelStep3Set)
+            {
+                IonChannelStep3Set ionChannelStep3Set= (IonChannelStep3Set) fragment;
+                ionChannelStep3Set.setImage();
             }
 
         }
@@ -258,6 +285,7 @@ public class IonChannelStep3Main extends Fragment {
 
     public static void IonChannelStep3Start()
     {
+
         Fragment fragment = adapter.getPage(currentPage);
         if(fragment instanceof IonChannelStep3TimeChart)
         {
@@ -271,11 +299,16 @@ public class IonChannelStep3Main extends Fragment {
         {
             IonChannelStep3Data ionChannelStep3Data= (IonChannelStep3Data) fragment;
             ionChannelStep3Data.setListView();
+        }else if(fragment instanceof IonChannelStep3Set)
+        {
+            IonChannelStep3Set ionChannelStep3Set= (IonChannelStep3Set) fragment;
+            ionChannelStep3Set.setImage();
         }
     }
 
     public static void IonChannelStep3Stop()
     {
+        indicateColor++;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -297,6 +330,11 @@ public class IonChannelStep3Main extends Fragment {
         {
             IonChannelStep3Data ionChannelStep3Data= (IonChannelStep3Data) fragment;
             ionChannelStep3Data.setListView();
+        }else if(fragment instanceof IonChannelStep3Set)
+        {
+            IonChannelStep3Set ionChannelStep3Set= (IonChannelStep3Set) fragment;
+            ionChannelStep3Set.setImage();
         }
     }
+
 }

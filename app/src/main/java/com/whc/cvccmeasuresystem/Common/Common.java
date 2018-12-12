@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.beardedhen.androidbootstrap.BootstrapEditText;
@@ -23,6 +24,7 @@ import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.SimpleFormatter;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.beardedhen.androidbootstrap.font.FontAwesome.FA_CALCULATOR;
 import static com.beardedhen.androidbootstrap.font.FontAwesome.FA_LIGHTBULB_O;
 import static com.beardedhen.androidbootstrap.font.FontAwesome.FA_SAVE;
@@ -69,6 +72,7 @@ public class Common {
     public static int measureTimes;
     public static TCPClient tcpClient;
     public static boolean finishToSave;
+    public static boolean finishToSave1;
     public static HashMap<Sample, HashMap<String, List<Solution>>> volCon;
     public static List<Integer> choiceColor;
     public static String[] arrayColor = {"#007bff", "#28a745", "#fd7e14", "#ffc107", "#dc3545"};
@@ -76,6 +80,7 @@ public class Common {
     public static PageCon pageCon;
     public static List<String> oldFragment;
     public static boolean needSet;
+    public static DecimalFormat nf=new DecimalFormat("#,##0.00");
 
 
     public static HashMap<String, String> MeasureType() {
@@ -89,10 +94,26 @@ public class Common {
     }
 
 
+    public static void clossKeyword(Activity context) {
+        InputMethodManager imm = (InputMethodManager) context
+                .getSystemService(INPUT_METHOD_SERVICE);
+        View view=context.getWindow().getCurrentFocus();
+        imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+    public static String doubleRemoveZero(String s) {
+        double d=Double.valueOf(s);
+        int a = (int) d;
+        if (a == d) {
+            return String.valueOf(a);
+        } else {
+            return String.valueOf(Common.nf.format(d));
+        }
+    }
+
     public static String calculateCon(Sample sample, Integer Voltage) {
-        float b, a, con;
-        b = Float.valueOf(sample.getIntercept()) + Float.valueOf(sample.getDifferenceY());
-        a = (Float.valueOf(sample.getSlope()) + Float.valueOf(sample.getDifferenceY()));
+        Double b, a, con;
+        b = Double.valueOf(sample.getIntercept());
+        a = (Double.valueOf(sample.getSlope()));
         con = (Voltage - b)/ a;
         return String.valueOf(con);
     }

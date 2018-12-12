@@ -250,7 +250,6 @@ public class IonChannelStep1 extends Fragment {
                 //Sample 4
                 insert(sample4String,getFourthName,fourthType.getText().toString(),nowFile.getID(),sampleDB);
             }
-            IonChannelStep2Main.initParameter=true;
             switchFragment(new IonChannelStep2Main(),getFragmentManager());
             oldFragment.add(IonChannel1);
             if(tcpClient!=null)
@@ -279,8 +278,9 @@ public class IonChannelStep1 extends Fragment {
         sample.setName(name);
         sample.setIonType(measureType);
         sample.setFileID(fileID);
+        sample.setLocation(saveName);
         sampleDB.insert(sample);
-        Sample nowSample=sampleDB.findOldSample(name,fileID);
+        Sample nowSample=sampleDB.findOldSample(name,fileID,saveName);
         sharedPreferences.edit().putInt(saveName,nowSample.getID()).apply();
     }
 

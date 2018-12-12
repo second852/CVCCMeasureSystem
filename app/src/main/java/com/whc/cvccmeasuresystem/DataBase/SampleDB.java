@@ -51,8 +51,8 @@ public class SampleDB {
     }
 
 
-    public Sample findOldSample(String name,Integer fileID) {
-        String sql = "SELECT * FROM Sample where name = '"+name+"' and  fileID = '"+fileID+"';";
+    public Sample findOldSample(String name,Integer fileID,String location) {
+        String sql = "SELECT * FROM Sample where name = '"+name+"' and  fileID = '"+fileID+"' and location = '"+location+"';";
         String[] args = {};
         Cursor cursor = db.rawQuery(sql, args);
         Sample sample=null;
@@ -62,15 +62,16 @@ public class SampleDB {
             sample.setName(cursor.getString(1));
             sample.setIonType(cursor.getString(2));
             sample.setFileID(cursor.getInt(3));
-            sample.setLimitHighVoltage(cursor.getString(4));
-            sample.setLimitLowVoltage(cursor.getString(5));
-            sample.setSlope(cursor.getString(6));
-            sample.setUnit(cursor.getString(7));
-            sample.setIntercept(cursor.getString(8));
-            sample.setStandardDeviation(cursor.getString(9));
-            sample.setDifferenceX(cursor.getString(10));
-            sample.setDifferenceY(cursor.getString(11));
-            sample.setR(cursor.getString(12));
+            sample.setLocation(cursor.getString(4));
+            sample.setLimitHighVoltage(cursor.getString(5));
+            sample.setLimitLowVoltage(cursor.getString(6));
+            sample.setSlope(cursor.getString(7));
+            sample.setUnit(cursor.getString(8));
+            sample.setIntercept(cursor.getString(9));
+            sample.setStandardDeviation(cursor.getString(10));
+            sample.setDifferenceX(cursor.getString(11));
+            sample.setDifferenceY(cursor.getString(12));
+            sample.setR(cursor.getString(13));
         }
         cursor.close();
         return sample;
@@ -87,15 +88,16 @@ public class SampleDB {
             sample.setName(cursor.getString(1));
             sample.setIonType(cursor.getString(2));
             sample.setFileID(cursor.getInt(3));
-            sample.setLimitHighVoltage(cursor.getString(4));
-            sample.setLimitLowVoltage(cursor.getString(5));
-            sample.setSlope(cursor.getString(6));
-            sample.setUnit(cursor.getString(7));
-            sample.setIntercept(cursor.getString(8));
-            sample.setStandardDeviation(cursor.getString(9));
-            sample.setDifferenceX(cursor.getString(10));
-            sample.setDifferenceY(cursor.getString(11));
-            sample.setR(cursor.getString(12));
+            sample.setLocation(cursor.getString(4));
+            sample.setLimitHighVoltage(cursor.getString(5));
+            sample.setLimitLowVoltage(cursor.getString(6));
+            sample.setSlope(cursor.getString(7));
+            sample.setUnit(cursor.getString(8));
+            sample.setIntercept(cursor.getString(9));
+            sample.setStandardDeviation(cursor.getString(10));
+            sample.setDifferenceX(cursor.getString(11));
+            sample.setDifferenceY(cursor.getString(12));
+            sample.setR(cursor.getString(13));
         }
         cursor.close();
         return sample;
@@ -107,6 +109,7 @@ public class SampleDB {
         values.put("name", sample.getName());
         values.put("ionType", sample.getIonType());
         values.put("fileID", sample.getFileID());
+        values.put("location", sample.getLocation());
         values.put("limitHighVoltage", sample.getLimitHighVoltage());
         values.put("limitLowVoltage", sample.getLimitLowVoltage());
         values.put("slope", sample.getSlope());
@@ -125,6 +128,7 @@ public class SampleDB {
         values.put("name", sample.getName());
         values.put("ionType", sample.getIonType());
         values.put("fileID", sample.getFileID());
+        values.put("location", sample.getLocation());
         values.put("limitHighVoltage", sample.getLimitHighVoltage());
         values.put("limitLowVoltage", sample.getLimitLowVoltage());
         values.put("slope", sample.getSlope());

@@ -1,6 +1,9 @@
 package com.whc.cvccmeasuresystem.Model;
 
 
+import android.util.Log;
+
+import java.util.Objects;
 
 /**
  * Created by Wang on 2018/12/4.
@@ -12,6 +15,7 @@ public class Sample {
     private String name;//1 sample name
     private String ionType;//2 solution type Common-SolutionType
     private int fileID;//3 file measure id
+    private String location;
     private String limitHighVoltage;
     private String limitLowVoltage;
     private String slope;
@@ -21,6 +25,14 @@ public class Sample {
     private String differenceY;
     private String R;
     private String unit;
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
     public String getUnit() {
         return unit;
@@ -130,21 +142,13 @@ public class Sample {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Sample sample = (Sample) o;
-
-        if (ID != sample.ID) return false;
-        if (fileID != sample.fileID) return false;
-        if (name != null ? !name.equals(sample.name) : sample.name != null) return false;
-        return ionType != null ? ionType.equals(sample.ionType) : sample.ionType == null;
+        return ID == sample.getID();
     }
 
     @Override
     public int hashCode() {
-        int result = ID;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (ionType != null ? ionType.hashCode() : 0);
-        result = 31 * result + fileID;
-        return result;
+
+        return Objects.hash(ID);
     }
 }

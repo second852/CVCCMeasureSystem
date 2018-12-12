@@ -22,12 +22,15 @@ import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Set;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
+import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Sample;
+import com.whc.cvccmeasuresystem.Model.SaveFile;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
@@ -174,8 +177,13 @@ public class HysteresisStep2Set extends Fragment {
                 solutionDB.insert(solutions);
             }
         }
+        SaveFileDB saveFileDB=new SaveFileDB(dataBase);
+        SaveFile saveFile=saveFileDB.findOldSaveFileById(sample1.getFileID());
+        saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
+        saveFileDB.update(saveFile);
         oldFragment.remove(oldFragment.size()-1);
         needSet=false;
+        finishToSave=true;
         Common.switchFragment(new HysteresisStep1(),getFragmentManager());
         tcpClient=null;
     }
@@ -265,7 +273,6 @@ public class HysteresisStep2Set extends Fragment {
                 Common.showToast(activity, measureStartNotExist);
                 return;
             }
-            finishToSave=true;
             FinishDialogFragment aa= new FinishDialogFragment();
             aa.setObject(HysteresisStep2Set.this);
             aa.show(getFragmentManager(),"show");

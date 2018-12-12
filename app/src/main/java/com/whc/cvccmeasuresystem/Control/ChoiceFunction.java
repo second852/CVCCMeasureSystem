@@ -15,6 +15,7 @@ import android.widget.SimpleAdapter;
 
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep1;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep1;
+import com.whc.cvccmeasuresystem.Control.History.HistoryMain;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep1;
@@ -93,6 +94,7 @@ public class ChoiceFunction extends Fragment {
             pageCon=null;
             oldFragment=new ArrayList<>();
             needSet=false;
+            finishToSave1=true;
             switch (i){
                 case 0:
                     fragment=new BatchStep1();
@@ -120,9 +122,11 @@ public class ChoiceFunction extends Fragment {
                     oldFragment.add(CFName);
                     break;
                 case 5:
+                    fragment=new HistoryMain();
+                    switchFragment(fragment,getFragmentManager());
+                    oldFragment.add(CFName);
                     break;
-                case 6:
-                    break;
+
             }
         }
     }

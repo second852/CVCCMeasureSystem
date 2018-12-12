@@ -14,6 +14,7 @@ import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Set;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Set;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Set;
 
 
 /**
@@ -94,6 +95,10 @@ public class FinishDialogFragment extends DialogFragment implements  DialogInter
                 {
                     DriftStep2Set driftStep2Set= (DriftStep2Set) object;
                     driftStep2Set.finishMeasure();
+                }else if(object instanceof IonChannelStep3Set)
+                {
+                    IonChannelStep3Set ionChannelStep3Set = (IonChannelStep3Set) object;
+                    ionChannelStep3Set.finishMeasure();
                 }
                 break;
             default:

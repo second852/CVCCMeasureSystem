@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -133,9 +134,9 @@ public class IonChannelStep3TimeChart extends Fragment{
         dataSet.setDrawCircleHole(false);
         dataSet.setDrawFilled(false);
         dataSet.setDrawValues(false);
-//        dataSet.setCircleColors(choiceColor);
+        dataSet.setCircleColors(choiceColor);
         dataSet.setValueTextSize(12f);
-//        dataSet.setColors(choiceColor);
+        dataSet.setColors(choiceColor);
 
 
         LineData data = new LineData(dataSet);
@@ -163,7 +164,6 @@ public class IonChannelStep3TimeChart extends Fragment{
         lineChart.setScaleEnabled(false);
 
         YAxis yAxis = lineChart.getAxis(YAxis.AxisDependency.LEFT);
-        yAxis.removeAllLimitLines();
         LimitLine yHigh = new LimitLine(Float.valueOf(sample.getLimitHighVoltage()), "Limit Voltage");
         yHigh.setLineColor(Color.RED);
         yHigh.setTextColor(Color.RED);
@@ -172,9 +172,6 @@ public class IonChannelStep3TimeChart extends Fragment{
         yLow.setLineColor(Color.RED);
         yLow.setTextColor(Color.RED);
         yAxis.addLimitLine(yLow);
-        YAxis yAxis1 = lineChart.getAxis(YAxis.AxisDependency.RIGHT);
-        yAxis1.setDrawAxisLine(false);
-        yAxis1.setDrawLabels(false);
         yAxis.setValueFormatter(new IAxisValueFormatter(){
 
             @Override
@@ -182,6 +179,11 @@ public class IonChannelStep3TimeChart extends Fragment{
                 return DoubleToInt(value)+"(mv)";
             }
         });
+
+
+        YAxis yAxis1 = lineChart.getAxis(YAxis.AxisDependency.RIGHT);
+        yAxis1.setDrawAxisLine(false);
+        yAxis1.setDrawLabels(false);
 
         lineChart.getLegend().setEnabled(false);
         lineChart.notifyDataSetChanged();

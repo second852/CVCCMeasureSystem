@@ -20,11 +20,15 @@ import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep1;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
+import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Sample;
+import com.whc.cvccmeasuresystem.Model.SaveFile;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
+
+import java.sql.Timestamp;
 
 import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
 import static com.whc.cvccmeasuresystem.Common.Common.finishToSave;
@@ -277,6 +281,10 @@ public class DriftStep2Set extends Fragment {
                 solutionDB.insert(solutions);
             }
         }
+        SaveFileDB saveFileDB=new SaveFileDB(dataBase);
+        SaveFile saveFile=saveFileDB.findOldSaveFileById(sample1.getFileID());
+        saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
+        saveFileDB.update(saveFile);
         needSet=false;
         oldFragment.remove(oldFragment.size()-1);
         switchFragment(new DriftStep1(),getFragmentManager());

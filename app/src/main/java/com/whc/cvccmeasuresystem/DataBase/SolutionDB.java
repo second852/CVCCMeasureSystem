@@ -45,6 +45,27 @@ public class SolutionDB {
         return solutions;
     }
 
+
+    public List<Solution> getSampleAll(int id) {
+        String sql = "SELECT * FROM Solution where sampleID = '"+id+"' order by id desc;";
+        String[] args = {};
+        Cursor cursor = db.rawQuery(sql, args);
+        List<Solution> solutions = new ArrayList<>();
+        Solution solution;
+        while (cursor.moveToNext()) {
+            solution=new Solution();
+            solution.setID(cursor.getInt(0));
+            solution.setConcentration(cursor.getString(1));
+            solution.setNumber(cursor.getString(2));
+            solution.setTime(new Timestamp(cursor.getLong(3)));
+            solution.setVoltage(cursor.getInt(4));
+            solution.setSampleID(cursor.getInt(5));
+            solutions.add(solution);
+        }
+        cursor.close();
+        return solutions;
+    }
+
     public long insert(Solution solution) {
         ContentValues values = new ContentValues();
         values.put("concentration", solution.getConcentration());

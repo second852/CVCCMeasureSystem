@@ -22,6 +22,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.Model.Sample;
@@ -172,6 +173,8 @@ public class IonChannelStep3ConChart extends Fragment{
         lineChart.setDragEnabled(true);
         lineChart.setTouchEnabled(false);
         lineChart.setScaleEnabled(false);
+
+
         YAxis yAxis = lineChart.getAxis(YAxis.AxisDependency.LEFT);
         YAxis yAxis1 = lineChart.getAxis(YAxis.AxisDependency.RIGHT);
         yAxis1.setDrawAxisLine(false);
@@ -180,7 +183,7 @@ public class IonChannelStep3ConChart extends Fragment{
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                return DoubleToInt(value)+"(mv)";
+                return "pH"+ Common.doubleRemoveZero(String.valueOf(value));
             }
         });
         Legend l = lineChart.getLegend();

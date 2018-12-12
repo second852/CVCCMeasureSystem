@@ -70,7 +70,7 @@ public class SolutionAdapter extends BaseAdapter {
             Sample sample=sampleDB.findOldSample(solution.getSampleID());
             times.setText(solution.getNumber());
             sampleName.setText(sample.getName());
-            sampleIon.setText(sample.getIonType()+solution.getConcentration());
+            sampleIon.setText(sample.getIonType()+"\n"+Common.doubleRemoveZero(solution.getConcentration()));
             sampleIVol.setText(String.valueOf(solution.getVoltage()));
             dateTime.setText(Common.timeToString.format(new Date(solution.getTime().getTime())));
         }

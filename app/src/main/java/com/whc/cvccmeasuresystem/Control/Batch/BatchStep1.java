@@ -223,7 +223,7 @@ public class BatchStep1 extends Fragment {
                 saveFile.setMeasureType("0");
                 saveFile.setName(Common.timeToString.format(new Date(System.currentTimeMillis())));
                 saveFile.setStatTime(new Timestamp(System.currentTimeMillis()));
-                saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
+                saveFile.setEndTime(new Timestamp(0));
                 saveFile.setUserId(useId);
                 saveFileDB.insert(saveFile);
                 SaveFile nowFile=saveFileDB.findOldSaveFile(saveFile.getName());
@@ -266,8 +266,9 @@ public class BatchStep1 extends Fragment {
         sample.setName(name);
         sample.setIonType(measureType);
         sample.setFileID(fileID);
+        sample.setLocation(saveName);
         sampleDB.insert(sample);
-        Sample nowSample=sampleDB.findOldSample(name,fileID);
+        Sample nowSample=sampleDB.findOldSample(name,fileID,saveName);
         sharedPreferences.edit().putInt(saveName,nowSample.getID()).apply();
     }
 

@@ -23,7 +23,11 @@ import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 import com.whc.cvccmeasuresystem.R;
 
+import java.util.ArrayList;
+
 import static com.whc.cvccmeasuresystem.Common.Common.*;
+import static com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main.initParameter;
+import static com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main.needOldData;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -36,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         SignIn.signIn = false;
         finishToSave = true;
-
+        oldFragment=new ArrayList<>();
     }
 
     @Override
@@ -44,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         Fragment fragment = new BatchStep2Main();
         fragment = new SignIn();
-        fragment=new IonChannelStep3Main();
+//        fragment=new IonChannelStep3Main();
+//        IonChannelStep2Main.errorSample=new ArrayList<>();
         switchFragment(fragment, getSupportFragmentManager());
     }
 
@@ -67,6 +72,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (!finishToSave) {
+            Common.showToast(MainActivity.this, fileNotSave);
+            return true;
+        }
+        if (!finishToSave1) {
             Common.showToast(MainActivity.this, fileNotSave);
             return true;
         }
@@ -106,6 +115,10 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             if (!finishToSave) {
+                Common.showToast(MainActivity.this, fileNotSave);
+                return true;
+            }
+            if (!finishToSave1) {
                 Common.showToast(MainActivity.this, fileNotSave);
                 return true;
             }
@@ -150,7 +163,8 @@ public class MainActivity extends AppCompatActivity {
                     case IonChannel2Set:
                         switchFragment(new IonChannelStep2Main(),getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
-                        IonChannelStep2Main.initParameter=false;
+                        initParameter=false;
+                        needOldData=true;
                         break;
                 }
 

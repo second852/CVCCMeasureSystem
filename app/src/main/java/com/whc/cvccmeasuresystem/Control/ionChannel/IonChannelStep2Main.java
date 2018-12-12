@@ -12,6 +12,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +68,7 @@ public class IonChannelStep2Main extends Fragment {
     public static FragmentPagerItemAdapter adapter;
     public static List<String> errorSample;
     public static boolean initParameter;
+    public static boolean needOldData;
 
 
     @Override
@@ -107,7 +109,47 @@ public class IonChannelStep2Main extends Fragment {
         if(initParameter)
         {
             setSample();
+        }else{
+            if(dataMap==null||dataMap.size()<=0)
+            {
+                setSample();
+            }
         }
+        if(needOldData)
+        {
+            setOldSample();
+        }
+    }
+
+    private void setOldSample() {
+        dataMap = new HashMap<>();
+        samples = new ArrayList<>();
+        errorSample=new ArrayList<>();
+        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+        dataBase = new DataBase(activity);
+        SampleDB sampleDB = new SampleDB(dataBase);
+        SolutionDB solutionDB=new SolutionDB(dataBase);
+        //sample 1
+        int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
+        sample1 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample1,solutionDB.getSampleAll(sample1.getID()));
+        samples.add(sample1);
+        //sample 2
+        sampleID = sharedPreferences.getInt(Common.sample2String, 0);
+        sample2 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample2, solutionDB.getSampleAll(sample2.getID()));
+        samples.add(sample2);
+        //sample 3
+        sampleID = sharedPreferences.getInt(Common.sample3String, 0);
+        sample3 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample3, solutionDB.getSampleAll(sample3.getID()));
+        samples.add(sample3);
+        //sample 4
+        sampleID = sharedPreferences.getInt(Common.sample4String, 0);
+        sample4 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample4, solutionDB.getSampleAll(sample4.getID()));
+        samples.add(sample4);
+
     }
 
     private void setSample() {

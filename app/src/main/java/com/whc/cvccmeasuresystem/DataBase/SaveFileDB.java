@@ -62,12 +62,30 @@ public class SaveFileDB {
         return saveFile;
     }
 
+    public SaveFile findOldSaveFileById(int id) {
+        String sql = "SELECT * FROM SaveFile where ID = '"+id+"';";
+        String[] args = {};
+        Cursor cursor = db.rawQuery(sql, args);
+        SaveFile saveFile=null;
+        if (cursor.moveToNext()) {
+            saveFile=new SaveFile();
+            saveFile.setID(cursor.getInt(0));
+            saveFile.setName(cursor.getString(1));
+            saveFile.setMeasureType(cursor.getString(2));
+            saveFile.setStatTime(new Timestamp(cursor.getLong(3)));
+            saveFile.setEndTime(new Timestamp(cursor.getLong(4)));
+            saveFile.setUserId(cursor.getInt(5));
+        }
+        cursor.close();
+        return saveFile;
+    }
+
     public long insert(SaveFile saveFile) {
         ContentValues values = new ContentValues();
         values.put("name", saveFile.getName());
         values.put("measureType", saveFile.getMeasureType());
         values.put("startTime", saveFile.getStatTime().getTime());
-        values.put("endTime", saveFile.getEndTime().getTime());
+        values.put("endTime", 0);
         values.put("userId", saveFile.getUserId());
         return db.insert(TABLE_NAME, null, values);
     }

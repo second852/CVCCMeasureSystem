@@ -265,8 +265,9 @@ public class SensitivityStep1 extends Fragment {
         sample.setName(name);
         sample.setIonType(measureType);
         sample.setFileID(fileID);
+        sample.setLocation(saveName);
         sampleDB.insert(sample);
-        Sample nowSample=sampleDB.findOldSample(name,fileID);
+        Sample nowSample=sampleDB.findOldSample(name,fileID,saveName);
         sharedPreferences.edit().putInt(saveName,nowSample.getID()).apply();
     }
 

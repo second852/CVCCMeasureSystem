@@ -2,6 +2,8 @@ package com.whc.cvccmeasuresystem.Control.ionChannel;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,14 +19,25 @@ import com.beardedhen.androidbootstrap.AwesomeTextView;
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.whc.cvccmeasuresystem.Clent.TCPClient;
+import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
+import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
+import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
+import com.whc.cvccmeasuresystem.DataBase.DataBase;
+import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
+import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
+import com.whc.cvccmeasuresystem.Model.Sample;
+import com.whc.cvccmeasuresystem.Model.SaveFile;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
-
+import static com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main.initParameter;
 
 
 public class IonChannelStep3Set extends Fragment {
@@ -34,7 +47,7 @@ public class IonChannelStep3Set extends Fragment {
     private ImageView sample1I,sample2I,sample3I,sample4I;
     private AwesomeTextView sample1N,sample2N,sample3N,sample4N;
     private BootstrapEditText measureTime;
-    private BootstrapButton start;
+    private BootstrapButton start,stop,finish,step02,step01,step04;
     private String mType;
 
 
@@ -190,6 +203,16 @@ public class IonChannelStep3Set extends Fragment {
         measureTime=view.findViewById(R.id.measureTime);
         start=view.findViewById(R.id.start);
         start.setOnClickListener(new startMeasureData());
+        stop=view.findViewById(R.id.stop);
+        stop.setOnClickListener(new stopMeasure());
+        finish=view.findViewById(R.id.finish);
+        finish.setOnClickListener(new finishFragment());
+        step02=view.findViewById(R.id.step02);
+        step02.setOnClickListener(new step02OnClick());
+        step01=view.findViewById(R.id.step01);
+        step01.setOnClickListener(new step01OnClick());
+        step04=view.findViewById(R.id.step04);
+        step04.setOnClickListener(new finishFragment());
     }
 
 
@@ -205,13 +228,113 @@ public class IonChannelStep3Set extends Fragment {
     private class startMeasureData implements View.OnClickListener {
         @Override
         public void onClick(View view) {
+            //防止重複量測
+            if (startMeasure) {
+                Common.showToast(activity, "Please wait util this measurement stop ");
+                return;
+            }
+
             mType=measureTime.getText().toString();
             mType=checkViewInteger(measureTime,mType);
             if(mType==null)
             {
                 return;
             }
+
+            //check Wifi
+            WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(activity.WIFI_SERVICE);
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            String ssId = wifiInfo.getSSID();
+            if (ssId == null || ssId.indexOf("BCS_Device") == -1) {
+                Common.showToast(activity, "Please connect BCS_Device");
+                return;
+            }
+
             new Thread(measureThread).start();
+        }
+    }
+
+    private class stopMeasure implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+
+            StopDialogFragment aa= new StopDialogFragment();
+            aa.setObject(IonChannelStep3Set.this);
+            aa.show(getFragmentManager(),"show");
+        }
+    }
+
+    private class finishFragment implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            if(startMeasure)
+            {
+                Common.showToast(activity, measureStartNotExist);
+                return;
+            }
+            FinishDialogFragment aa= new FinishDialogFragment();
+            aa.setObject(IonChannelStep3Set.this);
+            aa.show(getFragmentManager(),"show");
+        }
+    }
+
+    public void finishMeasure()
+    {
+        DataBase dataBase=new DataBase(activity);
+        SolutionDB solutionDB=new SolutionDB(dataBase);
+        for(Sample sample:IonChannelStep3Main.dataMap.keySet())
+        {
+            for (Solution solutions:IonChannelStep3Main.dataMap.get(sample))
+            {
+                solutionDB.insert(solutions);
+            }
+        }
+        SaveFileDB saveFileDB=new SaveFileDB(dataBase);
+        SaveFile saveFile=saveFileDB.findOldSaveFileById(sample1.getFileID());
+        saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
+        saveFileDB.update(saveFile);
+        oldFragment=new ArrayList<>();
+        oldFragment.add(Common.CFName);
+        IonChannelStep2Set.pageCon1=null;
+        IonChannelStep2Set.pageCon1=null;
+        needSet=false;
+        Common.switchFragment(new IonChannelStep1(),getFragmentManager());
+        tcpClient=null;
+        initParameter=true;
+        IonChannelStep3Main.noInitParameter=false;
+        finishToSave1=true;
+    }
+
+    private class step02OnClick implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            if (startMeasure) {
+                Common.showToast(activity, measureStartNotExist);
+                return;
+            }
+            switchFragment(new IonChannelStep2Main(),getFragmentManager());
+            oldFragment.remove(oldFragment.size() - 1);
+            IonChannelStep2Main.needOldData=true;
+            IonChannelStep3Main.noInitParameter=true;
+        }
+    }
+
+    private class step01OnClick implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            if (startMeasure) {
+                Common.showToast(activity, measureStartNotExist);
+                return;
+            }
+            if (tcpClient != null) {
+                tcpClient.cancelHomeTcpClient();
+                tcpClient = null;
+            }
+            IonChannelStep3Main.noInitParameter=true;
+            needSet=true;
+            IonChannelStep1 ionChannelStep1=new IonChannelStep1();
+            oldFragment.remove(oldFragment.size() - 1);
+            Common.switchFragment(ionChannelStep1, getFragmentManager());
         }
     }
 }

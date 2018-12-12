@@ -19,6 +19,7 @@ import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Set;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 
 import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
 
@@ -61,21 +62,17 @@ public class StopDialogFragment extends DialogFragment implements DialogInterfac
         switch (which) {
             case DialogInterface.BUTTON_POSITIVE:
                 if (object instanceof BatchStep2Set) {
-
                     BatchStep2Main.handlerMessage.sendEmptyMessage(2);
-
                 } else if (object instanceof SensitivityStep2Set) {
-
                     SensitivityStep2Main.handlerMessage.sendEmptyMessage(2);
-
                 } else if (object instanceof HysteresisStep2Set) {
-
                     HysteresisStep2Main.handlerMessage.sendEmptyMessage(2);
-
                 } else if (object instanceof DriftStep2Set) {
                     DriftStep2Main.handlerMessage.sendEmptyMessage(2);
-                }else if (object instanceof IonChannelStep2Set) {
+                } else if (object instanceof IonChannelStep2Set) {
                     IonChannelStep2Main.handlerMessage.sendEmptyMessage(2);
+                } else if (object instanceof IonChannelStep3Main) {
+                    IonChannelStep3Main.handlerMessage.sendEmptyMessage(2);
                 }
                 break;
             default:

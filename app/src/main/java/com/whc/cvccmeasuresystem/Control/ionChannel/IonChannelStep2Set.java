@@ -34,6 +34,7 @@ import java.util.HashMap;
 
 import static com.whc.cvccmeasuresystem.Common.Common.IonChannel2Set;
 import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
+import static com.whc.cvccmeasuresystem.Common.Common.fileNotSave;
 import static com.whc.cvccmeasuresystem.Common.Common.finishToSave;
 import static com.whc.cvccmeasuresystem.Common.Common.measureStartNotExist;
 import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
@@ -371,8 +372,9 @@ public class IonChannelStep2Set extends Fragment {
                 tcpClient.cancelHomeTcpClient();
                 tcpClient = null;
             }
-            BatchStep1 batchStep1 = new BatchStep1();
-            Common.switchFragment(batchStep1, getFragmentManager());
+            needSet=true;
+            IonChannelStep1 ionChannelStep1=new IonChannelStep1();
+            Common.switchFragment(ionChannelStep1, getFragmentManager());
         }
     }
 
@@ -502,43 +504,56 @@ public class IonChannelStep2Set extends Fragment {
         }
     }
 
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        saveListPage();
+    }
+
+    public  void saveListPage()
+    {
+        pageCon1 = new PageCon();
+        pageCon2 = new PageCon();
+        String ionOne = ionF1.getText().toString();
+        String ionTwo = ionF2.getText().toString();
+        String ionThree = ionF3.getText().toString();
+        String ionFour = ionF4.getText().toString();
+        if (ionOne != null) {
+            pageCon1.setCon1(ionOne);
+        }
+        if (ionTwo != null) {
+            pageCon1.setCon2(ionTwo);
+        }
+        if (ionThree != null) {
+            pageCon1.setCon3(ionThree);
+        }
+        if (ionFour != null) {
+            pageCon1.setCon4(ionFour);
+        }
+        ionOne = ionS1.getText().toString();
+        ionTwo = ionS2.getText().toString();
+        ionThree = ionS3.getText().toString();
+        ionFour = ionS4.getText().toString();
+        if (ionOne != null) {
+            pageCon2.setCon1(ionOne);
+        }
+        if (ionTwo != null) {
+            pageCon2.setCon2(ionTwo);
+        }
+        if (ionThree != null) {
+            pageCon2.setCon3(ionThree);
+        }
+        if (ionFour != null) {
+            pageCon2.setCon4(ionFour);
+        }
+    }
+
+
     private class waringOnClick implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            pageCon1 = new PageCon();
-            pageCon2 = new PageCon();
-            String ionOne = ionF1.getText().toString();
-            String ionTwo = ionF2.getText().toString();
-            String ionThree = ionF3.getText().toString();
-            String ionFour = ionF4.getText().toString();
-            if (ionOne != null) {
-                pageCon1.setCon1(ionOne);
-            }
-            if (ionTwo != null) {
-                pageCon1.setCon2(ionTwo);
-            }
-            if (ionThree != null) {
-                pageCon1.setCon3(ionThree);
-            }
-            if (ionFour != null) {
-                pageCon1.setCon4(ionFour);
-            }
-            ionOne = ionS1.getText().toString();
-            ionTwo = ionS2.getText().toString();
-            ionThree = ionS3.getText().toString();
-            ionFour = ionS4.getText().toString();
-            if (ionOne != null) {
-                pageCon2.setCon1(ionOne);
-            }
-            if (ionTwo != null) {
-                pageCon2.setCon2(ionTwo);
-            }
-            if (ionThree != null) {
-                pageCon2.setCon3(ionThree);
-            }
-            if (ionFour != null) {
-                pageCon2.setCon4(ionFour);
-            }
+            saveListPage();
             switchFragment(new IonChannelStep2Limit(),getFragmentManager());
             oldFragment.add(IonChannel2Set);
         }
@@ -584,9 +599,10 @@ public class IonChannelStep2Set extends Fragment {
                     solutionDB.insert(solution);
                 }
             }
+            saveListPage();
+            finishToSave=true;
             oldFragment.add(IonChannel2Set);
             switchFragment(new IonChannelStep3Main(),getFragmentManager());
-
         }
     }
 }

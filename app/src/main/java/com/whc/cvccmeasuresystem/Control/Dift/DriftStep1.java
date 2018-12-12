@@ -265,10 +265,11 @@ public class DriftStep1 extends Fragment {
     {
         Sample sample=new Sample();
         sample.setName(name);
+        sample.setLocation(saveName);
         sample.setIonType(measureType);
         sample.setFileID(fileID);
         sampleDB.insert(sample);
-        Sample nowSample=sampleDB.findOldSample(name,fileID);
+        Sample nowSample=sampleDB.findOldSample(name,fileID,saveName);
         sharedPreferences.edit().putInt(saveName,nowSample.getID()).apply();
     }
 
