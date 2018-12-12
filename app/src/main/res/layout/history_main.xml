@@ -90,58 +90,31 @@
             android:layout_weight="0.25"
             android:src="@drawable/search" />
     </LinearLayout>
-    <LinearLayout
-        android:layout_centerHorizontal="true"
+
+
+    <com.beardedhen.androidbootstrap.BootstrapButton
         android:layout_marginTop="10dp"
         android:layout_below="@+id/dataL"
-        android:id="@+id/buttonL"
-        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="10dp"
+        android:id="@+id/export"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <com.beardedhen.androidbootstrap.BootstrapButton
-            android:id="@+id/all"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#000000"
-            app:bootstrapBrand="success"
-            app:bootstrapSize="md"
-            app:bootstrapText="All"
-            app:buttonMode="regular"
-            app:roundedCorners="true"
-            app:showOutline="false" />
-        <com.beardedhen.androidbootstrap.BootstrapButton
-            android:layout_marginLeft="10dp"
-            android:id="@+id/clear"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#000000"
-            app:bootstrapBrand="danger"
-            app:bootstrapSize="md"
-            app:bootstrapText="Clear"
-            app:buttonMode="regular"
-            app:roundedCorners="true"
-            app:showOutline="false" />
-        <com.beardedhen.androidbootstrap.BootstrapButton
-            android:layout_marginLeft="10dp"
-            android:id="@+id/export"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:textColor="#000000"
-            app:bootstrapBrand="regular"
-            app:bootstrapSize="md"
-            app:bootstrapText="Export"
-            app:buttonMode="regular"
-            app:roundedCorners="true"
-            app:showOutline="false" />
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:textColor="#000000"
+        app:bootstrapBrand="regular"
+        app:bootstrapSize="md"
+        app:bootstrapText="Export Excel"
+        app:buttonMode="regular"
+        app:roundedCorners="true"
+        app:showOutline="false" />
 
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/buttonL"
-        android:layout_marginTop="10dp">
+        android:layout_below="@+id/export"
+        android:layout_marginTop="20dp">
     </ListView>
 
 

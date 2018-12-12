@@ -87,7 +87,7 @@ public class SignIn extends Fragment{
                 userDB.insert(new User(name));
             }
             signIn=true;
-            User user=userDB.findUser(name);
+            User user=userDB.findUserByName(name);
             sharedPreferences.edit().putInt(userId, user.getId()).apply();
             Common.switchFragment(new ChoiceFunction(),getFragmentManager());
         }

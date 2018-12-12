@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+        <CheckBox
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:id="@+id/choice"
+            android:layout_width="60dp"
+            android:textSize="12sp"
+            android:layout_height="match_parent"
+            android:background="@drawable/show_date_model_1"
+            android:textColor="#000000"
+            />
+        <TextView
+            android:id="@+id/name1"
+            android:layout_height="match_parent"
+            android:layout_width="80dp"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:background="@drawable/show_date_model_1"
+            android:textColor="#000000"/>
+        <TextView
+            android:id="@+id/slope1"
+            android:layout_height="match_parent"
+            android:layout_width="80dp"
+            android:textSize="12sp"
+            android:background="@drawable/show_date_model_1"
+            android:gravity="center"
+            android:textColor="#000000"/>
+        <TextView
+            android:id="@+id/name2"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:textSize="12sp"
+            android:background="@drawable/show_date_model_1"
+            android:gravity="center"
+            android:textColor="#000000"/>
+
+</LinearLayout>

@@ -19,7 +19,7 @@ public class UserDB {
 
     public UserDB(SQLiteOpenHelper sq)
     {
-        this.db=sq.getReadableDatabase();
+        this.db=sq.getWritableDatabase();
     }
 
     public List<User> getAll() {
@@ -62,8 +62,22 @@ public class UserDB {
         return result;
     }
 
-    public User findUser(String name) {
+    public User findUserByName(String name) {
         String sql = "SELECT * FROM User where name = '"+name+"' order by id desc;";
+        String[] args = {};
+        Cursor cursor = db.rawQuery(sql, args);
+        User user=null;
+        if (cursor.moveToNext()) {
+            user=new User();
+            user.setId(cursor.getInt(0));
+            user.setName(cursor.getString(1));
+        }
+        cursor.close();
+        return user;
+    }
+
+    public User findUserById(int  id) {
+        String sql = "SELECT * FROM User where id = '"+id+"' order by id desc;";
         String[] args = {};
         Cursor cursor = db.rawQuery(sql, args);
         User user=null;

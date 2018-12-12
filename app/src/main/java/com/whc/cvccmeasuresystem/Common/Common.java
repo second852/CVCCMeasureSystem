@@ -85,7 +85,7 @@ public class Common {
 
     public static HashMap<String, String> MeasureType() {
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put("0", "BatchStep1");
+        hashMap.put("0", "BatchStep");
         hashMap.put("1", "Ion channels");
         hashMap.put("2", "Sensitivity");
         hashMap.put("3", "Drift");
