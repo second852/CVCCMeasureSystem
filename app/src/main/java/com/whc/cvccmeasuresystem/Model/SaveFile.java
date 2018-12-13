@@ -61,4 +61,20 @@ public class SaveFile {
     public void setEndTime(Timestamp endTime) {
         this.endTime = endTime;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SaveFile saveFile = (SaveFile) o;
+
+        return ID == saveFile.ID;
+    }
+
+    @Override
+    public int hashCode() {
+        return ID;
+    }
 }

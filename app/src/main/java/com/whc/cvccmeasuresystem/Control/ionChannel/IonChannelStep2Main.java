@@ -276,7 +276,7 @@ public class IonChannelStep2Main extends Fragment {
             solution2.setColor(color);
             solution3.setColor(color);
             solution4.setColor(color);
-            choiceColor.add(color);
+
 
 
 

@@ -19,6 +19,7 @@ import com.whc.cvccmeasuresystem.Control.History.HistoryMain;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep1;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
+import static com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main.initParameter;
 
 
 public class ChoiceFunction extends Fragment {
@@ -95,6 +97,8 @@ public class ChoiceFunction extends Fragment {
             oldFragment=new ArrayList<>();
             needSet=false;
             finishToSave1=true;
+            initParameter=true;
+            IonChannelStep3Main.noInitParameter=false;
             switch (i){
                 case 0:
                     fragment=new BatchStep1();

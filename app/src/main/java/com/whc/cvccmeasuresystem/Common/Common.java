@@ -45,6 +45,7 @@ public class Common {
     public static final String userShare = "CVCCUser";
     public static final String userId = "userId";
     public static SimpleDateFormat timeToString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ");
+    public static SimpleDateFormat timeToSheet = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss ");
     public static final String sample1String = "sample1";
     public static final String sample2String = "sample2";
     public static final String sample3String = "sample3";

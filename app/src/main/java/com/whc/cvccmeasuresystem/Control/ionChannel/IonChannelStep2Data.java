@@ -147,6 +147,11 @@ public class IonChannelStep2Data extends Fragment{
 
         for(Solution solution:sampleSolution)
         {
+            if(sample1.getLimitHighVoltage()==null||sample1.getLimitLowVoltage()==null)
+            {
+                return;
+            }
+
             if(solution.getVoltage()>Integer.valueOf(sample1.getLimitHighVoltage()))
             {
                 sample1I.setImageResource(R.drawable.lighto);
@@ -171,6 +176,10 @@ public class IonChannelStep2Data extends Fragment{
         sampleSolution=dataMap.get(sample2);
         for(Solution solution:sampleSolution)
         {
+            if(sample2.getLimitHighVoltage()==null||sample2.getLimitLowVoltage()==null)
+            {
+                return;
+            }
             if(solution.getVoltage()>Integer.valueOf(sample2.getLimitHighVoltage()))
             {
                 sample2I.setImageResource(R.drawable.lighto);
@@ -194,6 +203,10 @@ public class IonChannelStep2Data extends Fragment{
         sampleSolution=dataMap.get(sample3);
         for(Solution solution:sampleSolution)
         {
+            if(sample3.getLimitHighVoltage()==null||sample3.getLimitLowVoltage()==null)
+            {
+                return;
+            }
             if(solution.getVoltage()>Integer.valueOf(sample3.getLimitHighVoltage()))
             {
                 sample3I.setImageResource(R.drawable.lighto);
@@ -219,6 +232,10 @@ public class IonChannelStep2Data extends Fragment{
         sampleSolution=dataMap.get(sample4);
         for(Solution solution:sampleSolution)
         {
+            if(sample4.getLimitHighVoltage()==null||sample4.getLimitLowVoltage()==null)
+            {
+                return;
+            }
             if(solution.getVoltage()>Integer.valueOf(sample4.getLimitHighVoltage()))
             {
                 sample4I.setImageResource(R.drawable.lighto);

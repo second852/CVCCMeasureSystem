@@ -8,7 +8,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:id="@+id/choice"
-            android:layout_width="70dp"
+            android:layout_width="65dp"
             android:textSize="12sp"
             android:layout_height="match_parent"
             android:background="@drawable/show_date_model_1"
@@ -17,7 +17,7 @@
         <TextView
             android:id="@+id/name1"
             android:layout_height="match_parent"
-            android:layout_width="80dp"
+            android:layout_width="60dp"
             android:textSize="12sp"
             android:gravity="center"
             android:background="@drawable/show_date_model_1"
@@ -25,7 +25,7 @@
         <TextView
             android:id="@+id/slope1"
             android:layout_height="match_parent"
-            android:layout_width="80dp"
+            android:layout_width="100dp"
             android:textSize="12sp"
             android:background="@drawable/show_date_model_1"
             android:gravity="center"

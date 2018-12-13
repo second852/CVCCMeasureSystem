@@ -107,6 +107,22 @@ public class IonChannelStep3Main extends Fragment {
         super.onStart();
         if(noInitParameter)
         {
+            if(dataMap==null||dataMap.size()<=0)
+            {
+                setSample();
+            }
+            if(samples==null||samples.size()<=0)
+            {
+                setSample();
+            }
+            if(errorSample==null||errorSample.size()<=0)
+            {
+                setSample();
+            }
+            if(choiceColor==null||choiceColor.size()<=0)
+            {
+                setSample();
+            }
             return;
         }
         setSample();

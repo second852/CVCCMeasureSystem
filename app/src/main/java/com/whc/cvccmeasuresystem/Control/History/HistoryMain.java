@@ -15,6 +15,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,9 +54,12 @@ import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.Model.User;
 import com.whc.cvccmeasuresystem.R;
 
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.io.ByteArrayOutputStream;
@@ -164,7 +168,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
             }
             if(pageCon.getCon2()!=null)
             {
-                dateBegin.setText(pageCon.getCon2());
+                dateEnd.setText(pageCon.getCon2());
             }
         }
     }
@@ -206,6 +210,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
     }
 
 
+
     private class showDate implements View.OnClickListener {
         @Override
         public void onClick(View view) {
@@ -226,7 +231,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
         }
     }
 
-
+    private CheckBox checkBoxFirst;
     public class FileAdapter extends BaseAdapter {
 
         private Context context;
@@ -255,7 +260,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
         }
 
         @Override
-        public View getView(int position, View itemView, final ViewGroup parent) {
+        public View getView(final int position, View itemView, final ViewGroup parent) {
             if (itemView == null) {
                 LayoutInflater layoutInflater = LayoutInflater.from(context);
                 itemView = layoutInflater.inflate(R.layout.data_adapter_item3, parent, false);
@@ -267,6 +272,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
 
             Drawable drawable;
             if (position == 0) {
+                checkBoxFirst=checkBox;
                 drawable = context.getResources().getDrawable(R.drawable.show_date_model_1);
                 checkBox.setText("All");
                 name1.setText("User");
@@ -279,8 +285,8 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
                         CheckBox c = (CheckBox) view;
                         if (c.isChecked()) {
                             choicePrint.addAll(saveFiles);
+                            choicePrint.remove(0);
                             allChoice = true;
-
                         } else {
                             choicePrint = new ArrayList<>();
                             allChoice = false;
@@ -307,6 +313,14 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
                             choicePrint.add(saveFile);
                         } else {
                             allChoice = false;
+                            checkBoxFirst.setChecked(false);
+                            for(int i=0;i<choicePrint.size();i++)
+                            {
+                                if(saveFile.equals(choicePrint.get(i)))
+                                {
+                                    choicePrint.remove(i);
+                                }
+                            }
                         }
                     }
                 });
@@ -380,7 +394,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
         ConnectivityManager mConnectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
         if (mNetworkInfo == null) {
-            Common.showToast(activity, "網路沒有開啟，無法下載!");
+            Common.showToast(activity, "I can’t connect to the Internet!!");
             return;
         }
         firstEnter = true;
@@ -413,7 +427,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
                         // and must
                         // fail.
                         if (!result.getStatus().isSuccess()) {
-                            Common.showToast(activity, "連線失敗!");
+                            Common.showToast(activity, "I can’t connect to the Internet!");
                             return;
                         }
                         Runnable runnable = new Runnable() {
@@ -465,14 +479,19 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
             SampleDB sampleDB=new SampleDB(new DataBase(activity));
             SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
             HSSFWorkbook workbook = new HSSFWorkbook();
+            int j=0;
             for(SaveFile saveFile:choicePrint)
             {
-                User user=userDB.findUserById(saveFile.getID());
-                Sheet sheetCon = workbook.createSheet(Common.timeToString.format(new Date(saveFile.getStatTime().getTime())));
-                sheetCon.setColumnWidth(0, 50 * 256);// 調整欄位寬度
-                sheetCon.setColumnWidth(1, 50 * 256);// 調整欄位寬度
-                sheetCon.setColumnWidth(2, 50 * 256);// 調整欄位寬度
-                sheetCon.setColumnWidth(3, 100 * 256);// 調整欄位寬度
+                User user=userDB.findUserById(saveFile.getUserId());
+                Log.d("ZXXXXXXXXXX","ID"+saveFile.getID());
+                Sheet sheetCon = workbook.createSheet(Common.timeToSheet.format(new Date(saveFile.getStatTime().getTime())));
+                sheetCon.setColumnWidth(0, 10 * 256);// 調整欄位寬度
+                sheetCon.setColumnWidth(1, 10 * 256);// 調整欄位寬度
+                sheetCon.setColumnWidth(2, 20 * 256);// 調整欄位寬度
+                sheetCon.setColumnWidth(3, 20* 256);// 調整欄位寬度
+                sheetCon.setColumnWidth(4, 20* 256);// 調整欄位寬度
+                sheetCon.setColumnWidth(5, 20* 256);// 調整欄位寬度
+                sheetCon.setColumnWidth(6, 20* 256);// 調整欄位寬度
 
                 //File
                 sheetCon.addMergedRegion(new CellRangeAddress(0,0, 0, 3));
@@ -483,11 +502,13 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
                 row.createCell(0).setCellValue("User");
                 row.createCell(1).setCellValue("Type");
                 row.createCell(2).setCellValue("DateTime");
+                sheetCon.addMergedRegion(new CellRangeAddress(1,1, 2, 4));
                 //File value
                 row = sheetCon.createRow(2);
                 row.createCell(0).setCellValue(user.getName());
                 row.createCell(1).setCellValue(Common.MeasureType().get(saveFile.getMeasureType()));
                 row.createCell(2).setCellValue(Common.timeToString.format(new Date(saveFile.getStatTime().getTime())));
+                sheetCon.addMergedRegion(new CellRangeAddress(2,2, 2, 4));
 
                 //Sample
                 sheetCon.addMergedRegion(new CellRangeAddress(4,4, 0, 3));
@@ -540,6 +561,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
                         rowCount++;
                     }
                 }
+                j++;
             }
 
             workbook.write(outputStream);
@@ -571,9 +593,14 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
         } else if (requestCode == 3) {
             progressL.setVisibility(View.GONE);
             if (resultCode == -1) {
-                Common.showToast(activity, "上傳成功");
+                Common.showToast(activity, "Success!");
             } else {
-                Common.showToast(activity, "上傳失敗");
+                Common.showToast(activity, "Fail!");
+            }
+            if(mGoogleApiClient!=null)
+            {
+                mGoogleApiClient.disconnect();
+                mGoogleApiClient=null;
             }
         }
     }
@@ -598,7 +625,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
         }
         // Called typically when the app is not yet authorized, and authorization dialog is displayed to the user.
         if (!firstEnter) {
-            Common.showToast(activity, "登入失敗");
+            Common.showToast(activity, "Fail!");
             progressL.setVisibility(View.GONE);
             return;
         }
@@ -613,6 +640,11 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
     private class openCloudy implements View.OnClickListener {
         @Override
         public void onClick(View view) {
+            if(choicePrint.size()<=0)
+            {
+                Common.showToast(activity,"Please choice file");
+                return;
+            }
             openCloud();
         }
     }

@@ -79,7 +79,7 @@ public class SolutionDB {
 
 
     public List<Solution> getSampleAByIdByMeasureType(int id,String measureType) {
-        String sql = "SELECT * FROM Solution where sampleID = '" + id + "' and measureType '"+measureType+"' order by id desc;";
+        String sql = "SELECT * FROM Solution where sampleID = '" + id + "' and measureType = '"+measureType+"' order by id desc;";
         String[] args = {};
         Cursor cursor = db.rawQuery(sql, args);
         List<Solution> solutions = new ArrayList<>();

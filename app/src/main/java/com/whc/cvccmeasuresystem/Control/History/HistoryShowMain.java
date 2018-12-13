@@ -129,7 +129,7 @@ public class HistoryShowMain extends Fragment {
                 pages.add(FragmentPagerItem.of("Chart", BatchStep2Chart.class));
                 pages.add(FragmentPagerItem.of("Data", BatchStep2Data.class));
                 break;
-            case "1":
+            case "3":
                 Common.dataMap=sampleDB.setMapSampeSolution(showFileDate.getID());
                 pages.add(FragmentPagerItem.of("Chart", DriftStep2Chart.class));
                 pages.add(FragmentPagerItem.of("Data", DriftStep2Data.class));
@@ -139,10 +139,15 @@ public class HistoryShowMain extends Fragment {
                 pages.add(FragmentPagerItem.of("Chart", HysteresisStep2Chart.class));
                 pages.add(FragmentPagerItem.of("Data", HysteresisStep2Data.class));
                 break;
-            case "3":
+            case "1":
                 Common.dataMap=sampleDB.setMapSampeSolutionToIC(showFileDate.getID(),"1");
                 pages.add(FragmentPagerItem.of("Data", IonChannelStep2Data.class));
                 IonChannelStep3Main.dataMap=sampleDB.setMapSampeSolutionToIC(showFileDate.getID(),"11");
+                choiceColor=new ArrayList<>();
+                for (Solution solution:dataMap.get(Common.sample1))
+                {
+                    choiceColor.add(solution.getColor());
+                }
                 pages.add(FragmentPagerItem.of("Chart(V-T)", IonChannelStep3TimeChart.class));
                 pages.add(FragmentPagerItem.of("Chart(Ion-T)",IonChannelStep3ConChart.class));
                 pages.add(FragmentPagerItem.of("Data", IonChannelStep3Data.class));

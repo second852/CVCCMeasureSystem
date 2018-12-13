@@ -303,6 +303,7 @@ public class IonChannelStep3Set extends Fragment {
         initParameter=true;
         IonChannelStep3Main.noInitParameter=false;
         finishToSave1=true;
+        finishToSave=true;
     }
 
     private class step02OnClick implements View.OnClickListener {

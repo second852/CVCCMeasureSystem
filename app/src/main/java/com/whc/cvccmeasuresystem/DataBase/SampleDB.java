@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 
@@ -14,6 +15,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.whc.cvccmeasuresystem.Common.Common.samples;
 
 
 public class SampleDB {
@@ -38,15 +41,17 @@ public class SampleDB {
             sample.setName(cursor.getString(1));
             sample.setIonType(cursor.getString(2));
             sample.setFileID(cursor.getInt(3));
-            sample.setLimitHighVoltage(cursor.getString(4));
-            sample.setLimitLowVoltage(cursor.getString(5));
-            sample.setSlope(cursor.getString(6));
-            sample.setUnit(cursor.getString(7));
-            sample.setIntercept(cursor.getString(8));
-            sample.setStandardDeviation(cursor.getString(9));
-            sample.setDifferenceX(cursor.getString(10));
-            sample.setDifferenceY(cursor.getString(11));
-            sample.setR(cursor.getString(12));
+            sample.setLocation(cursor.getString(4));
+            sample.setLimitHighVoltage(cursor.getString(5));
+            sample.setLimitLowVoltage(cursor.getString(6));
+            sample.setSlope(cursor.getString(7));
+            sample.setUnit(cursor.getString(8));
+            sample.setIntercept(cursor.getString(9));
+            sample.setStandardDeviation(cursor.getString(10));
+            sample.setDifferenceX(cursor.getString(11));
+            sample.setDifferenceY(cursor.getString(12));
+            sample.setR(cursor.getString(13));
+            samples.add(sample);
         }
         cursor.close();
         return samples;
@@ -65,15 +70,17 @@ public class SampleDB {
             sample.setName(cursor.getString(1));
             sample.setIonType(cursor.getString(2));
             sample.setFileID(cursor.getInt(3));
-            sample.setLimitHighVoltage(cursor.getString(4));
-            sample.setLimitLowVoltage(cursor.getString(5));
-            sample.setSlope(cursor.getString(6));
-            sample.setUnit(cursor.getString(7));
-            sample.setIntercept(cursor.getString(8));
-            sample.setStandardDeviation(cursor.getString(9));
-            sample.setDifferenceX(cursor.getString(10));
-            sample.setDifferenceY(cursor.getString(11));
-            sample.setR(cursor.getString(12));
+            sample.setLocation(cursor.getString(4));
+            sample.setLimitHighVoltage(cursor.getString(5));
+            sample.setLimitLowVoltage(cursor.getString(6));
+            sample.setSlope(cursor.getString(7));
+            sample.setUnit(cursor.getString(8));
+            sample.setIntercept(cursor.getString(9));
+            sample.setStandardDeviation(cursor.getString(10));
+            sample.setDifferenceX(cursor.getString(11));
+            sample.setDifferenceY(cursor.getString(12));
+            sample.setR(cursor.getString(13));
+            samples.add(sample);
         }
         cursor.close();
         return samples;
@@ -203,6 +210,11 @@ public class SampleDB {
         Common.sample2=samples.get(1);
         Common.sample3=samples.get(2);
         Common.sample4=samples.get(3);
+        IonChannelStep3Main.samples=new ArrayList<>();
+        IonChannelStep3Main.samples.add(Common.sample1);
+        IonChannelStep3Main.samples.add(Common.sample2);
+        IonChannelStep3Main.samples.add(Common.sample3);
+        IonChannelStep3Main.samples.add(Common.sample4);
         cursor.close();
         return dataMap;
     }
