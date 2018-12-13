@@ -8,7 +8,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:id="@+id/choice"
-            android:layout_width="60dp"
+            android:layout_width="70dp"
             android:textSize="12sp"
             android:layout_height="match_parent"
             android:background="@drawable/show_date_model_1"

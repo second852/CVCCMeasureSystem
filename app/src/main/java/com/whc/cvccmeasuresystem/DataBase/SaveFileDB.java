@@ -21,11 +21,32 @@ public class SaveFileDB {
 
     public SaveFileDB(SQLiteOpenHelper sq)
     {
-        this.db=sq.getReadableDatabase();
+        this.db=sq.getWritableDatabase();
     }
 
     public List<SaveFile> getAll() {
         String sql = "SELECT * FROM SaveFile order by id desc;";
+        String[] args = {};
+        Cursor cursor = db.rawQuery(sql, args);
+        List<SaveFile> saveFiles = new ArrayList<>();
+        SaveFile saveFile;
+        while (cursor.moveToNext()) {
+            saveFile=new SaveFile();
+            saveFile.setID(cursor.getInt(0));
+            saveFile.setName(cursor.getString(1));
+            saveFile.setMeasureType(cursor.getString(2));
+            saveFile.setStatTime(new Timestamp(cursor.getLong(3)));
+            saveFile.setEndTime(new Timestamp(cursor.getLong(4)));
+            saveFile.setUserId(cursor.getInt(5));
+            saveFiles.add(saveFile);
+        }
+        cursor.close();
+        return saveFiles;
+    }
+
+
+    public List<SaveFile> getFileByTime(long start,long end) {
+        String sql = "SELECT * FROM SaveFile where startTime between '"+start+"' and '"+end+"' order by id desc;";
         String[] args = {};
         Cursor cursor = db.rawQuery(sql, args);
         List<SaveFile> saveFiles = new ArrayList<>();

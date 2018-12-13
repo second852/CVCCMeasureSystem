@@ -21,21 +21,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:weightSum="1"
+                >
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
                     android:gravity="center_vertical"
-                    android:text="起日"
+                    android:text="Start Time"
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
                 <com.beardedhen.androidbootstrap.BootstrapEditText
                     android:id="@+id/dateBegin"
-                    android:layout_width="match_parent"
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
@@ -53,21 +57,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                >
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
                     android:gravity="center_vertical"
-                    android:text="訖日"
+                    android:text="Finish time"
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
                 <com.beardedhen.androidbootstrap.BootstrapEditText
+                    android:layout_weight="0.5"
                     android:id="@+id/dateEnd"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
@@ -117,7 +125,34 @@
         android:layout_marginTop="20dp">
     </ListView>
 
-
+    <RelativeLayout
+        android:id="@+id/progressL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffff"
+        android:visibility="gone"
+        >
+        <ProgressBar
+            android:id="@+id/progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:indeterminateBehavior="repeat"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:indeterminateDrawable="@drawable/ring_rotate"
+            android:indeterminateDuration="1500"
+            android:indeterminateOnly="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Connecting …"
+            android:textSize="25dp"
+            android:textColor="#000000"
+            android:layout_below="@+id/progress"
+            android:layout_centerHorizontal="true"
+            />
+    </RelativeLayout>
 
 
     <LinearLayout
@@ -149,7 +184,7 @@
             android:background="#BDBDBD"
             android:gravity="center"
             android:padding="5dp"
-            android:text="確認"
+            android:text="confirm"
             android:textColor="#000000"
             android:textSize="20sp" />
     </LinearLayout>

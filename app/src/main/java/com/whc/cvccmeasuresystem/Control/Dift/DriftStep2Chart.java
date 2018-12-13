@@ -110,12 +110,9 @@ public class DriftStep2Chart extends Fragment{
 
         solutions=dataMap.get(sample2);
         setLineChart(lineCharts[1],solutions,sample2);
-        Log.d("xxx ZZZZZZZZZ 1",solutions.size()+" ");
-
 
         solutions=dataMap.get(sample3);
         setLineChart(lineCharts[2],solutions,sample3);
-        Log.d("xxx ZZZZZZZZZ 2",solutions.size()+" ");
 
         solutions=dataMap.get(sample4);
         setLineChart(lineCharts[3],solutions,sample4);

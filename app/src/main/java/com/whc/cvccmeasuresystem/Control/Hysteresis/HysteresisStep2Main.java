@@ -215,13 +215,23 @@ public class HysteresisStep2Main extends Fragment {
             solution4.setTime(timestamp);
 
 
+            solution1.setMeasureType("4");
+            solution2.setMeasureType("4");
+            solution3.setMeasureType("4");
+            solution4.setMeasureType("4");
+
             solution1.setNumber(String.valueOf(measureTimes));
             solution2.setNumber(String.valueOf(measureTimes));
             solution3.setNumber(String.valueOf(measureTimes));
             solution4.setNumber(String.valueOf(measureTimes));
             measureTimes++;
 
-            choiceColor.add(Color.parseColor(arrayColor[indicateColor%arrayColor.length]));
+            int color =Color.parseColor(arrayColor[indicateColor%arrayColor.length]);
+            solution1.setColor(color);
+            solution2.setColor(color);
+            solution3.setColor(color);
+            solution4.setColor(color);
+            choiceColor.add(color);
 
 
             dataMap.get(sample1).add(solution1);

@@ -13,6 +13,24 @@ public class Solution implements Serializable{
     private Integer voltage;//4 read Voltage
     private int sampleID;//5  measure Sample
     private boolean noNormalV;//6 normal
+    private String measureType;
+    private int color;
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public String getMeasureType() {
+        return measureType;
+    }
+
+    public void setMeasureType(String measureType) {
+        this.measureType = measureType;
+    }
 
     public boolean isNoNormalV() {
         return noNormalV;

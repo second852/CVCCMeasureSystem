@@ -51,6 +51,7 @@ public class Common {
     public static final String sample4String = "sample4";
     public static final String needIon = "Please input this concentration";
     public static final String needInt = "Please input this number";
+    public static final String needData = "Please input this data";
     public static final String measureStartNotExist = "Measuring Now! Please pressure \"Stop\" !";
     public static final String fileNotSave = "File don't save! Please pressure \"Finish\" !";
     public static final String CFName = "ChoiceFunction";
@@ -60,6 +61,7 @@ public class Common {
     public static final String Drift1 = "Drift";
     public static final String IonChannel1 = "IonChannel1";
     public static final String IonChannel2Set = "IonChannel2Set";
+    public static final String HistoryMain = "HistoryMain";
 
 
     //measure constant

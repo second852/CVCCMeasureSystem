@@ -58,9 +58,12 @@ public class BatchStep2Data extends Fragment{
     {
         List<Solution> solutions=new ArrayList<>();
         solutions.add(new Solution());
-        for(Sample sample:samples)
+        if(samples!=null)
         {
-            solutions.addAll(dataMap.get(sample));
+            for(Sample sample:samples)
+            {
+                solutions.addAll(dataMap.get(sample));
+            }
         }
         listData.setAdapter(new SolutionAdapter(activity,solutions));
     }

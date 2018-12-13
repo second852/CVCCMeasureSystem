@@ -265,6 +265,20 @@ public class IonChannelStep2Main extends Fragment {
             solution3.setTime(timestamp);
             solution4.setTime(timestamp);
 
+            solution1.setMeasureType("1");
+            solution2.setMeasureType("1");
+            solution3.setMeasureType("1");
+            solution4.setMeasureType("1");
+
+
+            int color =Color.BLACK;
+            solution1.setColor(color);
+            solution2.setColor(color);
+            solution3.setColor(color);
+            solution4.setColor(color);
+            choiceColor.add(color);
+
+
 
             solution1.setNumber(String.valueOf(measureTimes));
             solution2.setNumber(String.valueOf(measureTimes));

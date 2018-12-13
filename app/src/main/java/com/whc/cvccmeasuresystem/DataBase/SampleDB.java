@@ -6,11 +6,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -21,7 +23,7 @@ public class SampleDB {
 
     public SampleDB(SQLiteOpenHelper sq)
     {
-        this.db=sq.getReadableDatabase();
+        this.db=sq.getWritableDatabase();
     }
 
     public List<Sample> getAll() {
@@ -50,6 +52,32 @@ public class SampleDB {
         return samples;
     }
 
+
+    public List<Sample> getFileSamepleAll(int fileID) {
+        String sql = "SELECT * FROM Sample where fileID = '"+fileID+"' order by id desc;";
+        String[] args = {};
+        Cursor cursor = db.rawQuery(sql, args);
+        List<Sample> samples = new ArrayList<>();
+        Sample sample;
+        while (cursor.moveToNext()) {
+            sample=new Sample();
+            sample.setID(cursor.getInt(0));
+            sample.setName(cursor.getString(1));
+            sample.setIonType(cursor.getString(2));
+            sample.setFileID(cursor.getInt(3));
+            sample.setLimitHighVoltage(cursor.getString(4));
+            sample.setLimitLowVoltage(cursor.getString(5));
+            sample.setSlope(cursor.getString(6));
+            sample.setUnit(cursor.getString(7));
+            sample.setIntercept(cursor.getString(8));
+            sample.setStandardDeviation(cursor.getString(9));
+            sample.setDifferenceX(cursor.getString(10));
+            sample.setDifferenceY(cursor.getString(11));
+            sample.setR(cursor.getString(12));
+        }
+        cursor.close();
+        return samples;
+    }
 
     public Sample findOldSample(String name,Integer fileID,String location) {
         String sql = "SELECT * FROM Sample where name = '"+name+"' and  fileID = '"+fileID+"' and location = '"+location+"';";
@@ -102,6 +130,85 @@ public class SampleDB {
         cursor.close();
         return sample;
     }
+
+
+    public HashMap<Sample, List<Solution>> setMapSampeSolution(Integer fileID) {
+        SolutionDB solutionDB=new SolutionDB(db);
+        HashMap<Sample, List<Solution>> dataMap=new HashMap<>();
+        String sql = "SELECT * FROM Sample where fileID = '"+fileID+"';";
+        String[] args = {};
+        Cursor cursor = db.rawQuery(sql, args);
+        Sample sample;
+        List<Sample> samples=new ArrayList<>();
+        Common.samples=new ArrayList<>();
+        while (cursor.moveToNext()) {
+            sample=new Sample();
+            sample.setID(cursor.getInt(0));
+            sample.setName(cursor.getString(1));
+            sample.setIonType(cursor.getString(2));
+            sample.setFileID(cursor.getInt(3));
+            sample.setLocation(cursor.getString(4));
+            sample.setLimitHighVoltage(cursor.getString(5));
+            sample.setLimitLowVoltage(cursor.getString(6));
+            sample.setSlope(cursor.getString(7));
+            sample.setUnit(cursor.getString(8));
+            sample.setIntercept(cursor.getString(9));
+            sample.setStandardDeviation(cursor.getString(10));
+            sample.setDifferenceX(cursor.getString(11));
+            sample.setDifferenceY(cursor.getString(12));
+            sample.setR(cursor.getString(13));
+            List<Solution> solutions=solutionDB.getSampleAll(sample.getID());
+            dataMap.put(sample,solutions);
+            samples.add(sample);
+            Common.samples.add(sample);
+        }
+        Common.sample1=samples.get(0);
+        Common.sample2=samples.get(1);
+        Common.sample3=samples.get(2);
+        Common.sample4=samples.get(3);
+        cursor.close();
+        return dataMap;
+    }
+
+
+    public HashMap<Sample, List<Solution>> setMapSampeSolutionToIC(Integer fileID,String measureType) {
+        SolutionDB solutionDB=new SolutionDB(db);
+        HashMap<Sample, List<Solution>> dataMap=new HashMap<>();
+        String sql = "SELECT * FROM Sample where fileID = '"+fileID+"';";
+        String[] args = {};
+        Cursor cursor = db.rawQuery(sql, args);
+        Sample sample;
+        List<Sample> samples=new ArrayList<>();
+        while (cursor.moveToNext()) {
+            sample=new Sample();
+            sample.setID(cursor.getInt(0));
+            sample.setName(cursor.getString(1));
+            sample.setIonType(cursor.getString(2));
+            sample.setFileID(cursor.getInt(3));
+            sample.setLocation(cursor.getString(4));
+            sample.setLimitHighVoltage(cursor.getString(5));
+            sample.setLimitLowVoltage(cursor.getString(6));
+            sample.setSlope(cursor.getString(7));
+            sample.setUnit(cursor.getString(8));
+            sample.setIntercept(cursor.getString(9));
+            sample.setStandardDeviation(cursor.getString(10));
+            sample.setDifferenceX(cursor.getString(11));
+            sample.setDifferenceY(cursor.getString(12));
+            sample.setR(cursor.getString(13));
+            List<Solution> solutions=solutionDB.getSampleAByIdByMeasureType(sample.getID(),measureType);
+            dataMap.put(sample,solutions);
+            samples.add(sample);
+        }
+        Common.sample1=samples.get(0);
+        Common.sample2=samples.get(1);
+        Common.sample3=samples.get(2);
+        Common.sample4=samples.get(3);
+        cursor.close();
+        return dataMap;
+    }
+
+
+
 
 
     public long insert(Sample sample) {
