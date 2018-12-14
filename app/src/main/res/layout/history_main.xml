@@ -112,7 +112,7 @@
         android:textColor="#000000"
         app:bootstrapBrand="regular"
         app:bootstrapSize="md"
-        app:bootstrapText="Export Excel"
+        app:bootstrapText="Export Excel {fa_file_excel_o}"
         app:buttonMode="regular"
         app:roundedCorners="true"
         app:showOutline="false" />

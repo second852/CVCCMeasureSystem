@@ -41,7 +41,7 @@ public class IonChannelStep2Data extends Fragment{
     private Activity activity;
     private ListView listData,listSlope;
     private ImageView sample1I,sample2I,sample3I,sample4I;
-    private AwesomeTextView sample1N,sample2N,sample3N,sample4N;
+//    private AwesomeTextView sample1N,sample2N,sample3N,sample4N;
     public TextView senMessage;
     public SampleDB sampleDB;
     public Integer[] index={0,0,1};
@@ -65,20 +65,20 @@ public class IonChannelStep2Data extends Fragment{
         listSlope=view.findViewById(R.id.listSlope);
 
         sample1I=view.findViewById(R.id.sample1I);
-        sample1N=view.findViewById(R.id.sample1N);
-        sample1N.setText(sample1.getName());
+//        sample1N=view.findViewById(R.id.sample1N);
+//        sample1N.setText(sample1.getName());
 
         sample2I=view.findViewById(R.id.sample2I);
-        sample2N=view.findViewById(R.id.sample2N);
-        sample2N.setText(sample2.getName());
+//        sample2N=view.findViewById(R.id.sample2N);
+//        sample2N.setText(sample2.getName());
 
         sample3I=view.findViewById(R.id.sample3I);
-        sample3N=view.findViewById(R.id.sample3N);
-        sample3N.setText(sample3.getName());
+//        sample3N=view.findViewById(R.id.sample3N);
+//        sample3N.setText(sample3.getName());
 
         sample4I=view.findViewById(R.id.sample4I);
-        sample4N=view.findViewById(R.id.sample4N);
-        sample4N.setText(sample4.getName());
+//        sample4N=view.findViewById(R.id.sample4N);
+//        sample4N.setText(sample4.getName());
 
 
         senMessage=view.findViewById(R.id.senMessage);
@@ -211,14 +211,14 @@ public class IonChannelStep2Data extends Fragment{
             {
                 sample3I.setImageResource(R.drawable.lighto);
                 sample3I.startAnimation(animation);
-                sample3N.setText(sample3.getName());
+//                sample3N.setText(sample3.getName());
                 solution.setNoNormalV(true);
             }
             if(solution.getVoltage()<Integer.valueOf(sample3.getLimitLowVoltage()))
             {
                 sample3I.setImageResource(R.drawable.lighto);
                 sample3I.startAnimation(animation);
-                sample3N.setText(sample3.getName());
+//                sample3N.setText(sample3.getName());
                 solution.setNoNormalV(true);
             }
 
@@ -240,14 +240,14 @@ public class IonChannelStep2Data extends Fragment{
             {
                 sample4I.setImageResource(R.drawable.lighto);
                 sample4I.startAnimation(animation);
-                sample4N.setText(sample4.getName());
+//                sample4N.setText(sample4.getName());
                 solution.setNoNormalV(true);
             }
             if(solution.getVoltage()<Integer.valueOf(sample4.getLimitLowVoltage()))
             {
                 sample4I.setImageResource(R.drawable.lighto);
                 sample4I.startAnimation(animation);
-                sample4N.setText(sample4.getName());
+//                sample4N.setText(sample4.getName());
                 solution.setNoNormalV(true);
             }
 

@@ -20,10 +20,21 @@ import com.whc.cvccmeasuresystem.DataBase.UserDB;
 import com.whc.cvccmeasuresystem.Model.User;
 import com.whc.cvccmeasuresystem.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static com.whc.cvccmeasuresystem.Common.Common.finishToSave1;
+import static com.whc.cvccmeasuresystem.Common.Common.needSet;
+import static com.whc.cvccmeasuresystem.Common.Common.oldFragment;
+import static com.whc.cvccmeasuresystem.Common.Common.pageCon;
+import static com.whc.cvccmeasuresystem.Common.Common.solution1;
+import static com.whc.cvccmeasuresystem.Common.Common.solution2;
+import static com.whc.cvccmeasuresystem.Common.Common.solution3;
+import static com.whc.cvccmeasuresystem.Common.Common.solution4;
 import static com.whc.cvccmeasuresystem.Common.Common.userId;
 import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+import static com.whc.cvccmeasuresystem.Control.History.HistoryMain.saveFiles;
+import static com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main.initParameter;
 
 public class SignIn extends Fragment{
     private View view;
@@ -54,6 +65,16 @@ public class SignIn extends Fragment{
         enter=view.findViewById(R.id.enter);
         DataBase dataBase=new DataBase(activity);
         userDB=new UserDB(dataBase);
+        solution1=null;
+        solution2=null;
+        solution3=null;
+        solution4=null;
+        pageCon=null;
+        oldFragment=new ArrayList<>();
+        needSet=false;
+        finishToSave1=true;
+        initParameter=true;
+        saveFiles=null;
         return view;
     }
 

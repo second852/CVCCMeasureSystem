@@ -41,11 +41,11 @@ public class DriftStep2Main extends Fragment {
 
     private Activity activity;
     private SharedPreferences sharedPreferences;
-    private SmartTabLayout viewPagerTab;
+    private SmartTabLayout driftViewPagerTab;
     private DataBase dataBase;
 
 
-    public static ViewPager priceViewPager;
+    public static ViewPager driftViewPager;
     public static FragmentPagerItemAdapter adapter;
 
 
@@ -78,17 +78,17 @@ public class DriftStep2Main extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final View view = inflater.inflate(R.layout.batch_step2_main, container, false);
-        viewPagerTab = view.findViewById(R.id.viewPagerTab);
-        priceViewPager = view.findViewById(R.id.batchViewPager);
+        final View view = inflater.inflate(R.layout.driff_step2_main, container, false);
+        driftViewPagerTab = view.findViewById(R.id.driftViewPagerTab);
+        driftViewPager = view.findViewById(R.id.driftViewPager);
         FragmentPagerItems pages = new FragmentPagerItems(activity);
         pages.add(FragmentPagerItem.of("Set", DriftStep2Set.class));
         pages.add(FragmentPagerItem.of("Chart", DriftStep2Chart.class));
         pages.add(FragmentPagerItem.of("Data", DriftStep2Data.class));
         adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
-        priceViewPager.setAdapter(adapter);
-        priceViewPager.addOnPageChangeListener(new PageListener());
-        viewPagerTab.setViewPager(priceViewPager);
+        driftViewPager.setAdapter(adapter);
+        driftViewPager.addOnPageChangeListener(new PageListener());
+        driftViewPagerTab.setViewPager(driftViewPager);
         return view;
     }
 
@@ -165,17 +165,18 @@ public class DriftStep2Main extends Fragment {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             //data 處理
-            int currentPage = priceViewPager.getCurrentItem();
+            int currentPage = driftViewPager.getCurrentItem();
 
             if (msg.what == 1) {
                 DriftStart();
-                DriftStep2Main.priceViewPager.setCurrentItem(1);
+                DriftStep2Main.driftViewPager.setCurrentItem(1);
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
                 return;
             }
 
             if (msg.what == 2) {
                 DriftEnd();
+                DriftStep2Main.driftViewPager.setCurrentItem(1);
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
@@ -278,6 +279,7 @@ public class DriftStep2Main extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         Fragment fragment= DriftStep2Main.adapter.getPage(currentPage);
         if(fragment instanceof DriftStep2Chart)
         {

@@ -134,7 +134,7 @@ public class HistoryShowMain extends Fragment {
                 pages.add(FragmentPagerItem.of("Chart", DriftStep2Chart.class));
                 pages.add(FragmentPagerItem.of("Data", DriftStep2Data.class));
                 break;
-            case "2":
+            case "4":
                 Common.dataMap=sampleDB.setMapSampeSolution(showFileDate.getID());
                 pages.add(FragmentPagerItem.of("Chart", HysteresisStep2Chart.class));
                 pages.add(FragmentPagerItem.of("Data", HysteresisStep2Data.class));
@@ -152,7 +152,7 @@ public class HistoryShowMain extends Fragment {
                 pages.add(FragmentPagerItem.of("Chart(Ion-T)",IonChannelStep3ConChart.class));
                 pages.add(FragmentPagerItem.of("Data", IonChannelStep3Data.class));
                 break;
-            case "4":
+            case "2":
                 Common.dataMap=sampleDB.setMapSampeSolution(showFileDate.getID());
                 volCon=new HashMap<>();
                 volCon.put(sample1,new HashMap<String, List<Solution>>());

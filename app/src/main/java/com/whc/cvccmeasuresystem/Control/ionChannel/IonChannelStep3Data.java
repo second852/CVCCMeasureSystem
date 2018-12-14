@@ -41,8 +41,8 @@ public class IonChannelStep3Data extends Fragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.batch_step2_data, container, false);
-        listData=view.findViewById(R.id.listData);
+        view = inflater.inflate(R.layout.ion_step3_data, container, false);
+        listData=view.findViewById(R.id.ionListData);
         listData.setDividerHeight(0);
         return view;
     }

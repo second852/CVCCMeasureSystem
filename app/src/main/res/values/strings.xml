@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name_icon">BCS</string>
     <string name="app_name">BC System</string>
     <string name="measure_stop">Measurement Stop</string>
     <string name="measure_start">Measurement Start</string>

@@ -40,11 +40,11 @@ public class HysteresisStep2Main extends Fragment {
 
     private Activity activity;
     private SharedPreferences sharedPreferences;
-    private SmartTabLayout viewPagerTab;
+    private SmartTabLayout hisViewPagerTab;
 
     private DataBase dataBase;
 
-    public static ViewPager priceViewPager;
+    public static ViewPager hisViewPager;
     public static FragmentPagerItemAdapter adapter;
     public static int loopIndex;
 
@@ -77,17 +77,17 @@ public class HysteresisStep2Main extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final View view = inflater.inflate(R.layout.batch_step2_main, container, false);
-        viewPagerTab = view.findViewById(R.id.viewPagerTab);
-        priceViewPager = view.findViewById(R.id.batchViewPager);
+        final View view = inflater.inflate(R.layout.hysteresis_step2_main, container, false);
+        hisViewPagerTab = view.findViewById(R.id.hisViewPagerTab);
+        hisViewPager = view.findViewById(R.id.hisViewPager);
         FragmentPagerItems pages = new FragmentPagerItems(activity);
         pages.add(FragmentPagerItem.of("Set", HysteresisStep2Set.class));
         pages.add(FragmentPagerItem.of("Chart", HysteresisStep2Chart.class));
         pages.add(FragmentPagerItem.of("Data", HysteresisStep2Data.class));
         adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
-        priceViewPager.setAdapter(adapter);
-        priceViewPager.addOnPageChangeListener(new PageListener());
-        viewPagerTab.setViewPager(priceViewPager);
+        hisViewPager.setAdapter(adapter);
+        hisViewPager.addOnPageChangeListener(new PageListener());
+        hisViewPagerTab.setViewPager(hisViewPager);
         return view;
     }
 
@@ -165,16 +165,17 @@ public class HysteresisStep2Main extends Fragment {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             //data 處理
-            int currentPage = priceViewPager.getCurrentItem();
+            int currentPage = hisViewPager.getCurrentItem();
 
             if (msg.what == 1) {
                 HysteresisStart();
-                HysteresisStep2Main.priceViewPager.setCurrentItem(1);
+                HysteresisStep2Main.hisViewPager.setCurrentItem(1);
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
                 return;
             }
 
             if (msg.what == 2) {
+                HysteresisStep2Main.hisViewPager.setCurrentItem(1);
                 HysteresisEnd();
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;

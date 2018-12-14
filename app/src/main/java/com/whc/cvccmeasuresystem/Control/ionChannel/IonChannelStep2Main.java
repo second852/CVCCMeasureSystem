@@ -89,7 +89,7 @@ public class IonChannelStep2Main extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final View view = inflater.inflate(R.layout.batch_step2_main, container, false);
+        final View view = inflater.inflate(R.layout.ion_step2_main, container, false);
         viewPagerTab = view.findViewById(R.id.viewPagerTab);
         priceViewPager = view.findViewById(R.id.batchViewPager);
         FragmentPagerItems pages = new FragmentPagerItems(activity);
@@ -226,6 +226,7 @@ public class IonChannelStep2Main extends Fragment {
             }
 
             if (msg.what == 2) {
+                IonChannelStep2Main.priceViewPager.setCurrentItem(1);
                 IonChannelStep2Stop();
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;

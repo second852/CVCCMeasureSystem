@@ -146,7 +146,7 @@ public class Common {
         for (Fragment f : fragmentManager.getFragments()) {
             fragmentTransaction.remove(f);
         }
-        fragmentTransaction.add(R.id.body, fragment);
+        fragmentTransaction.replace(R.id.body, fragment);
         fragmentTransaction.commit();
     }
 

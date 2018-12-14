@@ -74,7 +74,14 @@
                 app:roundedCorners="true"
                 app:showOutline="true" />
         </LinearLayout>
-
+        <com.beardedhen.androidbootstrap.AwesomeTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:text="Sample = S "
+            android:textSize="20sp"
+            app:bootstrapBrand="primary" />
         <LinearLayout
             android:layout_marginTop="20dp"
             android:orientation="horizontal"

@@ -20,6 +20,7 @@ import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Set;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Set;
 
 import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
 
@@ -71,7 +72,7 @@ public class StopDialogFragment extends DialogFragment implements DialogInterfac
                     DriftStep2Main.handlerMessage.sendEmptyMessage(2);
                 } else if (object instanceof IonChannelStep2Set) {
                     IonChannelStep2Main.handlerMessage.sendEmptyMessage(2);
-                } else if (object instanceof IonChannelStep3Main) {
+                } else if (object instanceof IonChannelStep3Set) {
                     IonChannelStep3Main.handlerMessage.sendEmptyMessage(2);
                 }
                 break;

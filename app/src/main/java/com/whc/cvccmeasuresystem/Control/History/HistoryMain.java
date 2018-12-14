@@ -6,6 +6,8 @@ import android.content.IntentSender;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -94,7 +96,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
     private ImageView search;
     private RelativeLayout progressL;
 
-    private static List<SaveFile> saveFiles;
+    public static List<SaveFile> saveFiles;
     private static List<SaveFile> choicePrint;
     public static SaveFile showFileDate;
     private GoogleApiClient mGoogleApiClient;
@@ -144,7 +146,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
         findViewById();
         setOnClick();
         if (saveFiles == null) {
-            saveFiles = saveFileDB.getAll();
+            HistoryMain.saveFiles = saveFileDB.getAll();
             saveFiles.add(0, new SaveFile());
             choicePrint = new ArrayList<>();
         }
@@ -298,7 +300,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
             } else {
                 final SaveFile saveFile = saveFiles.get(position);
                 drawable = context.getResources().getDrawable(R.drawable.show_date_model_2);
-                User user = userDB.findUserById(saveFile.getID());
+                User user = userDB.findUserById(saveFile.getUserId());
                 name1.setText(user.getName());
                 slope1.setText(Common.MeasureType().get(saveFile.getMeasureType()));
                 name2.setText(Common.timeToString.format(new Date(saveFile.getStatTime().getTime())));
@@ -483,7 +485,6 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
             for(SaveFile saveFile:choicePrint)
             {
                 User user=userDB.findUserById(saveFile.getUserId());
-                Log.d("ZXXXXXXXXXX","ID"+saveFile.getID());
                 Sheet sheetCon = workbook.createSheet(Common.timeToSheet.format(new Date(saveFile.getStatTime().getTime())));
                 sheetCon.setColumnWidth(0, 10 * 256);// 調整欄位寬度
                 sheetCon.setColumnWidth(1, 10 * 256);// 調整欄位寬度
@@ -643,6 +644,13 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
             if(choicePrint.size()<=0)
             {
                 Common.showToast(activity,"Please choice file");
+                return;
+            }
+            WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(activity.WIFI_SERVICE);
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            String ssId = wifiInfo.getSSID();
+            if (ssId == null || ssId.indexOf("BCS_Device") != -1) {
+                Common.showToast(activity, "Please change WiFi!");
                 return;
             }
             openCloud();

@@ -43,10 +43,10 @@ public class SensitivityStep2Main extends Fragment {
 
     private Activity activity;
     private SharedPreferences sharedPreferences;
-    private SmartTabLayout viewPagerTab;
+    private SmartTabLayout senViewPagerTab;
     private DataBase dataBase;
 
-    public static ViewPager priceViewPager;
+    public static ViewPager senViewPager;
     public static FragmentPagerItemAdapter adapter;
 
 
@@ -71,18 +71,18 @@ public class SensitivityStep2Main extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final View view = inflater.inflate(R.layout.batch_step2_main, container, false);
-        viewPagerTab = view.findViewById(R.id.viewPagerTab);
-        priceViewPager = view.findViewById(R.id.batchViewPager);
+        final View view = inflater.inflate(R.layout.sen_step2_main, container, false);
+        senViewPagerTab = view.findViewById(R.id.senViewPagerTab);
+        senViewPager = view.findViewById(R.id.senViewPager);
         FragmentPagerItems pages = new FragmentPagerItems(activity);
         pages.add(FragmentPagerItem.of("Set", SensitivityStep2Set.class));
         pages.add(FragmentPagerItem.of("Chart(V-T)", SensitivityStep2TimeChart.class));
         pages.add(FragmentPagerItem.of("Chart(mV-Ion)", SensitivityStep2ConChart.class));
         pages.add(FragmentPagerItem.of("Data", SensitivityStep2Data.class));
         adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
-        priceViewPager.setAdapter(adapter);
-        priceViewPager.addOnPageChangeListener(new PageListener());
-        viewPagerTab.setViewPager(priceViewPager);
+        senViewPager.setAdapter(adapter);
+        senViewPager.addOnPageChangeListener(new PageListener());
+        senViewPagerTab.setViewPager(senViewPager);
         return view;
     }
 
@@ -174,14 +174,16 @@ public class SensitivityStep2Main extends Fragment {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             //data 處理
-            int currentPage = priceViewPager.getCurrentItem();
+            int currentPage = senViewPager.getCurrentItem();
 
             if (msg.what == 1) {
+                SensitivityStep2Main.senViewPager.setCurrentItem(1);
                 startMeasure();
                 return;
             }
 
             if (msg.what == 2) {
+                SensitivityStep2Main.senViewPager.setCurrentItem(1);
                 endMeasure();
                 return;
             }
@@ -274,11 +276,11 @@ public class SensitivityStep2Main extends Fragment {
             SensitivityStep2ConChart.message.setText(R.string.measure_start);
             SensitivityStep2ConChart.message.setTextColor(Color.BLUE);
         }
-        SensitivityStep2Main.priceViewPager.setCurrentItem(1);
         Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
     }
 
     public static void endMeasure() {
+
         new Thread(new Runnable() {
             @Override
             public void run() {

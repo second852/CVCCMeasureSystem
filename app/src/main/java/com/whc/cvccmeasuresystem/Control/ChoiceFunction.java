@@ -28,6 +28,7 @@ import java.util.Map;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
 import static com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main.initParameter;
+import static com.whc.cvccmeasuresystem.Control.History.HistoryMain.saveFiles;
 
 
 public class ChoiceFunction extends Fragment {
@@ -98,6 +99,7 @@ public class ChoiceFunction extends Fragment {
             needSet=false;
             finishToSave1=true;
             initParameter=true;
+            saveFiles=null;
             IonChannelStep3Main.noInitParameter=false;
             switch (i){
                 case 0:

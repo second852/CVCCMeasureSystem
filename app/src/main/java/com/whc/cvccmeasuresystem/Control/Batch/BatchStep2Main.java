@@ -191,6 +191,7 @@ public class BatchStep2Main extends Fragment {
 
             if(msg.what==2)
             {
+                BatchStep2Main.priceViewPager.setCurrentItem(1);
                 BatchStop();
                 Common.showToast(adapter.getPage(currentPage).getActivity(),"Measurement End!");
                 return;

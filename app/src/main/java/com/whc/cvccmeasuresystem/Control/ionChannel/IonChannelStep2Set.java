@@ -65,8 +65,7 @@ public class IonChannelStep2Set extends Fragment {
     private BootstrapEditText ionF1, ionF2, ionF3, ionF4;
     private BootstrapEditText ionS1, ionS2, ionS3, ionS4;
 
-    private AwesomeTextView nameF1, nameF2, nameF3, nameF4;
-    private AwesomeTextView nameS1, nameS2, nameS3, nameS4;
+
 
     public static PageCon pageCon1, pageCon2;
 
@@ -144,15 +143,15 @@ public class IonChannelStep2Set extends Fragment {
         conS3.setText(sample3.getIonType());
         conS4.setText(sample4.getIonType());
 
-        nameF1.setText(sample1.getName());
-        nameF2.setText(sample2.getName());
-        nameF3.setText(sample3.getName());
-        nameF4.setText(sample4.getName());
-
-        nameS1.setText(sample1.getName());
-        nameS2.setText(sample2.getName());
-        nameS3.setText(sample3.getName());
-        nameS4.setText(sample4.getName());
+//        nameF1.setText(sample1.getName());
+//        nameF2.setText(sample2.getName());
+//        nameF3.setText(sample3.getName());
+//        nameF4.setText(sample4.getName());
+//
+//        nameS1.setText(sample1.getName());
+//        nameS2.setText(sample2.getName());
+//        nameS3.setText(sample3.getName());
+//        nameS4.setText(sample4.getName());
     }
 
 
@@ -194,16 +193,16 @@ public class IonChannelStep2Set extends Fragment {
         startS = view.findViewById(R.id.startS);
         stopS = view.findViewById(R.id.stopS);
 
-        nameF1 = view.findViewById(R.id.nameF1);
-        nameF2 = view.findViewById(R.id.nameF2);
-        nameF3 = view.findViewById(R.id.nameF3);
-        nameF4 = view.findViewById(R.id.nameF4);
-
-
-        nameS1 = view.findViewById(R.id.nameS1);
-        nameS2 = view.findViewById(R.id.nameS2);
-        nameS3 = view.findViewById(R.id.nameS3);
-        nameS4 = view.findViewById(R.id.nameS4);
+//        nameF1 = view.findViewById(R.id.nameF1);
+//        nameF2 = view.findViewById(R.id.nameF2);
+//        nameF3 = view.findViewById(R.id.nameF3);
+//        nameF4 = view.findViewById(R.id.nameF4);
+//
+//
+//        nameS1 = view.findViewById(R.id.nameS1);
+//        nameS2 = view.findViewById(R.id.nameS2);
+//        nameS3 = view.findViewById(R.id.nameS3);
+//        nameS4 = view.findViewById(R.id.nameS4);
 
         step01 = view.findViewById(R.id.step01);
         next = view.findViewById(R.id.next);

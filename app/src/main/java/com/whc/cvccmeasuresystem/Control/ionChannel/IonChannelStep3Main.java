@@ -12,7 +12,6 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +21,6 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItem;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 import com.whc.cvccmeasuresystem.Common.Common;
-import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
-import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.Model.Sample;
@@ -57,12 +54,12 @@ public class IonChannelStep3Main extends Fragment {
 
     private Activity activity;
     private SharedPreferences sharedPreferences;
-    private SmartTabLayout viewPagerTab;
+    private SmartTabLayout ionViewPagerTab;
     private DataBase dataBase;
 
 
-    public static ViewPager priceViewPager;
-    public static FragmentPagerItemAdapter adapter;
+    public static ViewPager ionViewPager;
+    public static FragmentPagerItemAdapter adapterIonStep3;
     public static List<String> errorSample;
     public static HashMap<Sample,List<Solution>> dataMap;
     public static List<Sample> samples;
@@ -87,18 +84,18 @@ public class IonChannelStep3Main extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final View view = inflater.inflate(R.layout.batch_step2_main, container, false);
-        viewPagerTab = view.findViewById(R.id.viewPagerTab);
-        priceViewPager = view.findViewById(R.id.batchViewPager);
+        final View view = inflater.inflate(R.layout.ion_step3_main, container, false);
+        ionViewPagerTab = view.findViewById(R.id.ionViewPagerTab);
+        ionViewPager = view.findViewById(R.id.ionViewPager);
         FragmentPagerItems pages = new FragmentPagerItems(activity);
         pages.add(FragmentPagerItem.of("Set", IonChannelStep3Set.class));
         pages.add(FragmentPagerItem.of("Chart(V-T)", IonChannelStep3TimeChart.class));
         pages.add(FragmentPagerItem.of("Chart(Ion-T)",IonChannelStep3ConChart.class));
         pages.add(FragmentPagerItem.of("Data", IonChannelStep3Data.class));
-        adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
-        priceViewPager.setAdapter(adapter);
-        priceViewPager.addOnPageChangeListener(new PageListener());
-        viewPagerTab.setViewPager(priceViewPager);
+        adapterIonStep3 = new FragmentPagerItemAdapter(getFragmentManager(), pages);
+        ionViewPager.setAdapter(adapterIonStep3);
+        ionViewPager.addOnPageChangeListener(new PageListener());
+        ionViewPagerTab.setViewPager(ionViewPager);
         return view;
     }
 
@@ -175,7 +172,7 @@ public class IonChannelStep3Main extends Fragment {
         @Override
         public void onPageSelected(int position) {
             currentPage = position;
-            Fragment fragment = adapter.getPage(position);
+            Fragment fragment = adapterIonStep3.getPage(position);
             if(fragment instanceof IonChannelStep3TimeChart)
             {
                 IonChannelStep3TimeChart ionChannelStep3TimeChart= (IonChannelStep3TimeChart) fragment;
@@ -207,23 +204,24 @@ public class IonChannelStep3Main extends Fragment {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             //data 處理
-            int currentPage = priceViewPager.getCurrentItem();
+            int currentPage = ionViewPager.getCurrentItem();
 
             if (msg.what == 1) {
                 IonChannelStep3Start();
-                IonChannelStep3Main.priceViewPager.setCurrentItem(1);
-                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
+                ionViewPager.setCurrentItem(1);
+                Common.showToast(adapterIonStep3.getPage(currentPage).getActivity(), "Measurement Start!");
                 return;
             }
 
             if (msg.what == 2) {
+                ionViewPager.setCurrentItem(1);
                 IonChannelStep3Stop();
-                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
+                Common.showToast(adapterIonStep3.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
 
             if (msg.what == 4) {
-                Common.showToast(adapter.getPage(currentPage).getActivity(), "Connecting fail! \n Please Reboot WiFi and \n Pressure \"Start\" again!");
+                Common.showToast(adapterIonStep3.getPage(currentPage).getActivity(), "Connecting fail! \n Please Reboot WiFi and \n Pressure \"Start\" again!");
                 return;
             }
 
@@ -286,7 +284,7 @@ public class IonChannelStep3Main extends Fragment {
             dataMap.get(sample3).add(solution3);
             dataMap.get(sample4).add(solution4);
 
-            Fragment fragment = adapter.getPage(currentPage);
+            Fragment fragment = adapterIonStep3.getPage(currentPage);
             if(fragment instanceof IonChannelStep3TimeChart)
             {
                 IonChannelStep3TimeChart ionChannelStep3TimeChart= (IonChannelStep3TimeChart) fragment;
@@ -312,7 +310,7 @@ public class IonChannelStep3Main extends Fragment {
     public static void IonChannelStep3Start()
     {
 
-        Fragment fragment = adapter.getPage(currentPage);
+        Fragment fragment = adapterIonStep3.getPage(currentPage);
         if(fragment instanceof IonChannelStep3TimeChart)
         {
             IonChannelStep3TimeChart ionChannelStep3TimeChart= (IonChannelStep3TimeChart) fragment;
@@ -343,7 +341,7 @@ public class IonChannelStep3Main extends Fragment {
         }).start();
         tcpClient.mRun=false;
         startMeasure=false;
-        Fragment fragment = adapter.getPage(currentPage);
+        Fragment fragment = adapterIonStep3.getPage(currentPage);
         if(fragment instanceof IonChannelStep3TimeChart)
         {
             IonChannelStep3TimeChart ionChannelStep3TimeChart= (IonChannelStep3TimeChart) fragment;
