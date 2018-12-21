@@ -39,7 +39,7 @@ import static com.whc.cvccmeasuresystem.Common.Common.*;
 public class DriftStep2Main extends Fragment {
 
 
-    private Activity activity;
+    private static Activity activity;
     private SharedPreferences sharedPreferences;
     private SmartTabLayout driftViewPagerTab;
     private DataBase dataBase;
@@ -104,7 +104,8 @@ public class DriftStep2Main extends Fragment {
         samples = new ArrayList<>();
         choiceColor = new ArrayList<>();
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-
+        sharedPreferences.edit().putString(finalFragment,Common.Drift1).apply();
+        sharedPreferences.edit().putBoolean(measureEnd,false).apply();
         dataBase = new DataBase(activity);
         SampleDB sampleDB = new SampleDB(dataBase);
 
@@ -239,6 +240,12 @@ public class DriftStep2Main extends Fragment {
             dataMap.get(sample3).add(solution3);
             dataMap.get(sample4).add(solution4);
 
+
+            SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
+            solutionDB.insert(solution1);
+            solutionDB.insert(solution2);
+            solutionDB.insert(solution3);
+            solutionDB.insert(solution4);
 
             Fragment fragment = adapter.getPage(currentPage);
 

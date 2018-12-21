@@ -13,11 +13,10 @@ import android.view.ViewGroup;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
-import com.whc.cvccmeasuresystem.Clent.TCPClient;
+import com.whc.cvccmeasuresystem.Client.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
-import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Set;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
@@ -28,7 +27,6 @@ import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 
-import java.io.IOException;
 import java.sql.Timestamp;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;

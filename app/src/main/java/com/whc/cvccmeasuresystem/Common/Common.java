@@ -3,12 +3,10 @@ package com.whc.cvccmeasuresystem.Common;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -16,8 +14,7 @@ import android.widget.Toast;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.beardedhen.androidbootstrap.BootstrapText;
 import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.data.Entry;
-import com.whc.cvccmeasuresystem.Clent.TCPClient;
+import com.whc.cvccmeasuresystem.Client.TCPClient;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
@@ -30,13 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.logging.SimpleFormatter;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
-import static com.beardedhen.androidbootstrap.font.FontAwesome.FA_CALCULATOR;
-import static com.beardedhen.androidbootstrap.font.FontAwesome.FA_LIGHTBULB_O;
-import static com.beardedhen.androidbootstrap.font.FontAwesome.FA_SAVE;
-import static com.beardedhen.androidbootstrap.font.FontAwesome.FA_SIGN_IN;
 
 public class Common {
     public static String[] mainFunctionName = {"BatchStep1", "Ion channels", "Sensitivity", "Drift", "Hysteresis", "History"};
@@ -63,7 +55,8 @@ public class Common {
     public static final String IonChannel1 = "IonChannel1";
     public static final String IonChannel2Set = "IonChannel2Set";
     public static final String HistoryMain = "HistoryMain";
-
+    public static final String finalFragment = "finalFragment";
+    public static final String measureEnd = "measureEnd";
 
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;

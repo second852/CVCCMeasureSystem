@@ -1,9 +1,12 @@
-package com.whc.cvccmeasuresystem.Clent;
+package com.whc.cvccmeasuresystem.Client;
 
 
+import android.app.job.JobParameters;
+import android.app.job.JobService;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Message;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 
 
@@ -11,34 +14,20 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.sql.Timestamp;
+
 import android.os.Handler;
 
-import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Chart;
-import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
-import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
-import com.whc.cvccmeasuresystem.Control.Dift.DriftStep1;
-import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Chart;
-import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Data;
-import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Main;
-import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Set;
-import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Chart;
-import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Data;
-import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
-import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Set;
-import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2ConChart;
-import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main;
-import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
-import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2TimeChart;
-import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Data;
-import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
-import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Set;
-import com.whc.cvccmeasuresystem.R;
 
+import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.DataBase.DataBase;
+import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
+import com.whc.cvccmeasuresystem.Model.Solution;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
 
 
-public class TCPClient {
+public class TCPClient extends JobService {
 
 
     public static final String SERVERIP = "192.168.4.1"; //your computer IP address
@@ -53,6 +42,7 @@ public class TCPClient {
     private InputStream in;
 
    private PrintWriter out;
+   private SharedPreferences sharedPreferences;
 
 
     public TCPClient(String measureDuration, String measureTime, Handler handlerMessage, Object object) {
@@ -146,11 +136,79 @@ public class TCPClient {
                             break;
 
                         default:
+
                             if(i>times)
                             {
                                 mRun=false;
                                 startMeasure=false;
+                                break;
                             }
+
+                            String[] voltages = str.split(",");
+                            try {
+                                new Integer(voltages[2]);
+                            } catch (Exception e) {
+                                break;
+                            }
+
+
+                            if(solution1==null)
+                            {
+                                sharedPreferences = this.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+                               
+                            }
+
+                            Solution solution1 = new Solution(Common.solution1.getConcentration(), sample1.getID());
+                            Solution solution2 = new Solution(Common.solution2.getConcentration(), sample2.getID());
+                            Solution solution3 = new Solution(Common.solution3.getConcentration(), sample3.getID());
+                            Solution solution4 = new Solution(Common.solution4.getConcentration(), sample4.getID());
+
+
+                            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+                            solution1.setVoltage(new Integer(voltages[1]));
+                            solution2.setVoltage(new Integer(voltages[2]));
+                            solution3.setVoltage(new Integer(voltages[3]));
+                            solution4.setVoltage(new Integer(voltages[4]));
+
+
+                            solution1.setTime(timestamp);
+                            solution2.setTime(timestamp);
+                            solution3.setTime(timestamp);
+                            solution4.setTime(timestamp);
+
+
+                            solution1.setMeasureType("3");
+                            solution2.setMeasureType("3");
+                            solution3.setMeasureType("3");
+                            solution4.setMeasureType("3");
+
+                            solution1.setNumber(String.valueOf(measureTimes));
+                            solution2.setNumber(String.valueOf(measureTimes));
+                            solution3.setNumber(String.valueOf(measureTimes));
+                            solution4.setNumber(String.valueOf(measureTimes));
+                            measureTimes++;
+
+                            int color = Color.parseColor(arrayColor[indicateColor%arrayColor.length]);
+                            solution1.setColor(color);
+                            solution2.setColor(color);
+                            solution3.setColor(color);
+                            solution4.setColor(color);
+                            choiceColor.add(color);
+
+                            dataMap.get(sample1).add(solution1);
+                            dataMap.get(sample2).add(solution2);
+                            dataMap.get(sample3).add(solution3);
+                            dataMap.get(sample4).add(solution4);
+
+
+                            SolutionDB solutionDB=new SolutionDB(new DataBase(this));
+                            solutionDB.insert(solution1);
+                            solutionDB.insert(solution2);
+                            solutionDB.insert(solution3);
+                            solutionDB.insert(solution4);
+
+
                             message=new Message();
                             message.obj=str;
                             message.what=3;
@@ -193,4 +251,16 @@ public class TCPClient {
     }
 
 
+
+    @Override
+    public boolean onStartJob(JobParameters jobParameters) {
+        run();
+        return false;
+    }
+
+    @Override
+    public boolean onStopJob(JobParameters jobParameters) {
+
+        return false;
+    }
 }

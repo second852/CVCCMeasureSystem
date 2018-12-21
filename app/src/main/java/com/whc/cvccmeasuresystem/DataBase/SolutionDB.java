@@ -54,7 +54,7 @@ public class SolutionDB {
 
 
     public List<Solution> getSampleAll(int id) {
-        String sql = "SELECT * FROM Solution where sampleID = '" + id + "' order by id desc;";
+        String sql = "SELECT * FROM Solution where sampleID = '" + id + "' order by time;";
         String[] args = {};
         Cursor cursor = db.rawQuery(sql, args);
         List<Solution> solutions = new ArrayList<>();

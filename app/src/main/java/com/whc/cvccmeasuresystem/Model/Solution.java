@@ -13,7 +13,7 @@ public class Solution implements Serializable{
     private Integer voltage;//4 read Voltage
     private int sampleID;//5  measure Sample
     private boolean noNormalV;//6 normal
-    private String measureType;
+    private String measureType;//7 measureType
     private int color;
 
     public int getColor() {

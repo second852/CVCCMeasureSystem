@@ -481,7 +481,7 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
             SampleDB sampleDB=new SampleDB(new DataBase(activity));
             SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
             HSSFWorkbook workbook = new HSSFWorkbook();
-            int j=0;
+
             for(SaveFile saveFile:choicePrint)
             {
                 User user=userDB.findUserById(saveFile.getUserId());
@@ -491,8 +491,8 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
                 sheetCon.setColumnWidth(2, 20 * 256);// 調整欄位寬度
                 sheetCon.setColumnWidth(3, 20* 256);// 調整欄位寬度
                 sheetCon.setColumnWidth(4, 20* 256);// 調整欄位寬度
-                sheetCon.setColumnWidth(5, 20* 256);// 調整欄位寬度
-                sheetCon.setColumnWidth(6, 20* 256);// 調整欄位寬度
+//                sheetCon.setColumnWidth(5, 20* 256);// 調整欄位寬度
+                sheetCon.setColumnWidth(15, 25* 256);// 調整欄位寬度
 
                 //File
                 sheetCon.addMergedRegion(new CellRangeAddress(0,0, 0, 3));
@@ -538,31 +538,53 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
                 }
 
                 //Solution
-                rowCount++;
-                sheetCon.addMergedRegion(new CellRangeAddress(rowCount,rowCount, 0, 3));
-                row = sheetCon.createRow(rowCount);
-                row.createCell(0).setCellValue("Solution");
+                rowCount=0;
+                sheetCon.addMergedRegion(new CellRangeAddress(rowCount,rowCount, 6, 15));
+                row = sheetCon.getRow(rowCount);
+                row.createCell(6).setCellValue("Solution");
                 //Solution Type
                 rowCount++;
-                row = sheetCon.createRow(rowCount);
-                row.createCell(0).setCellValue("name");
-                row.createCell(1).setCellValue("Ion");
-                row.createCell(2).setCellValue("Voltage(mv)");
+                row = sheetCon.getRow(rowCount);
+                row.createCell(6).setCellValue("Time");
+
+                int i=6;
+                for(Sample sample:samples)
+                {
+                    row.createCell(++i).setCellValue(sample.getIonType());
+                    row.createCell(++i).setCellValue(sample.getName()+"(mv)");
+                }
+                row.createCell(++i).setCellValue("DateTime");
+
                 //Sample value
                 rowCount++;
+                boolean firstLoop=true;
+                int j=0,loop=0;
                 for (Sample sample:samples)
                 {
                     List<Solution> solutions=solutionDB.getSampleAll(sample.getID());
+                    int k=0;
                     for(Solution solution:solutions)
                     {
-                        row = sheetCon.createRow(rowCount);
-                        row.createCell(0).setCellValue(sample.getName());
-                        row.createCell(1).setCellValue(sample.getIonType()+solution.getConcentration());
-                        row.createCell(2).setCellValue(solution.getVoltage());
-                        rowCount++;
+
+                        row = sheetCon.getRow(rowCount+k);
+                        if(row==null)
+                        {
+                            row = sheetCon.createRow(rowCount+k);
+                        }
+                        if(firstLoop)
+                        {
+                            row.createCell(6).setCellValue(j++);
+                            row.createCell(15).setCellValue(Common.timeToString.format(new Date(solution.getTime().getTime())));
+                        }else{
+                            row = sheetCon.getRow(rowCount+k);
+                        }
+                        row.createCell(7+loop).setCellValue(solution.getConcentration());
+                        row.createCell(8+loop).setCellValue(solution.getVoltage());
+                        k++;
                     }
+                    firstLoop=false;
+                    loop=loop+2;
                 }
-                j++;
             }
 
             workbook.write(outputStream);

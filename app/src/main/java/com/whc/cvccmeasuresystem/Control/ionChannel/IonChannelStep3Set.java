@@ -15,14 +15,12 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
-import com.beardedhen.androidbootstrap.AwesomeTextView;
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
-import com.whc.cvccmeasuresystem.Clent.TCPClient;
+import com.whc.cvccmeasuresystem.Client.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
-import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;

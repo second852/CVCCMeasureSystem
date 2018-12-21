@@ -44,17 +44,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         SignIn.signIn = false;
         finishToSave = true;
-        oldFragment = new ArrayList<>();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Fragment fragment = new BatchStep2Main();
-        fragment = new SignIn();
-//        fragment=new IonChannelStep3Main();
-//        IonChannelStep2Main.errorSample=new ArrayList<>();
-        switchFragment(fragment, getSupportFragmentManager());
+        if(oldFragment==null)
+        {
+            switchFragment(new SignIn(), getSupportFragmentManager());
+        }
     }
 
 

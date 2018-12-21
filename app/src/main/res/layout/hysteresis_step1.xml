@@ -365,6 +365,7 @@
                     android:layout_marginRight="30dp"
                     android:gravity="center_vertical"
                     android:hint="5"
+                    android:text="5"
                     android:inputType="numberDecimal"
                     android:singleLine="true"
                     android:textColor="#000000"

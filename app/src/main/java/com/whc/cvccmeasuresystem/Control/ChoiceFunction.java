@@ -46,6 +46,7 @@ public class ChoiceFunction extends Fragment {
             activity = getActivity();
         }
         ((AppCompatActivity)activity).getSupportActionBar().show();
+        oldFragment = new ArrayList<>();
     }
 
 

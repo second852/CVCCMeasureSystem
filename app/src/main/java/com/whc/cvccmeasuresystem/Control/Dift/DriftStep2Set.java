@@ -2,6 +2,7 @@ package com.whc.cvccmeasuresystem.Control.Dift;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -13,25 +14,22 @@ import android.view.ViewGroup;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
-import com.whc.cvccmeasuresystem.Clent.TCPClient;
+import com.whc.cvccmeasuresystem.Client.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
-import com.whc.cvccmeasuresystem.Control.Batch.BatchStep1;
-import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
-import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
-import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.SaveFile;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.sql.Timestamp;
 
-import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
+import static com.whc.cvccmeasuresystem.Common.Common.finalFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.finishToSave;
+import static com.whc.cvccmeasuresystem.Common.Common.measureEnd;
 import static com.whc.cvccmeasuresystem.Common.Common.measureStartNotExist;
 import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
 import static com.whc.cvccmeasuresystem.Common.Common.needInt;
@@ -49,6 +47,7 @@ import static com.whc.cvccmeasuresystem.Common.Common.solution4;
 import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
 import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
+import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
 
 public class DriftStep2Set extends Fragment {
@@ -273,18 +272,13 @@ public class DriftStep2Set extends Fragment {
     public void finishMeasure()
     {
         DataBase dataBase=new DataBase(activity);
-        SolutionDB solutionDB=new SolutionDB(dataBase);
-        for(Sample sample:dataMap.keySet())
-        {
-            for (Solution solutions:dataMap.get(sample))
-            {
-                solutionDB.insert(solutions);
-            }
-        }
         SaveFileDB saveFileDB=new SaveFileDB(dataBase);
         SaveFile saveFile=saveFileDB.findOldSaveFileById(sample1.getFileID());
         saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
         saveFileDB.update(saveFile);
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString(finalFragment,Common.Drift1).apply();
+        sharedPreferences.edit().putBoolean(measureEnd,true).apply();
         needSet=false;
         oldFragment.remove(oldFragment.size()-1);
         switchFragment(new DriftStep1(),getFragmentManager());
