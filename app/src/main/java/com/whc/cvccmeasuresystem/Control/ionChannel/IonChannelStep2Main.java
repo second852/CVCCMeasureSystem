@@ -58,7 +58,7 @@ import static com.whc.cvccmeasuresystem.Common.Common.volCon;
 public class IonChannelStep2Main extends Fragment {
 
 
-    private Activity activity;
+    private static Activity activity;
     private SharedPreferences sharedPreferences;
     private SmartTabLayout viewPagerTab;
     private DataBase dataBase;
@@ -279,7 +279,11 @@ public class IonChannelStep2Main extends Fragment {
             solution4.setColor(color);
 
 
-
+            SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
+            solutionDB.insert(solution1);
+            solutionDB.insert(solution2);
+            solutionDB.insert(solution3);
+            solutionDB.insert(solution4);
 
             solution1.setNumber(String.valueOf(measureTimes));
             solution2.setNumber(String.valueOf(measureTimes));

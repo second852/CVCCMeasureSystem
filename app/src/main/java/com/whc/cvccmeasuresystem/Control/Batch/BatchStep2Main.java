@@ -84,8 +84,8 @@ public class BatchStep2Main extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        dataMap=null;
-        volCon=null;
+//        dataMap=null;
+//        volCon=null;
     }
 
     @Override

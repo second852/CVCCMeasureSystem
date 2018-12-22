@@ -23,6 +23,7 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
+import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
@@ -52,7 +53,7 @@ import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 public class IonChannelStep3Main extends Fragment {
 
 
-    private Activity activity;
+    private static  Activity activity;
     private SharedPreferences sharedPreferences;
     private SmartTabLayout ionViewPagerTab;
     private DataBase dataBase;
@@ -278,6 +279,12 @@ public class IonChannelStep3Main extends Fragment {
             solution3.setColor(color);
             solution4.setColor(color);
             choiceColor.add(color);
+
+            SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
+            solutionDB.insert(solution1);
+            solutionDB.insert(solution2);
+            solutionDB.insert(solution3);
+            solutionDB.insert(solution4);
 
             dataMap.get(sample1).add(solution1);
             dataMap.get(sample2).add(solution2);

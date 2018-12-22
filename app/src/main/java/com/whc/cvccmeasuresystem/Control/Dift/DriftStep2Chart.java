@@ -194,7 +194,7 @@ public class DriftStep2Chart extends Fragment{
     private List<String> getLabels(int size) {
         List<String> chartLabels = new ArrayList<>();
         for (int i = 0; i < (size+1); i++) {
-            chartLabels.add( (i+1) + "min");
+            chartLabels.add( 5*(i+1) + "min");
         }
         return chartLabels;
     }

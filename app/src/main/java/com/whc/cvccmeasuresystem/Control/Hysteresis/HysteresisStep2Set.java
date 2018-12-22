@@ -168,14 +168,6 @@ public class HysteresisStep2Set extends Fragment {
     public void finishMeasure()
     {
         DataBase dataBase=new DataBase(activity);
-        SolutionDB solutionDB=new SolutionDB(dataBase);
-        for(Sample sample:dataMap.keySet())
-        {
-            for (Solution solutions:dataMap.get(sample))
-            {
-                solutionDB.insert(solutions);
-            }
-        }
         SaveFileDB saveFileDB=new SaveFileDB(dataBase);
         SaveFile saveFile=saveFileDB.findOldSaveFileById(sample1.getFileID());
         saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));

@@ -1,8 +1,10 @@
 package com.whc.cvccmeasuresystem.Control.Dift;
 
 import android.app.Activity;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -14,22 +16,24 @@ import android.view.ViewGroup;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
+import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Client.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
+import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
+import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.SaveFile;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.sql.Timestamp;
 
-import static com.whc.cvccmeasuresystem.Common.Common.finalFragment;
+import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
 import static com.whc.cvccmeasuresystem.Common.Common.finishToSave;
-import static com.whc.cvccmeasuresystem.Common.Common.measureEnd;
 import static com.whc.cvccmeasuresystem.Common.Common.measureStartNotExist;
 import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
 import static com.whc.cvccmeasuresystem.Common.Common.needInt;
@@ -47,19 +51,15 @@ import static com.whc.cvccmeasuresystem.Common.Common.solution4;
 import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
 import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
-import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
 
 public class DriftStep2Set extends Fragment {
 
     private View view;
     private Activity activity;
-    private BootstrapButton con1, con2, con3, con4, start,stop,finish,step01,step03;
+    private BootstrapButton con1, con2, con3, con4, start, stop, finish, step01, step03;
     private BootstrapEditText ion1, ion2, ion3, ion4, measureTime;
     private String mTime;
-
-
-
 
 
     @Override
@@ -98,26 +98,20 @@ public class DriftStep2Set extends Fragment {
         step01.setOnClickListener(new step01OnClick());
         step03.setOnClickListener(new finishFragment());
         measureTime.setText(String.valueOf(720));
-        if(pageCon!=null)
-        {
-            if(pageCon.getCon1()!=null)
-            {
+        if (pageCon != null) {
+            if (pageCon.getCon1() != null) {
                 ion1.setText(pageCon.getCon1());
             }
-            if(pageCon.getCon2()!=null)
-            {
+            if (pageCon.getCon2() != null) {
                 ion2.setText(pageCon.getCon2());
             }
-            if(pageCon.getCon3()!=null)
-            {
+            if (pageCon.getCon3() != null) {
                 ion3.setText(pageCon.getCon3());
             }
-            if(pageCon.getCon4()!=null)
-            {
+            if (pageCon.getCon4() != null) {
                 ion4.setText(pageCon.getCon4());
             }
-            if(pageCon.getExpTime()!=null)
-            {
+            if (pageCon.getExpTime() != null) {
                 measureTime.setText(pageCon.getExpTime());
             }
         }
@@ -126,30 +120,25 @@ public class DriftStep2Set extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        pageCon=new PageCon();
+        pageCon = new PageCon();
         String ionOne = ion1.getText().toString();
         String ionTwo = ion2.getText().toString();
         String ionThree = ion3.getText().toString();
         String ionFour = ion4.getText().toString();
-        String mType=measureTime.getText().toString();
-        if(ionOne!=null)
-        {
+        String mType = measureTime.getText().toString();
+        if (ionOne != null) {
             pageCon.setCon1(ionOne);
         }
-        if(ionTwo!=null)
-        {
+        if (ionTwo != null) {
             pageCon.setCon2(ionTwo);
         }
-        if(ionTwo!=null)
-        {
+        if (ionTwo != null) {
             pageCon.setCon3(ionThree);
         }
-        if(ionTwo!=null)
-        {
+        if (ionTwo != null) {
             pageCon.setCon4(ionFour);
         }
-        if(mTime!=null)
-        {
+        if (mTime != null) {
             pageCon.setExpTime(mType);
         }
     }
@@ -165,22 +154,20 @@ public class DriftStep2Set extends Fragment {
         ion4 = view.findViewById(R.id.ion4);
         measureTime = view.findViewById(R.id.measureTime);
         start = view.findViewById(R.id.start);
-        stop=view.findViewById(R.id.stop);
-        finish=view.findViewById(R.id.finish);
-        step01=view.findViewById(R.id.step01);
-        step03=view.findViewById(R.id.step03);
+        stop = view.findViewById(R.id.stop);
+        finish = view.findViewById(R.id.finish);
+        step01 = view.findViewById(R.id.step01);
+        step03 = view.findViewById(R.id.step03);
     }
 
 
     private Runnable measureThread = new Runnable() {
         @Override
         public void run() {
-            tcpClient=new TCPClient("1", mTime, DriftStep2Main.handlerMessage,DriftStep2Set.this);
+            tcpClient = new TCPClient("5", mTime, DriftStep2Main.handlerMessage, DriftStep2Set.this);
             tcpClient.run();
         }
     };
-
-
 
 
     private class startMeasure implements View.OnClickListener {
@@ -188,9 +175,8 @@ public class DriftStep2Set extends Fragment {
         public void onClick(View view) {
 
             //防止重複量測
-            if(startMeasure)
-            {
-                Common.showToast(activity,"Please wait util this measurement stop ");
+            if (startMeasure) {
+                Common.showToast(activity, "Please wait util this measurement stop ");
                 return;
             }
 
@@ -250,72 +236,84 @@ public class DriftStep2Set extends Fragment {
                 return;
             }
             //conection
-            solution1=new Solution(ionOne,sample1.getID());
-            solution2=new Solution(ionTwo,sample2.getID());
-            solution3=new Solution(ionThree,sample3.getID());
-            solution4=new Solution(ionFour,sample4.getID());
-            Common.showToast(activity,"Wifi Connecting");
-            measureTimes=0;
-            new Thread(measureThread).start();
+            solution1 = new Solution(ionOne, sample1.getID());
+            solution2 = new Solution(ionTwo, sample2.getID());
+            solution3 = new Solution(ionThree, sample3.getID());
+            solution4 = new Solution(ionFour, sample4.getID());
+            Common.showToast(activity, "Wifi Connecting");
+            measureTimes = 0;
+//            new Thread(measureThread).start();
+
+
+            JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            //判斷是否建立過
+//     tm.cancelAll(); no need,becauseCompiler will remove all job
+
+//            if (tm.getAllPendingJobs().size() == 1) {
+//                return;
+//            }
+
+            ComponentName mServiceComponent = new ComponentName(activity, JobService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);
+//        tm.cancelAll();
+//            builder.setPeriodic(1000*60*60);
+//            builder.setPersisted(true);
+            builder.setMinimumLatency(1);
+            builder.setOverrideDeadline(2);
+            builder.setRequiresCharging(false);
+            builder.setRequiresDeviceIdle(false);
+            tm.schedule(builder.build());
         }
     }
 
     private class stopMeasure implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            StopDialogFragment aa= new StopDialogFragment();
+            StopDialogFragment aa = new StopDialogFragment();
             aa.setObject(DriftStep2Set.this);
-            aa.show(getFragmentManager(),"show");
+            aa.show(getFragmentManager(), "show");
         }
     }
 
-    public void finishMeasure()
-    {
-        DataBase dataBase=new DataBase(activity);
-        SaveFileDB saveFileDB=new SaveFileDB(dataBase);
-        SaveFile saveFile=saveFileDB.findOldSaveFileById(sample1.getFileID());
+    public void finishMeasure() {
+        DataBase dataBase = new DataBase(activity);
+        SaveFileDB saveFileDB = new SaveFileDB(dataBase);
+        SaveFile saveFile = saveFileDB.findOldSaveFileById(sample1.getFileID());
         saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
         saveFileDB.update(saveFile);
-        SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-        sharedPreferences.edit().putString(finalFragment,Common.Drift1).apply();
-        sharedPreferences.edit().putBoolean(measureEnd,true).apply();
-        needSet=false;
-        oldFragment.remove(oldFragment.size()-1);
-        switchFragment(new DriftStep1(),getFragmentManager());
-        tcpClient=null;
+        needSet = false;
+        oldFragment.remove(oldFragment.size() - 1);
+        switchFragment(new DriftStep1(), getFragmentManager());
+        tcpClient = null;
     }
-
 
 
     private class finishFragment implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            if(startMeasure)
-            {
+            if (startMeasure) {
                 Common.showToast(activity, measureStartNotExist);
                 return;
             }
-            finishToSave=true;
-            FinishDialogFragment aa= new FinishDialogFragment();
+            finishToSave = true;
+            FinishDialogFragment aa = new FinishDialogFragment();
             aa.setObject(DriftStep2Set.this);
-            aa.show(getFragmentManager(),"show");
+            aa.show(getFragmentManager(), "show");
         }
     }
 
     private class step01OnClick implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            if(startMeasure)
-            {
+            if (startMeasure) {
                 Common.showToast(activity, measureStartNotExist);
                 return;
             }
-            if(tcpClient!=null)
-            {
+            if (tcpClient != null) {
                 tcpClient.cancelHomeTcpClient();
-                tcpClient=null;
+                tcpClient = null;
             }
-            Common.switchFragment(new DriftStep1(),getFragmentManager());
+            Common.switchFragment(new DriftStep1(), getFragmentManager());
         }
     }
 }

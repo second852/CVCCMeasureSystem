@@ -82,10 +82,10 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
-        if (tcpClient != null) {
-            tcpClient.cancelHomeTcpClient();
-            tcpClient = null;
-        }
+//        if (tcpClient != null) {
+//            tcpClient.cancelHomeTcpClient();
+//            tcpClient = null;
+//        }
 
         switch (item.getItemId()) {
             case R.id.home:
@@ -115,10 +115,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (tcpClient != null) {
-            tcpClient.cancelHomeTcpClient();
-            tcpClient = null;
-        }
+//        if (tcpClient != null) {
+//            tcpClient.cancelHomeTcpClient();
+//            tcpClient = null;
+//        }
     }
 
     @Override

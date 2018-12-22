@@ -12,6 +12,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,8 +72,9 @@ public class DriftStep2Main extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        dataMap = null;
-        volCon = null;
+//        dataMap = null;
+//        volCon = null;
+        Log.d("XXXXXX","onDestroyView");
     }
 
     @Override
@@ -96,7 +98,11 @@ public class DriftStep2Main extends Fragment {
     public void onStart() {
         super.onStart();
         //set Page
-        setSample();
+        if(!startMeasure)
+        {
+            setSample();
+        }
+        Log.d("XXXXXX","onStart");
     }
 
     private void setSample() {
@@ -104,8 +110,7 @@ public class DriftStep2Main extends Fragment {
         samples = new ArrayList<>();
         choiceColor = new ArrayList<>();
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-        sharedPreferences.edit().putString(finalFragment,Common.Drift1).apply();
-        sharedPreferences.edit().putBoolean(measureEnd,false).apply();
+
         dataBase = new DataBase(activity);
         SampleDB sampleDB = new SampleDB(dataBase);
 
@@ -233,12 +238,6 @@ public class DriftStep2Main extends Fragment {
             solution2.setColor(color);
             solution3.setColor(color);
             solution4.setColor(color);
-            choiceColor.add(color);
-
-            dataMap.get(sample1).add(solution1);
-            dataMap.get(sample2).add(solution2);
-            dataMap.get(sample3).add(solution3);
-            dataMap.get(sample4).add(solution4);
 
 
             SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
@@ -246,6 +245,13 @@ public class DriftStep2Main extends Fragment {
             solutionDB.insert(solution2);
             solutionDB.insert(solution3);
             solutionDB.insert(solution4);
+
+            choiceColor.add(color);
+            dataMap.get(sample1).add(solution1);
+            dataMap.get(sample2).add(solution2);
+            dataMap.get(sample3).add(solution3);
+            dataMap.get(sample4).add(solution4);
+
 
             Fragment fragment = adapter.getPage(currentPage);
 

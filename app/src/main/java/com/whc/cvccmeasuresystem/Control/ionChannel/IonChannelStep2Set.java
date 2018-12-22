@@ -579,14 +579,7 @@ public class IonChannelStep2Set extends Fragment {
                 return;
             }
 
-            SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
-            for(Sample sample:dataMap.keySet())
-            {
-                for(Solution solution:dataMap.get(sample))
-                {
-                    solutionDB.insert(solution);
-                }
-            }
+
             saveListPage();
             finishToSave=true;
             oldFragment.add(IonChannel2Set);

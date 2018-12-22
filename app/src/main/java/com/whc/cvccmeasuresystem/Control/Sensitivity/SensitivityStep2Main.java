@@ -41,11 +41,10 @@ import static com.whc.cvccmeasuresystem.Common.Common.currentPage;
 public class SensitivityStep2Main extends Fragment {
 
 
-    private Activity activity;
+    private static Activity activity;
     private SharedPreferences sharedPreferences;
     private SmartTabLayout senViewPagerTab;
     private DataBase dataBase;
-
     public static ViewPager senViewPager;
     public static FragmentPagerItemAdapter adapter;
 
@@ -96,8 +95,6 @@ public class SensitivityStep2Main extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        dataMap = null;
-        volCon = null;
     }
 
     private void setSample() {
@@ -240,6 +237,12 @@ public class SensitivityStep2Main extends Fragment {
             solution3.setColor(color);
             solution4.setColor(color);
             choiceColor.add(color);
+
+            SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
+            solutionDB.insert(solution1);
+            solutionDB.insert(solution2);
+            solutionDB.insert(solution3);
+            solutionDB.insert(solution4);
 
             dataMap.get(sample1).add(solution1);
             dataMap.get(sample2).add(solution2);
