@@ -21,10 +21,13 @@ import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItem;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
+import com.whc.cvccmeasuresystem.Client.JobService;
+import com.whc.cvccmeasuresystem.Client.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
+import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
@@ -32,6 +35,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
@@ -62,20 +66,11 @@ public class DriftStep2Main extends Fragment {
         //init
         activity.setTitle("Drift Monitor Step2");
         dataBase = new DataBase(activity);
-        if (tcpClient == null) {
-            startMeasure = false;
-        } else {
-            startMeasure = true;
-        }
+        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-//        dataMap = null;
-//        volCon = null;
-        Log.d("XXXXXX","onDestroyView");
-    }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -98,18 +93,67 @@ public class DriftStep2Main extends Fragment {
     public void onStart() {
         super.onStart();
         //set Page
-        if(!startMeasure)
+        SharedPreferences sharedPreferences=activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+        boolean endMeasure=sharedPreferences.getBoolean(Common.measureEnd,true);
+        startMeasure=(!endMeasure);
+        if(endMeasure)
         {
             setSample();
+        }else{
+            setMeasureSample();
+            driftViewPager.setCurrentItem(1);
+            JobService.handlerMessage=DriftStep2Main.handlerMessage;
         }
-        Log.d("XXXXXX","onStart");
+        sharedPreferences.edit().putBoolean(onPause,false).apply();
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences sharedPreferences=activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+        sharedPreferences.edit().putBoolean(onPause,true).apply();
+    }
+
+    private void setMeasureSample() {
+        dataMap = new HashMap<>();
+        samples = new ArrayList<>();
+        choiceColor = new ArrayList<>();
+
+        dataBase = new DataBase(activity);
+        SampleDB sampleDB = new SampleDB(dataBase);
+        SolutionDB solutionDB=new SolutionDB(dataBase);
+        //sample 1
+        int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
+        sample1 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample1, solutionDB.getSampleAll(sampleID));
+        samples.add(sample1);
+        //sample 2
+        sampleID = sharedPreferences.getInt(Common.sample2String, 0);
+        sample2 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample2, solutionDB.getSampleAll(sampleID));
+        samples.add(sample2);
+        //sample 3
+        sampleID = sharedPreferences.getInt(Common.sample3String, 0);
+        sample3 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample3, solutionDB.getSampleAll(sampleID));
+        samples.add(sample3);
+        //sample 4
+        sampleID = sharedPreferences.getInt(Common.sample4String, 0);
+        sample4 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample4, solutionDB.getSampleAll(sampleID));
+        samples.add(sample4);
+        for(Solution solution:dataMap.get(sample1))
+        {
+            choiceColor.add(solution.getColor());
+        }
+    }
+
 
     private void setSample() {
         dataMap = new HashMap<>();
         samples = new ArrayList<>();
         choiceColor = new ArrayList<>();
-        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+
 
         dataBase = new DataBase(activity);
         SampleDB sampleDB = new SampleDB(dataBase);
@@ -193,60 +237,7 @@ public class DriftStep2Main extends Fragment {
             }
 
 
-            String result = (String) msg.obj;
-            String[] voltages = result.split(",");
-            try {
-                new Integer(voltages[2]);
-            } catch (Exception e) {
-                return;
-            }
-
-
-            Solution solution1 = new Solution(Common.solution1.getConcentration(), sample1.getID());
-            Solution solution2 = new Solution(Common.solution2.getConcentration(), sample2.getID());
-            Solution solution3 = new Solution(Common.solution3.getConcentration(), sample3.getID());
-            Solution solution4 = new Solution(Common.solution4.getConcentration(), sample4.getID());
-
-
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-
-            solution1.setVoltage(new Integer(voltages[1]));
-            solution2.setVoltage(new Integer(voltages[2]));
-            solution3.setVoltage(new Integer(voltages[3]));
-            solution4.setVoltage(new Integer(voltages[4]));
-
-
-            solution1.setTime(timestamp);
-            solution2.setTime(timestamp);
-            solution3.setTime(timestamp);
-            solution4.setTime(timestamp);
-
-
-            solution1.setMeasureType("3");
-            solution2.setMeasureType("3");
-            solution3.setMeasureType("3");
-            solution4.setMeasureType("3");
-
-            solution1.setNumber(String.valueOf(measureTimes));
-            solution2.setNumber(String.valueOf(measureTimes));
-            solution3.setNumber(String.valueOf(measureTimes));
-            solution4.setNumber(String.valueOf(measureTimes));
-            measureTimes++;
-
-            int color =Color.parseColor(arrayColor[indicateColor%arrayColor.length]);
-            solution1.setColor(color);
-            solution2.setColor(color);
-            solution3.setColor(color);
-            solution4.setColor(color);
-
-
-            SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
-            solutionDB.insert(solution1);
-            solutionDB.insert(solution2);
-            solutionDB.insert(solution3);
-            solutionDB.insert(solution4);
-
-            choiceColor.add(color);
+            choiceColor.add(oneColor);
             dataMap.get(sample1).add(solution1);
             dataMap.get(sample2).add(solution2);
             dataMap.get(sample3).add(solution3);
@@ -285,7 +276,7 @@ public class DriftStep2Main extends Fragment {
             }
         }).start();
         indicateColor++;
-        tcpClient.mRun=false;
+        TCPClient.mRun=false;
         startMeasure=false;
         try {
             tcpClient.socket.close();

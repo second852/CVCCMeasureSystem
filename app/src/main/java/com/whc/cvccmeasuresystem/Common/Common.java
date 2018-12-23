@@ -51,13 +51,19 @@ public class Common {
     public static final String BS1 = "BatchStep1";
     public static final String Sen1 = "SensitivityStep1";
     public static final String Hys1 = "HysteresisStep1";
+
     public static final String Drift1 = "Drift";
+    public static final String Drift2Set = "Drift2Set";
+
+
     public static final String IonChannel1 = "IonChannel1";
     public static final String IonChannel2Set = "IonChannel2Set";
     public static final String HistoryMain = "HistoryMain";
+
     public static final String finalFragment = "finalFragment";
     public static final String measureEnd = "measureEnd";
-
+    public static final String finalPage = "finalPage";
+    public static final String onPause = "onPause";
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;
     public static HashMap<Sample, List<Solution>> dataMap;
@@ -70,8 +76,11 @@ public class Common {
     public static boolean finishToSave;
     public static boolean finishToSave1;
     public static HashMap<Sample, HashMap<String, List<Solution>>> volCon;
+
     public static List<Integer> choiceColor;
     public static String[] arrayColor = {"#007bff", "#28a745", "#fd7e14", "#ffc107", "#dc3545"};
+    public static int oneColor;
+
     public static int indicateColor;
     public static PageCon pageCon;
     public static List<String> oldFragment;

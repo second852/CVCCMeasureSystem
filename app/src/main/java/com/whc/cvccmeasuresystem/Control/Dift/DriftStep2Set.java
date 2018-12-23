@@ -5,6 +5,7 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
+import com.google.gson.Gson;
 import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Client.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
@@ -32,8 +34,12 @@ import com.whc.cvccmeasuresystem.R;
 
 import java.sql.Timestamp;
 
+import static com.whc.cvccmeasuresystem.Common.Common.Drift2Set;
 import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
+import static com.whc.cvccmeasuresystem.Common.Common.finalFragment;
+import static com.whc.cvccmeasuresystem.Common.Common.finalPage;
 import static com.whc.cvccmeasuresystem.Common.Common.finishToSave;
+import static com.whc.cvccmeasuresystem.Common.Common.measureEnd;
 import static com.whc.cvccmeasuresystem.Common.Common.measureStartNotExist;
 import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
 import static com.whc.cvccmeasuresystem.Common.Common.needInt;
@@ -51,6 +57,7 @@ import static com.whc.cvccmeasuresystem.Common.Common.solution4;
 import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
 import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
+import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
 
 public class DriftStep2Set extends Fragment {
@@ -60,6 +67,7 @@ public class DriftStep2Set extends Fragment {
     private BootstrapButton con1, con2, con3, con4, start, stop, finish, step01, step03;
     private BootstrapEditText ion1, ion2, ion3, ion4, measureTime;
     private String mTime;
+    private SharedPreferences sharedPreferences;
 
 
     @Override
@@ -70,6 +78,7 @@ public class DriftStep2Set extends Fragment {
         } else {
             activity = getActivity();
         }
+        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
     }
 
     @Nullable
@@ -117,9 +126,10 @@ public class DriftStep2Set extends Fragment {
         }
     }
 
+
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onPause() {
+        super.onPause();
         pageCon = new PageCon();
         String ionOne = ion1.getText().toString();
         String ionTwo = ion2.getText().toString();
@@ -141,7 +151,15 @@ public class DriftStep2Set extends Fragment {
         if (mTime != null) {
             pageCon.setExpTime(mType);
         }
+
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(pageCon);
+        prefsEditor.putString(finalPage,json);
+        prefsEditor.apply();
     }
+
+
 
     private void findViewById() {
         con1 = view.findViewById(R.id.con1);
@@ -242,27 +260,30 @@ public class DriftStep2Set extends Fragment {
             solution4 = new Solution(ionFour, sample4.getID());
             Common.showToast(activity, "Wifi Connecting");
             measureTimes = 0;
-//            new Thread(measureThread).start();
 
 
+//          new Thread(measureThread).start();
             JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            //判斷是否建立過
-//     tm.cancelAll(); no need,becauseCompiler will remove all job
-
-//            if (tm.getAllPendingJobs().size() == 1) {
-//                return;
-//            }
+            JobService.handlerMessage=DriftStep2Main.handlerMessage;
+            JobService.object=DriftStep2Set.this;
+            JobService.measureDuration="1";
+            JobService.measureTime=mTime;
+            JobService.mRun=true;
 
             ComponentName mServiceComponent = new ComponentName(activity, JobService.class);
             JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);
-//        tm.cancelAll();
-//            builder.setPeriodic(1000*60*60);
-//            builder.setPersisted(true);
+            tm.cancelAll();
+
             builder.setMinimumLatency(1);
             builder.setOverrideDeadline(2);
             builder.setRequiresCharging(false);
             builder.setRequiresDeviceIdle(false);
             tm.schedule(builder.build());
+
+
+            sharedPreferences.edit().putString(finalFragment,Drift2Set).apply();
+            sharedPreferences.edit().putBoolean(measureEnd,false).apply();
+
         }
     }
 
@@ -285,6 +306,7 @@ public class DriftStep2Set extends Fragment {
         oldFragment.remove(oldFragment.size() - 1);
         switchFragment(new DriftStep1(), getFragmentManager());
         tcpClient = null;
+        sharedPreferences.edit().putBoolean(measureEnd,true).apply();
     }
 
 

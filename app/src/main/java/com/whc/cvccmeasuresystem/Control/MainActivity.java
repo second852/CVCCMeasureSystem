@@ -1,10 +1,13 @@
 package com.whc.cvccmeasuresystem.Control;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,11 +15,13 @@ import android.view.MenuItem;
 
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
+import com.google.gson.Gson;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.OutDialogFragment;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep1;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep1;
+import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Main;
 import com.whc.cvccmeasuresystem.Control.History.HistoryMain;
 import com.whc.cvccmeasuresystem.Control.History.HistoryShowMain;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
@@ -24,6 +29,7 @@ import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep1;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
+import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
@@ -42,16 +48,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         TypefaceProvider.registerDefaultIconSets();
         setContentView(R.layout.activity_main);
-        SignIn.signIn = false;
         finishToSave = true;
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if(oldFragment==null)
+
+        SharedPreferences sharedPreferences=this.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+        String finalFragment=sharedPreferences.getString(Common.finalFragment,"");
+        boolean endMeasure=sharedPreferences.getBoolean(Common.measureEnd,true);
+
+        if(endMeasure)
         {
+            SignIn.signIn = false;
             switchFragment(new SignIn(), getSupportFragmentManager());
+        }else{
+            SignIn.signIn = true;
+            Gson gson = new Gson();
+            switch (finalFragment) {
+                case Common.Drift2Set:
+                    switchFragment(new DriftStep2Main(), getSupportFragmentManager());
+                    String json = sharedPreferences.getString(Common.finalPage, "");
+                    Common.pageCon= gson.fromJson(json, PageCon.class);
+                    break;
+                  default:
+                      switchFragment(new SignIn(), getSupportFragmentManager());
+                      break;
+            }
         }
     }
 
@@ -112,14 +136,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-//        if (tcpClient != null) {
-//            tcpClient.cancelHomeTcpClient();
-//            tcpClient = null;
-//        }
-    }
+
+
+
+
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

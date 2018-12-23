@@ -24,7 +24,7 @@ public class TCPClient {
 
     public static final String SERVERIP = "192.168.4.1"; //your computer IP address
     public static final int SERVERPORT = 23;
-    public boolean mRun = false;
+    public static  boolean mRun = false;
 
     private String measureDuration;
     private String measureTime;

@@ -1,10 +1,12 @@
 package com.whc.cvccmeasuresystem.Model;
 
+import java.io.Serializable;
+
 /**
  * Created by Wang on 2018/12/9.
  */
 
-public class PageCon {
+public class PageCon implements Serializable{
 
     private String con1;
     private String con2;
