@@ -23,7 +23,7 @@ import com.whc.cvccmeasuresystem.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.finishToSave1;
+
 import static com.whc.cvccmeasuresystem.Common.Common.needSet;
 import static com.whc.cvccmeasuresystem.Common.Common.oldFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.pageCon;
@@ -72,7 +72,6 @@ public class SignIn extends Fragment{
         pageCon=null;
         oldFragment=new ArrayList<>();
         needSet=false;
-        finishToSave1=true;
         initParameter=true;
         saveFiles=null;
         return view;

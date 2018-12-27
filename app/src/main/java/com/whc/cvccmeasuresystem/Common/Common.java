@@ -64,6 +64,8 @@ public class Common {
     public static final String measureEnd = "measureEnd";
     public static final String finalPage = "finalPage";
     public static final String onPause = "onPause";
+    public static final String finishToSave = "finishToSave";
+
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;
     public static HashMap<Sample, List<Solution>> dataMap;
@@ -73,8 +75,6 @@ public class Common {
     public static List<Sample> samples;
     public static int measureTimes;
     public static TCPClient tcpClient;
-    public static boolean finishToSave;
-    public static boolean finishToSave1;
     public static HashMap<Sample, HashMap<String, List<Solution>>> volCon;
 
     public static List<Integer> choiceColor;

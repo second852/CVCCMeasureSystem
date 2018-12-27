@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         TypefaceProvider.registerDefaultIconSets();
         setContentView(R.layout.activity_main);
-        finishToSave = true;
     }
 
     @Override
@@ -66,8 +65,11 @@ public class MainActivity extends AppCompatActivity {
         }else{
             SignIn.signIn = true;
             Gson gson = new Gson();
+            oldFragment=new ArrayList<>();
+            oldFragment.add(Common.CFName);
             switch (finalFragment) {
                 case Common.Drift2Set:
+                    oldFragment.add(Common.Drift1);
                     switchFragment(new DriftStep2Main(), getSupportFragmentManager());
                     String json = sharedPreferences.getString(Common.finalPage, "");
                     Common.pageCon= gson.fromJson(json, PageCon.class);
@@ -96,20 +98,6 @@ public class MainActivity extends AppCompatActivity {
             Common.showToast(MainActivity.this, measureStartNotExist);
             return true;
         }
-
-        if (!finishToSave) {
-            Common.showToast(MainActivity.this, fileNotSave);
-            return true;
-        }
-        if (!finishToSave1) {
-            Common.showToast(MainActivity.this, fileNotSave);
-            return true;
-        }
-
-//        if (tcpClient != null) {
-//            tcpClient.cancelHomeTcpClient();
-//            tcpClient = null;
-//        }
 
         switch (item.getItemId()) {
             case R.id.home:
@@ -149,14 +137,8 @@ public class MainActivity extends AppCompatActivity {
                 Common.showToast(MainActivity.this, measureStartNotExist);
                 return true;
             }
-            if (!finishToSave) {
-                Common.showToast(MainActivity.this, fileNotSave);
-                return true;
-            }
-            if (!finishToSave1) {
-                Common.showToast(MainActivity.this, fileNotSave);
-                return true;
-            }
+
+
             if (oldFragment != null && oldFragment.size() > 0) {
                 String name = oldFragment.get(oldFragment.size() - 1);
                 switch (name) {

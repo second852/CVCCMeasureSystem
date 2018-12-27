@@ -98,7 +98,6 @@ public class ChoiceFunction extends Fragment {
             pageCon=null;
             oldFragment=new ArrayList<>();
             needSet=false;
-            finishToSave1=true;
             initParameter=true;
             saveFiles=null;
             IonChannelStep3Main.noInitParameter=false;

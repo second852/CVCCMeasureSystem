@@ -139,13 +139,13 @@ public class DriftStep2Chart extends Fragment{
         dataSet.setHighlightEnabled(false);
         dataSet.setCircleRadius(3);
         dataSet.setDrawCircleHole(false);
-        dataSet.setDrawValues(true);
-        dataSet.setValueFormatter(new IValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-                return sample.getIonType()+solutions.get((int) entry.getX()).getConcentration();
-            }
-        });
+        dataSet.setDrawValues(false);
+//        dataSet.setValueFormatter(new IValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+//                return sample.getIonType()+solutions.get((int) entry.getX()).getConcentration();
+//            }
+//        });
         dataSet.setCircleColors(choiceColor);
         dataSet.setValueTextSize(12f);
         dataSet.setColors(choiceColor);

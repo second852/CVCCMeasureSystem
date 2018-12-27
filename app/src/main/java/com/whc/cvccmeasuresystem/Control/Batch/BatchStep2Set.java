@@ -258,7 +258,6 @@ public class BatchStep2Set extends Fragment {
                 Common.showToast(activity, measureStartNotExist);
                 return;
             }
-            finishToSave = true;
             FinishDialogFragment aa = new FinishDialogFragment();
             aa.setObject(BatchStep2Set.this);
             aa.show(getFragmentManager(), "show");

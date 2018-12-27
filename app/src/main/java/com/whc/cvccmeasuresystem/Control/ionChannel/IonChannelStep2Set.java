@@ -27,7 +27,6 @@ import java.util.ArrayList;
 
 import static com.whc.cvccmeasuresystem.Common.Common.IonChannel2Set;
 import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
-import static com.whc.cvccmeasuresystem.Common.Common.finishToSave;
 import static com.whc.cvccmeasuresystem.Common.Common.measureStartNotExist;
 import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
 import static com.whc.cvccmeasuresystem.Common.Common.needSet;
@@ -581,7 +580,6 @@ public class IonChannelStep2Set extends Fragment {
 
 
             saveListPage();
-            finishToSave=true;
             oldFragment.add(IonChannel2Set);
             switchFragment(new IonChannelStep3Main(),getFragmentManager());
         }

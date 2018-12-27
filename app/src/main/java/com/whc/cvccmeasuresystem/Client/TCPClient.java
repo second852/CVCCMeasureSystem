@@ -115,7 +115,6 @@ public class TCPClient {
                     switch (str)
                     {
                         case "$D,Start,#":
-                            finishToSave=false;
                             startMeasure=true;
                             handlerMessage.sendEmptyMessage(1);
                             break;

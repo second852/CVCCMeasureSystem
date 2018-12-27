@@ -38,7 +38,6 @@ import static com.whc.cvccmeasuresystem.Common.Common.Drift2Set;
 import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
 import static com.whc.cvccmeasuresystem.Common.Common.finalFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.finalPage;
-import static com.whc.cvccmeasuresystem.Common.Common.finishToSave;
 import static com.whc.cvccmeasuresystem.Common.Common.measureEnd;
 import static com.whc.cvccmeasuresystem.Common.Common.measureStartNotExist;
 import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
@@ -297,16 +296,11 @@ public class DriftStep2Set extends Fragment {
     }
 
     public void finishMeasure() {
-        DataBase dataBase = new DataBase(activity);
-        SaveFileDB saveFileDB = new SaveFileDB(dataBase);
-        SaveFile saveFile = saveFileDB.findOldSaveFileById(sample1.getFileID());
-        saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
-        saveFileDB.update(saveFile);
         needSet = false;
         oldFragment.remove(oldFragment.size() - 1);
         switchFragment(new DriftStep1(), getFragmentManager());
-        tcpClient = null;
         sharedPreferences.edit().putBoolean(measureEnd,true).apply();
+        tcpClient = null;
     }
 
 
@@ -317,7 +311,6 @@ public class DriftStep2Set extends Fragment {
                 Common.showToast(activity, measureStartNotExist);
                 return;
             }
-            finishToSave = true;
             FinishDialogFragment aa = new FinishDialogFragment();
             aa.setObject(DriftStep2Set.this);
             aa.show(getFragmentManager(), "show");

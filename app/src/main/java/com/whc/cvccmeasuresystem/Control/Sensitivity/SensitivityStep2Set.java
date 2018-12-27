@@ -277,7 +277,6 @@ public class SensitivityStep2Set extends Fragment {
                 Common.showToast(activity, measureStartNotExist);
                 return;
             }
-            finishToSave=true;
             FinishDialogFragment aa= new FinishDialogFragment();
             aa.setObject(SensitivityStep2Set.this);
             aa.show(getFragmentManager(),"show");

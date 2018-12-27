@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -78,20 +79,26 @@ public class DriftStep2Main extends Fragment {
         final View view = inflater.inflate(R.layout.driff_step2_main, container, false);
         driftViewPagerTab = view.findViewById(R.id.driftViewPagerTab);
         driftViewPager = view.findViewById(R.id.driftViewPager);
-        FragmentPagerItems pages = new FragmentPagerItems(activity);
-        pages.add(FragmentPagerItem.of("Set", DriftStep2Set.class));
-        pages.add(FragmentPagerItem.of("Chart", DriftStep2Chart.class));
-        pages.add(FragmentPagerItem.of("Data", DriftStep2Data.class));
-        adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
-        driftViewPager.setAdapter(adapter);
-        driftViewPager.addOnPageChangeListener(new PageListener());
-        driftViewPagerTab.setViewPager(driftViewPager);
+
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        if(adapter==null)
+        {
+            FragmentPagerItems pages = new FragmentPagerItems(activity);
+            pages.add(FragmentPagerItem.of("Set", DriftStep2Set.class));
+            pages.add(FragmentPagerItem.of("Chart", DriftStep2Chart.class));
+            pages.add(FragmentPagerItem.of("Data", DriftStep2Data.class));
+            adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
+            driftViewPager.setAdapter(adapter);
+            driftViewPager.addOnPageChangeListener(new PageListener());
+            driftViewPagerTab.setViewPager(driftViewPager);
+        }
+
+
         //set Page
         SharedPreferences sharedPreferences=activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         boolean endMeasure=sharedPreferences.getBoolean(Common.measureEnd,true);
@@ -112,6 +119,12 @@ public class DriftStep2Main extends Fragment {
         super.onPause();
         SharedPreferences sharedPreferences=activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         sharedPreferences.edit().putBoolean(onPause,true).apply();
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        for (Fragment f : getFragmentManager().getFragments()) {
+            fragmentTransaction.remove(f);
+        }
+        fragmentTransaction.commit();
+        adapter=null;
     }
 
     private void setMeasureSample() {
@@ -243,16 +256,18 @@ public class DriftStep2Main extends Fragment {
             dataMap.get(sample3).add(solution3);
             dataMap.get(sample4).add(solution4);
 
-
-            Fragment fragment = adapter.getPage(currentPage);
-
-            if (fragment instanceof DriftStep2Chart) {
-                DriftStep2Chart driftStep2Chart = (DriftStep2Chart) fragment;
-                driftStep2Chart.setData();
-            } else if (fragment instanceof DriftStep2Data) {
-                DriftStep2Data driftStep2Data = (DriftStep2Data) fragment;
-                driftStep2Data.setListView();
+            if(adapter!=null)
+            {
+                Fragment fragment = adapter.getPage(currentPage);
+                if (fragment instanceof DriftStep2Chart) {
+                    DriftStep2Chart driftStep2Chart = (DriftStep2Chart) fragment;
+                    driftStep2Chart.setData();
+                } else if (fragment instanceof DriftStep2Data) {
+                    DriftStep2Data driftStep2Data = (DriftStep2Data) fragment;
+                    driftStep2Data.setListView();
+                }
             }
+
         }
     };
 
@@ -269,20 +284,25 @@ public class DriftStep2Main extends Fragment {
     public static void DriftEnd()
     {
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                tcpClient.sendEndMessage();
+        if(tcpClient!=null)
+        {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    tcpClient.sendEndMessage();
+                }
+            }).start();
+            try {
+                tcpClient.socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }).start();
+        }
+
         indicateColor++;
         TCPClient.mRun=false;
         startMeasure=false;
-        try {
-            tcpClient.socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
 
         Fragment fragment= DriftStep2Main.adapter.getPage(currentPage);
         if(fragment instanceof DriftStep2Chart)

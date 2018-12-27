@@ -174,7 +174,6 @@ public class HysteresisStep2Set extends Fragment {
         saveFileDB.update(saveFile);
         oldFragment.remove(oldFragment.size()-1);
         needSet=false;
-        finishToSave=true;
         Common.switchFragment(new HysteresisStep1(),getFragmentManager());
         tcpClient=null;
     }

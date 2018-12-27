@@ -27,9 +27,6 @@ import java.nio.charset.Charset;
 import java.sql.Timestamp;
 
 import static com.whc.cvccmeasuresystem.Common.Common.arrayColor;
-import static com.whc.cvccmeasuresystem.Common.Common.choiceColor;
-import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
-import static com.whc.cvccmeasuresystem.Common.Common.finishToSave;
 import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
 import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
 import static com.whc.cvccmeasuresystem.Common.Common.onPause;
@@ -39,7 +36,6 @@ import static com.whc.cvccmeasuresystem.Common.Common.sample2;
 import static com.whc.cvccmeasuresystem.Common.Common.sample3;
 import static com.whc.cvccmeasuresystem.Common.Common.sample4;
 import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
 import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
 /**
@@ -125,7 +121,6 @@ public class JobService extends android.app.job.JobService{
                 int i=0;
                 int times=Integer.valueOf(measureTime)/Integer.valueOf(measureDuration);
                 String str;
-                Message message;
                 while (mRun) {
 
                     if(in==null)
@@ -138,12 +133,12 @@ public class JobService extends android.app.job.JobService{
                     long startTime = System.currentTimeMillis();
                     byte[] bytes = readStream(in);
                     str = new String(bytes, Charset.forName("UTF-8"));
-                    boolean onPause= false;
+                    boolean onPause=sharedPreferences.getBoolean(Common.onPause,false);
                     switch (str)
                     {
                         case "$D,Start,#":
-                            finishToSave=false;
                             startMeasure=true;
+                            sharedPreferences.getBoolean(Common.measureEnd,false);
                             if(!onPause)
                             {
                                 handlerMessage.sendEmptyMessage(1);
@@ -153,6 +148,7 @@ public class JobService extends android.app.job.JobService{
 
                             mRun=false;
                             startMeasure=false;
+                            sharedPreferences.getBoolean(Common.measureEnd,true);
                             if(!onPause)
                             {
                                 handlerMessage.sendEmptyMessage(2);

@@ -36,10 +36,7 @@ import java.util.List;
 import static com.whc.cvccmeasuresystem.Common.Common.arrayColor;
 import static com.whc.cvccmeasuresystem.Common.Common.choiceColor;
 import static com.whc.cvccmeasuresystem.Common.Common.currentPage;
-import static com.whc.cvccmeasuresystem.Common.Common.finishToSave;
-import static com.whc.cvccmeasuresystem.Common.Common.finishToSave1;
 import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
-import static com.whc.cvccmeasuresystem.Common.Common.measureStartNotExist;
 import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
 import static com.whc.cvccmeasuresystem.Common.Common.sample1;
 import static com.whc.cvccmeasuresystem.Common.Common.sample2;
@@ -160,7 +157,6 @@ public class IonChannelStep3Main extends Fragment {
         sample4 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample4, new ArrayList<Solution>());
         samples.add(sample4);
-        finishToSave1=false;
     }
 
 
