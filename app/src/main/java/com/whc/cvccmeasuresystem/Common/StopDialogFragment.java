@@ -22,7 +22,7 @@ import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Set;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Set;
 
-import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
+
 
 
 /**

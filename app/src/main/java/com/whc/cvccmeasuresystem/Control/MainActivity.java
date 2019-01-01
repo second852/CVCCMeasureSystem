@@ -56,23 +56,23 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences=this.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         String finalFragment=sharedPreferences.getString(Common.finalFragment,"");
-        boolean endMeasure=sharedPreferences.getBoolean(Common.measureEnd,true);
+        boolean endModule=sharedPreferences.getBoolean(Common.endModule,true);
 
-        if(endMeasure)
+        if(endModule)
         {
             SignIn.signIn = false;
             switchFragment(new SignIn(), getSupportFragmentManager());
         }else{
             SignIn.signIn = true;
             Gson gson = new Gson();
+            String json = sharedPreferences.getString(Common.finalPage, "");
+            Common.pageCon= gson.fromJson(json, PageCon.class);
             oldFragment=new ArrayList<>();
             oldFragment.add(Common.CFName);
             switch (finalFragment) {
                 case Common.Drift2Set:
                     oldFragment.add(Common.Drift1);
                     switchFragment(new DriftStep2Main(), getSupportFragmentManager());
-                    String json = sharedPreferences.getString(Common.finalPage, "");
-                    Common.pageCon= gson.fromJson(json, PageCon.class);
                     break;
                   default:
                       switchFragment(new SignIn(), getSupportFragmentManager());
@@ -98,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
             Common.showToast(MainActivity.this, measureStartNotExist);
             return true;
         }
-
         switch (item.getItemId()) {
             case R.id.home:
                 Common.switchFragment(new ChoiceFunction(), getSupportFragmentManager());
@@ -109,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+        SharedPreferences sharedPreferences=this.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+        sharedPreferences.edit().putBoolean(Common.endModule,true).apply();
         return true;
     }
 
@@ -145,37 +146,31 @@ public class MainActivity extends AppCompatActivity {
                     case CFName:
                         Common.switchFragment(new ChoiceFunction(), getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
-                        tcpClient = null;
                         break;
                     case BS1:
                         Common.switchFragment(new BatchStep1(), getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
                         needSet = true;
-                        tcpClient = null;
                         break;
                     case Sen1:
                         Common.switchFragment(new SensitivityStep1(), getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
-                        tcpClient = null;
                         needSet = true;
                         break;
                     case Hys1:
                         Common.switchFragment(new HysteresisStep1(), getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
-                        tcpClient = null;
                         needSet = true;
                         break;
                     case Drift1:
                         Common.switchFragment(new DriftStep1(), getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
                         needSet = true;
-                        tcpClient = null;
                         break;
                     case IonChannel1:
                         switchFragment(new IonChannelStep1(), getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
                         needSet = true;
-                        tcpClient = null;
                         break;
                     case IonChannel2Set:
                         switchFragment(new IonChannelStep2Main(), getSupportFragmentManager());

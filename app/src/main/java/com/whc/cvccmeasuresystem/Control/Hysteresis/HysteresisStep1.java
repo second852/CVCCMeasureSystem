@@ -27,25 +27,8 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.Hys1;
-import static com.whc.cvccmeasuresystem.Common.Common.Sen1;
-import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
-import static com.whc.cvccmeasuresystem.Common.Common.needInt;
-import static com.whc.cvccmeasuresystem.Common.Common.needName;
-import static com.whc.cvccmeasuresystem.Common.Common.needSet;
-import static com.whc.cvccmeasuresystem.Common.Common.oldFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1String;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2String;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3String;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4String;
-import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
-import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+import static com.whc.cvccmeasuresystem.Common.Common.*;
+
 
 
 public class HysteresisStep1 extends Fragment {
@@ -279,11 +262,6 @@ public class HysteresisStep1 extends Fragment {
 
             switchFragment(new HysteresisStep2Main(),getFragmentManager());
             oldFragment.add(Hys1);
-            if(tcpClient!=null)
-            {
-               tcpClient.cancelHomeTcpClient();
-                tcpClient=null;
-            }
             startMeasure=false;
             indicateColor=0;
 

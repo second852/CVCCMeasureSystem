@@ -240,11 +240,6 @@ public class BatchStep1 extends Fragment {
 
             switchFragment(new BatchStep2Main(),getFragmentManager());
             oldFragment.add(BS1);
-            if(tcpClient!=null)
-            {
-               tcpClient.cancelHomeTcpClient();
-               tcpClient=null;
-            }
             startMeasure=false;
             indicateColor=0;
         }

@@ -2,6 +2,9 @@ package com.whc.cvccmeasuresystem.Control.Dift;
 
 
 import android.app.Activity;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -13,7 +16,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,21 +25,12 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItem;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 import com.whc.cvccmeasuresystem.Client.JobService;
-import com.whc.cvccmeasuresystem.Client.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
-import com.whc.cvccmeasuresystem.DataBase.SampleDB;
-import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
-import com.whc.cvccmeasuresystem.Model.Sample;
-import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
+import java.io.IOException;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
 
@@ -46,7 +39,6 @@ public class DriftStep2Main extends Fragment {
 
 
     private static Activity activity;
-    private SharedPreferences sharedPreferences;
     private SmartTabLayout driftViewPagerTab;
     private DataBase dataBase;
 
@@ -67,7 +59,6 @@ public class DriftStep2Main extends Fragment {
         //init
         activity.setTitle("Drift Monitor Step2");
         dataBase = new DataBase(activity);
-        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
     }
 
 
@@ -101,24 +92,22 @@ public class DriftStep2Main extends Fragment {
 
         //set Page
         SharedPreferences sharedPreferences=activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-        boolean endMeasure=sharedPreferences.getBoolean(Common.measureEnd,true);
+        sharedPreferences.edit().putBoolean(Common.endModule,false).apply();
+        boolean endMeasure=sharedPreferences.getBoolean(Common.endMeasure,true);
         startMeasure=(!endMeasure);
         if(endMeasure)
         {
-            setSample();
+            Common.setSample(sharedPreferences,activity,dataBase);
         }else{
-            setMeasureSample();
+            Common.setMeasureSample(sharedPreferences,activity,dataBase);
             driftViewPager.setCurrentItem(1);
             JobService.handlerMessage=DriftStep2Main.handlerMessage;
         }
-        sharedPreferences.edit().putBoolean(onPause,false).apply();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        SharedPreferences sharedPreferences=activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-        sharedPreferences.edit().putBoolean(onPause,true).apply();
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         for (Fragment f : getFragmentManager().getFragments()) {
             fragmentTransaction.remove(f);
@@ -127,72 +116,7 @@ public class DriftStep2Main extends Fragment {
         adapter=null;
     }
 
-    private void setMeasureSample() {
-        dataMap = new HashMap<>();
-        samples = new ArrayList<>();
-        choiceColor = new ArrayList<>();
 
-        dataBase = new DataBase(activity);
-        SampleDB sampleDB = new SampleDB(dataBase);
-        SolutionDB solutionDB=new SolutionDB(dataBase);
-        //sample 1
-        int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
-        sample1 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample1, solutionDB.getSampleAll(sampleID));
-        samples.add(sample1);
-        //sample 2
-        sampleID = sharedPreferences.getInt(Common.sample2String, 0);
-        sample2 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample2, solutionDB.getSampleAll(sampleID));
-        samples.add(sample2);
-        //sample 3
-        sampleID = sharedPreferences.getInt(Common.sample3String, 0);
-        sample3 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample3, solutionDB.getSampleAll(sampleID));
-        samples.add(sample3);
-        //sample 4
-        sampleID = sharedPreferences.getInt(Common.sample4String, 0);
-        sample4 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample4, solutionDB.getSampleAll(sampleID));
-        samples.add(sample4);
-        for(Solution solution:dataMap.get(sample1))
-        {
-            choiceColor.add(solution.getColor());
-        }
-    }
-
-
-    private void setSample() {
-        dataMap = new HashMap<>();
-        samples = new ArrayList<>();
-        choiceColor = new ArrayList<>();
-
-
-        dataBase = new DataBase(activity);
-        SampleDB sampleDB = new SampleDB(dataBase);
-
-
-        //sample 1
-        int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
-        sample1 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample1, new ArrayList<Solution>());
-        samples.add(sample1);
-        //sample 2
-        sampleID = sharedPreferences.getInt(Common.sample2String, 0);
-        sample2 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample2, new ArrayList<Solution>());
-        samples.add(sample2);
-        //sample 3
-        sampleID = sharedPreferences.getInt(Common.sample3String, 0);
-        sample3 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample3, new ArrayList<Solution>());
-        samples.add(sample3);
-        //sample 4
-        sampleID = sharedPreferences.getInt(Common.sample4String, 0);
-        sample4 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample4, new ArrayList<Solution>());
-        samples.add(sample4);
-    }
 
 
     private class PageListener implements ViewPager.OnPageChangeListener {
@@ -231,15 +155,28 @@ public class DriftStep2Main extends Fragment {
             int currentPage = driftViewPager.getCurrentItem();
 
             if (msg.what == 1) {
-                DriftStart();
                 DriftStep2Main.driftViewPager.setCurrentItem(1);
+                DriftStart();
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
                 return;
             }
 
             if (msg.what == 2) {
-                DriftEnd();
+
+                JobService.mRun=false;
+                startMeasure=false;
+                if(JobService.socket!=null)
+                {
+                    try {
+                        JobService.socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                activity.getSharedPreferences(userShare, Context.MODE_PRIVATE).edit().putBoolean(Common.endMeasure,true).apply();
                 DriftStep2Main.driftViewPager.setCurrentItem(1);
+                indicateColor++;
+                DriftEnd();
                 Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
@@ -283,32 +220,14 @@ public class DriftStep2Main extends Fragment {
 
     public static void DriftEnd()
     {
-
-        if(tcpClient!=null)
+        if(adapter!=null)
         {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    tcpClient.sendEndMessage();
-                }
-            }).start();
-            try {
-                tcpClient.socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            Fragment fragment= DriftStep2Main.adapter.getPage(currentPage);
+            if(fragment instanceof DriftStep2Chart)
+            {
+                DriftStep2Chart.message.setText(R.string.measure_stop);
+                DriftStep2Chart.message.setTextColor(Color.RED);
             }
-        }
-
-        indicateColor++;
-        TCPClient.mRun=false;
-        startMeasure=false;
-
-
-        Fragment fragment= DriftStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof DriftStep2Chart)
-        {
-            DriftStep2Chart.message.setText(R.string.measure_stop);
-            DriftStep2Chart.message.setTextColor(Color.RED);
         }
     }
 }

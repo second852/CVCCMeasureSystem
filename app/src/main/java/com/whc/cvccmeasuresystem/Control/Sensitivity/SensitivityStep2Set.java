@@ -13,15 +13,12 @@ import android.view.ViewGroup;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
-import com.whc.cvccmeasuresystem.Client.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
-import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
+import com.whc.cvccmeasuresystem.Common.HomeDialogFragment;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
-import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
-import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.SaveFile;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
@@ -157,13 +154,7 @@ public class SensitivityStep2Set extends Fragment {
     }
 
 
-    private Runnable measureThread = new Runnable() {
-        @Override
-        public void run() {
-            tcpClient=new TCPClient("1", mTime, SensitivityStep2Main.handlerMessage,SensitivityStep2Set.this);
-            tcpClient.run();
-        }
-    };
+
 
 
 
@@ -241,7 +232,6 @@ public class SensitivityStep2Set extends Fragment {
             solution4=new Solution(ionFour,sample4.getID());
             Common.showToast(activity,"Wifi Connecting");
             measureTimes=0;
-            new Thread(measureThread).start();
         }
     }
 
@@ -264,7 +254,6 @@ public class SensitivityStep2Set extends Fragment {
         oldFragment.remove(oldFragment.size()-1);
         needSet=false;
         Common.switchFragment(new SensitivityStep1(),getFragmentManager());
-        tcpClient=null;
     }
 
 
@@ -277,7 +266,7 @@ public class SensitivityStep2Set extends Fragment {
                 Common.showToast(activity, measureStartNotExist);
                 return;
             }
-            FinishDialogFragment aa= new FinishDialogFragment();
+            HomeDialogFragment aa= new HomeDialogFragment();
             aa.setObject(SensitivityStep2Set.this);
             aa.show(getFragmentManager(),"show");
         }
@@ -290,11 +279,6 @@ public class SensitivityStep2Set extends Fragment {
             {
                 Common.showToast(activity, measureStartNotExist);
                 return;
-            }
-            if(tcpClient!=null)
-            {
-                tcpClient.cancelHomeTcpClient();
-                tcpClient=null;
             }
             SensitivityStep2Set sensitivityStep2Set=new SensitivityStep2Set();
             Common.switchFragment(sensitivityStep2Set,getFragmentManager());

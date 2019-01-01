@@ -33,18 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.arrayColor;
-import static com.whc.cvccmeasuresystem.Common.Common.choiceColor;
-import static com.whc.cvccmeasuresystem.Common.Common.currentPage;
-import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
-import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4;
-import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
-import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+import static com.whc.cvccmeasuresystem.Common.Common.*;
 
 
 public class IonChannelStep3Main extends Fragment {
@@ -336,13 +325,6 @@ public class IonChannelStep3Main extends Fragment {
     public static void IonChannelStep3Stop()
     {
         indicateColor++;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                tcpClient.sendEndMessage();
-            }
-        }).start();
-        tcpClient.mRun=false;
         startMeasure=false;
         Fragment fragment = adapterIonStep3.getPage(currentPage);
         if(fragment instanceof IonChannelStep3TimeChart)

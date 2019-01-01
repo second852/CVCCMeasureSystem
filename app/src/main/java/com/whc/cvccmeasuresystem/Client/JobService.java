@@ -26,7 +26,10 @@ import java.net.Socket;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
 
+import static com.whc.cvccmeasuresystem.Common.Common.Drift2Set;
 import static com.whc.cvccmeasuresystem.Common.Common.arrayColor;
+import static com.whc.cvccmeasuresystem.Common.Common.endMeasure;
+import static com.whc.cvccmeasuresystem.Common.Common.finalFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
 import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
 import static com.whc.cvccmeasuresystem.Common.Common.onPause;
@@ -45,14 +48,16 @@ import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 public class JobService extends android.app.job.JobService{
 
     public static final String ServerIP = "192.168.4.1"; //your computer IP address
-    public static final int SerVerPort = 23;
+    public static final int ServerPort = 23;
     public static String measureDuration;
     public static String measureTime;
     public static Handler handlerMessage;
     public static Object object;
     public static boolean mRun;
+    public static String measureType;
+    public static String measureFragment;
 
-    public Socket socket;
+    public static Socket socket;
     private InputStream in;
     private PrintWriter out;
     private SharedPreferences sharedPreferences;
@@ -106,7 +111,7 @@ public class JobService extends android.app.job.JobService{
             Log.e("TCP Client", "C: Connecting...");
 
             //create a socket to make the connection with the server
-            socket = new Socket(serverAddr, SerVerPort);
+            socket = new Socket(serverAddr, ServerPort);
             socket.setKeepAlive(true);
             try {
 
@@ -133,26 +138,18 @@ public class JobService extends android.app.job.JobService{
                     long startTime = System.currentTimeMillis();
                     byte[] bytes = readStream(in);
                     str = new String(bytes, Charset.forName("UTF-8"));
-                    boolean onPause=sharedPreferences.getBoolean(Common.onPause,false);
                     switch (str)
                     {
                         case "$D,Start,#":
                             startMeasure=true;
-                            sharedPreferences.getBoolean(Common.measureEnd,false);
-                            if(!onPause)
-                            {
-                                handlerMessage.sendEmptyMessage(1);
-                            }
+                            sharedPreferences.edit().putString(finalFragment,measureFragment).apply();
+                            sharedPreferences.edit().putBoolean(endMeasure,false).apply();
+                            handlerMessage.sendEmptyMessage(1);
                             break;
                         case "$D,End,#":
 
-                            mRun=false;
-                            startMeasure=false;
-                            sharedPreferences.getBoolean(Common.measureEnd,true);
-                            if(!onPause)
-                            {
-                                handlerMessage.sendEmptyMessage(2);
-                            }
+                            handlerMessage.sendEmptyMessage(2);
+                            sendEndMessage();
                             break;
 
                         default:
@@ -192,10 +189,10 @@ public class JobService extends android.app.job.JobService{
                             solution4.setTime(timestamp);
 
 
-                            solution1.setMeasureType("3");
-                            solution2.setMeasureType("3");
-                            solution3.setMeasureType("3");
-                            solution4.setMeasureType("3");
+                            solution1.setMeasureType(measureType);
+                            solution2.setMeasureType(measureType);
+                            solution3.setMeasureType(measureType);
+                            solution4.setMeasureType(measureType);
 
                             solution1.setNumber(String.valueOf(measureTimes));
                             solution2.setNumber(String.valueOf(measureTimes));
@@ -221,10 +218,8 @@ public class JobService extends android.app.job.JobService{
                             Common.solution3=solution1;
                             Common.solution4=solution1;
 
-                            if(!onPause)
-                            {
-                                handlerMessage.sendEmptyMessage(3);
-                            }
+
+                            handlerMessage.sendEmptyMessage(3);
                             i++;
                             break;
                     }

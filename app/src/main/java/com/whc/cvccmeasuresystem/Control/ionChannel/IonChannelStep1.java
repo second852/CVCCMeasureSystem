@@ -28,20 +28,8 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.BS1;
-import static com.whc.cvccmeasuresystem.Common.Common.IonChannel1;
-import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
-import static com.whc.cvccmeasuresystem.Common.Common.needName;
-import static com.whc.cvccmeasuresystem.Common.Common.needSet;
-import static com.whc.cvccmeasuresystem.Common.Common.oldFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1String;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2String;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3String;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4String;
-import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
-import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+import static com.whc.cvccmeasuresystem.Common.Common.*;
+
 
 
 public class IonChannelStep1 extends Fragment {
@@ -252,11 +240,6 @@ public class IonChannelStep1 extends Fragment {
             }
             switchFragment(new IonChannelStep2Main(),getFragmentManager());
             oldFragment.add(IonChannel1);
-            if(tcpClient!=null)
-            {
-               tcpClient.cancelHomeTcpClient();
-               tcpClient=null;
-            }
             startMeasure=false;
             indicateColor=0;
         }

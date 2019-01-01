@@ -13,35 +13,17 @@ import android.view.ViewGroup;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
-import com.whc.cvccmeasuresystem.Client.TCPClient;
+
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
-import com.whc.cvccmeasuresystem.DataBase.DataBase;
-import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
-import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
 
-import static com.whc.cvccmeasuresystem.Common.Common.IonChannel2Set;
-import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
-import static com.whc.cvccmeasuresystem.Common.Common.measureStartNotExist;
-import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
-import static com.whc.cvccmeasuresystem.Common.Common.needSet;
-import static com.whc.cvccmeasuresystem.Common.Common.oldFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4;
-import static com.whc.cvccmeasuresystem.Common.Common.solution1;
-import static com.whc.cvccmeasuresystem.Common.Common.solution2;
-import static com.whc.cvccmeasuresystem.Common.Common.solution3;
-import static com.whc.cvccmeasuresystem.Common.Common.solution4;
-import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
+import static com.whc.cvccmeasuresystem.Common.Common.*;
+
 
 
 public class IonChannelStep2Set extends Fragment {
@@ -201,13 +183,7 @@ public class IonChannelStep2Set extends Fragment {
     }
 
 
-    private Runnable measureThread = new Runnable() {
-        @Override
-        public void run() {
-            tcpClient = new TCPClient("1", "1", IonChannelStep2Main.handlerMessage, IonChannelStep2Set.this);
-            tcpClient.run();
-        }
-    };
+
 
 
     private class startMeasureF implements View.OnClickListener {
@@ -332,7 +308,6 @@ public class IonChannelStep2Set extends Fragment {
             solution3 = new Solution(ionThree, sample3.getID());
             solution4 = new Solution(ionFour, sample4.getID());
             Common.showToast(activity, "Wifi Connecting");
-            new Thread(measureThread).start();
             measureTimes = 1;
         }
     }
@@ -354,10 +329,6 @@ public class IonChannelStep2Set extends Fragment {
             if (startMeasure) {
                 Common.showToast(activity, measureStartNotExist);
                 return;
-            }
-            if (tcpClient != null) {
-                tcpClient.cancelHomeTcpClient();
-                tcpClient = null;
             }
             needSet=true;
             IonChannelStep1 ionChannelStep1=new IonChannelStep1();
@@ -486,7 +457,6 @@ public class IonChannelStep2Set extends Fragment {
             solution3 = new Solution(ionThree, sample3.getID());
             solution4 = new Solution(ionFour, sample4.getID());
             Common.showToast(activity, "Wifi Connecting");
-            new Thread(measureThread).start();
             measureTimes = 2;
         }
     }

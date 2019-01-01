@@ -1,9 +1,8 @@
 package com.whc.cvccmeasuresystem.Client;
 
 
-import android.graphics.Color;
+
 import android.os.Message;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 
 
@@ -22,18 +21,18 @@ import static com.whc.cvccmeasuresystem.Common.Common.*;
 public class TCPClient {
 
 
-    public static final String SERVERIP = "192.168.4.1"; //your computer IP address
-    public static final int SERVERPORT = 23;
-    public static  boolean mRun = false;
+    public final String SERVERIP = "192.168.4.1"; //your computer IP address
+    public final int SERVERPORT = 23;
+    public boolean mRun = false;
 
     private String measureDuration;
     private String measureTime;
     private Handler handlerMessage;
     private Object object;
-    public Socket socket;
+    public  Socket socket;
     private InputStream in;
 
-   private PrintWriter out;
+    private PrintWriter out;
 
 
     public TCPClient(String measureDuration, String measureTime, Handler handlerMessage, Object object) {
@@ -65,11 +64,6 @@ public class TCPClient {
 
 
 
-    public void cancelHomeTcpClient()
-    {
-        startMeasure=false;
-        mRun=false;
-    }
 
 
 

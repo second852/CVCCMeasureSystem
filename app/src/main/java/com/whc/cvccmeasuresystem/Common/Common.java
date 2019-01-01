@@ -3,6 +3,7 @@ package com.whc.cvccmeasuresystem.Common;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,7 +15,10 @@ import android.widget.Toast;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.beardedhen.androidbootstrap.BootstrapText;
 import com.github.mikephil.charting.components.Description;
-import com.whc.cvccmeasuresystem.Client.TCPClient;
+import com.google.gson.Gson;
+import com.whc.cvccmeasuresystem.DataBase.DataBase;
+import com.whc.cvccmeasuresystem.DataBase.SampleDB;
+import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
@@ -46,7 +50,6 @@ public class Common {
     public static final String needInt = "Please input this number";
     public static final String needData = "Please input this data";
     public static final String measureStartNotExist = "Measuring Now! Please pressure \"Stop\" !";
-    public static final String fileNotSave = "File don't save! Please pressure \"Finish\" !";
     public static final String CFName = "ChoiceFunction";
     public static final String BS1 = "BatchStep1";
     public static final String Sen1 = "SensitivityStep1";
@@ -61,10 +64,10 @@ public class Common {
     public static final String HistoryMain = "HistoryMain";
 
     public static final String finalFragment = "finalFragment";
-    public static final String measureEnd = "measureEnd";
+    public static final String endMeasure = "endMeasure";
     public static final String finalPage = "finalPage";
     public static final String onPause = "onPause";
-    public static final String finishToSave = "finishToSave";
+    public static final String endModule = "endModule";
 
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;
@@ -74,7 +77,6 @@ public class Common {
     public static int currentPage;
     public static List<Sample> samples;
     public static int measureTimes;
-    public static TCPClient tcpClient;
     public static HashMap<Sample, HashMap<String, List<Solution>>> volCon;
 
     public static List<Integer> choiceColor;
@@ -241,5 +243,85 @@ public class Common {
 
         }
     }
+
+
+    public  static void  setSample(SharedPreferences sharedPreferences,Activity activity,DataBase dataBase) {
+        dataMap=new HashMap<>();
+        samples=new ArrayList<>();
+        choiceColor=new ArrayList<>();
+        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+
+        dataBase = new DataBase(activity);
+        SampleDB sampleDB = new SampleDB(dataBase);
+
+
+        //sample 1
+        int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
+        sample1 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample1,new ArrayList<Solution>());
+        samples.add(sample1);
+        //sample 2
+        sampleID = sharedPreferences.getInt(Common.sample2String, 0);
+        sample2 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample2,new ArrayList<Solution>());
+        samples.add(sample2);
+        //sample 3
+        sampleID = sharedPreferences.getInt(Common.sample3String, 0);
+        sample3 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample3,new ArrayList<Solution>());
+        samples.add(sample3);
+        //sample 4
+        sampleID = sharedPreferences.getInt(Common.sample4String, 0);
+        sample4 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample4,new ArrayList<Solution>());
+        samples.add(sample4);
+    }
+
+
+    public static void setMeasureSample(SharedPreferences sharedPreferences,Activity activity,DataBase dataBase) {
+        dataMap = new HashMap<>();
+        samples = new ArrayList<>();
+        choiceColor = new ArrayList<>();
+
+        dataBase = new DataBase(activity);
+        SampleDB sampleDB = new SampleDB(dataBase);
+        SolutionDB solutionDB=new SolutionDB(dataBase);
+        //sample 1
+        int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
+        sample1 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample1, solutionDB.getSampleAll(sampleID));
+        samples.add(sample1);
+        //sample 2
+        sampleID = sharedPreferences.getInt(Common.sample2String, 0);
+        sample2 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample2, solutionDB.getSampleAll(sampleID));
+        samples.add(sample2);
+        //sample 3
+        sampleID = sharedPreferences.getInt(Common.sample3String, 0);
+        sample3 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample3, solutionDB.getSampleAll(sampleID));
+        samples.add(sample3);
+        //sample 4
+        sampleID = sharedPreferences.getInt(Common.sample4String, 0);
+        sample4 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample4, solutionDB.getSampleAll(sampleID));
+        samples.add(sample4);
+        for(Solution solution:dataMap.get(sample1))
+        {
+            choiceColor.add(solution.getColor());
+        }
+    }
+
+
+    public static void savePageParameter(SharedPreferences sharedPreferences,PageCon pageCon)
+    {
+
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(pageCon);
+        prefsEditor.putString(finalPage,json);
+        prefsEditor.apply();
+    }
+
 
 }

@@ -154,7 +154,22 @@ public class DriftStep2Chart extends Fragment{
 
         LineData data = new LineData(dataSet);
         XAxis xAxis = lineChart.getXAxis();
-        xAxis.setGranularity(1f);
+
+//       if(size>60)
+//       {
+//           xAxis.setGranularity(60f);
+//       }else if(size>20)
+//       {
+//           xAxis.setGranularity(60f);
+//       }else{
+//           xAxis.setGranularity(1f);
+//       }
+
+
+//        lineChart.setPinchZoom(true);
+
+
+
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setValueFormatter(new IAxisValueFormatter() {
             @Override

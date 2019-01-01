@@ -53,22 +53,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.arrayColor;
-import static com.whc.cvccmeasuresystem.Common.Common.choiceColor;
-import static com.whc.cvccmeasuresystem.Common.Common.currentPage;
-import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
-import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
-import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
-import static com.whc.cvccmeasuresystem.Common.Common.oldFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4;
-import static com.whc.cvccmeasuresystem.Common.Common.samples;
-import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
-import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+import static com.whc.cvccmeasuresystem.Common.Common.*;
+
+
+
 import static com.whc.cvccmeasuresystem.Common.Common.volCon;
 import static com.whc.cvccmeasuresystem.Control.History.HistoryMain.showFileDate;
 
@@ -111,6 +99,7 @@ public class HistoryShowMain extends Fragment {
                 backToSearch();
             }
         });
+        setShowViewPager();
         return view;
     }
 
@@ -185,7 +174,7 @@ public class HistoryShowMain extends Fragment {
             backToSearch();
             return ;
         }
-        setShowViewPager();
+
     }
 
 

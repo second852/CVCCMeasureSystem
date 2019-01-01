@@ -60,11 +60,6 @@ public class SensitivityStep2Main extends Fragment {
 
         activity.setTitle("Sensitivity Monitor Step2");
         dataBase = new DataBase(activity);
-        if (tcpClient == null) {
-            startMeasure = false;
-        } else {
-            startMeasure = true;
-        }
     }
 
     @Override
@@ -283,21 +278,7 @@ public class SensitivityStep2Main extends Fragment {
     }
 
     public static void endMeasure() {
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                tcpClient.sendEndMessage();
-            }
-        }).start();
         indicateColor++;
-        tcpClient.mRun = false;
-        startMeasure = false;
-        try {
-            tcpClient.socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         Fragment fragment = SensitivityStep2Main.adapter.getPage(currentPage);
         if (fragment instanceof SensitivityStep2TimeChart) {
             SensitivityStep2TimeChart.message.setText(R.string.measure_stop);

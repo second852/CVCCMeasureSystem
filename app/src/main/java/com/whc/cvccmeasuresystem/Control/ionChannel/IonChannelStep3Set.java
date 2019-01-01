@@ -17,14 +17,11 @@ import android.widget.ImageView;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
-import com.whc.cvccmeasuresystem.Client.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
-import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
+import com.whc.cvccmeasuresystem.Common.HomeDialogFragment;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
-import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
-import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.SaveFile;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
@@ -214,13 +211,7 @@ public class IonChannelStep3Set extends Fragment {
     }
 
 
-    private Runnable measureThread = new Runnable() {
-        @Override
-        public void run() {
-            tcpClient = new TCPClient("1", mType, IonChannelStep3Main.handlerMessage, IonChannelStep3Set.this);
-            tcpClient.run();
-        }
-    };
+
 
 
     private class startMeasureData implements View.OnClickListener {
@@ -247,8 +238,6 @@ public class IonChannelStep3Set extends Fragment {
                 Common.showToast(activity, "Please connect BCS_Device");
                 return;
             }
-
-            new Thread(measureThread).start();
         }
     }
 
@@ -270,7 +259,7 @@ public class IonChannelStep3Set extends Fragment {
                 Common.showToast(activity, measureStartNotExist);
                 return;
             }
-            FinishDialogFragment aa= new FinishDialogFragment();
+            HomeDialogFragment aa= new HomeDialogFragment();
             aa.setObject(IonChannelStep3Set.this);
             aa.show(getFragmentManager(),"show");
         }
@@ -289,7 +278,6 @@ public class IonChannelStep3Set extends Fragment {
         IonChannelStep2Set.pageCon1=null;
         needSet=false;
         Common.switchFragment(new IonChannelStep1(),getFragmentManager());
-        tcpClient=null;
         initParameter=true;
         IonChannelStep3Main.noInitParameter=false;
     }
@@ -314,10 +302,6 @@ public class IonChannelStep3Set extends Fragment {
             if (startMeasure) {
                 Common.showToast(activity, measureStartNotExist);
                 return;
-            }
-            if (tcpClient != null) {
-                tcpClient.cancelHomeTcpClient();
-                tcpClient = null;
             }
             IonChannelStep3Main.noInitParameter=true;
             needSet=true;

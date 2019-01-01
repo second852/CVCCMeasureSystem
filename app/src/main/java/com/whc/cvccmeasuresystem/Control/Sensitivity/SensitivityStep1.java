@@ -241,11 +241,6 @@ public class SensitivityStep1 extends Fragment {
 
             switchFragment(new SensitivityStep2Main(),getFragmentManager());
             oldFragment.add(Sen1);
-            if(tcpClient!=null)
-            {
-                tcpClient.cancelHomeTcpClient();
-                tcpClient=null;
-            }
             indicateColor=0;
             startMeasure=false;
         }

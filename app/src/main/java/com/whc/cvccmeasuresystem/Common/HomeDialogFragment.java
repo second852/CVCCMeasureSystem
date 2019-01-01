@@ -21,7 +21,7 @@ import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Set;
  * Created by Wang on 2018/1/3.
  */
 
-public class FinishDialogFragment extends DialogFragment implements  DialogInterface.OnClickListener{
+public class HomeDialogFragment extends DialogFragment implements  DialogInterface.OnClickListener{
 
 
     private Object object;
@@ -60,8 +60,8 @@ public class FinishDialogFragment extends DialogFragment implements  DialogInter
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        String  title="Save the records";
-        String message="Do you want to Save the records?";
+        String  title="Leave this page";
+        String message="Do you want to leave this page?";
 
 
 

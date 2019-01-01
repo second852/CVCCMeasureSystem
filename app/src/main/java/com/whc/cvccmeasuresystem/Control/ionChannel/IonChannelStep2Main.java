@@ -50,9 +50,7 @@ import static com.whc.cvccmeasuresystem.Common.Common.sample3;
 import static com.whc.cvccmeasuresystem.Common.Common.sample4;
 import static com.whc.cvccmeasuresystem.Common.Common.samples;
 import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.tcpClient;
 import static com.whc.cvccmeasuresystem.Common.Common.userShare;
-import static com.whc.cvccmeasuresystem.Common.Common.volCon;
 
 
 public class IonChannelStep2Main extends Fragment {
@@ -320,13 +318,6 @@ public class IonChannelStep2Main extends Fragment {
 
     public static void IonChannelStep2Stop()
     {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                tcpClient.sendEndMessage();
-            }
-        }).start();
-        tcpClient.mRun=false;
         startMeasure=false;
         Fragment fragment= IonChannelStep2Main.adapter.getPage(1);
         if(fragment instanceof IonChannelStep2Data)

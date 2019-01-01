@@ -241,11 +241,6 @@ public class DriftStep1 extends Fragment {
 
             switchFragment(new DriftStep2Main(),getFragmentManager());
             oldFragment.add(Drift1);
-            if(tcpClient!=null)
-            {
-               tcpClient.cancelHomeTcpClient();
-                tcpClient=null;
-            }
             startMeasure=false;
             indicateColor=0;
         }

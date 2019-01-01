@@ -62,11 +62,6 @@ public class HysteresisStep2Main extends Fragment {
         //init
         activity.setTitle("Hysteresis Monitor Step2");
         dataBase = new DataBase(activity);
-        if (tcpClient == null) {
-            startMeasure = false;
-        } else {
-            startMeasure = true;
-        }
     }
 
     @Override
@@ -269,20 +264,9 @@ public class HysteresisStep2Main extends Fragment {
 
     public static void HysteresisEnd()
     {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                tcpClient.sendEndMessage();
-            }
-        }).start();
+
         indicateColor++;
-        tcpClient.mRun=false;
         startMeasure=false;
-        try {
-            tcpClient.socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         Fragment fragment= HysteresisStep2Main.adapter.getPage(currentPage);
         if(fragment instanceof HysteresisStep2Chart){
             HysteresisStep2Chart.message.setText(R.string.measure_stop);

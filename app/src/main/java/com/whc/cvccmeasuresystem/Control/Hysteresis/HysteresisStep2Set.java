@@ -16,15 +16,12 @@ import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapDropDown;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.beardedhen.androidbootstrap.BootstrapText;
-import com.whc.cvccmeasuresystem.Client.TCPClient;
 import com.whc.cvccmeasuresystem.Common.Common;
-import com.whc.cvccmeasuresystem.Common.FinishDialogFragment;
+import com.whc.cvccmeasuresystem.Common.HomeDialogFragment;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
-import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
-import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.SaveFile;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
@@ -157,13 +154,7 @@ public class HysteresisStep2Set extends Fragment {
     }
 
 
-    private Runnable measureThread = new Runnable() {
-        @Override
-        public void run() {
-            tcpClient=new TCPClient("1", String.valueOf(HysteresisStep1.pointLoop), HysteresisStep2Main.handlerMessage,HysteresisStep2Set.this);
-            tcpClient.run();
-        }
-    };
+
 
     public void finishMeasure()
     {
@@ -175,7 +166,6 @@ public class HysteresisStep2Set extends Fragment {
         oldFragment.remove(oldFragment.size()-1);
         needSet=false;
         Common.switchFragment(new HysteresisStep1(),getFragmentManager());
-        tcpClient=null;
     }
 
 
@@ -240,7 +230,6 @@ public class HysteresisStep2Set extends Fragment {
 
             Common.showToast(activity,"Wifi Connecting");
             measureTimes=0;
-            new Thread(measureThread).start();
         }
     }
 
@@ -263,7 +252,7 @@ public class HysteresisStep2Set extends Fragment {
                 Common.showToast(activity, measureStartNotExist);
                 return;
             }
-            FinishDialogFragment aa= new FinishDialogFragment();
+            HomeDialogFragment aa= new HomeDialogFragment();
             aa.setObject(HysteresisStep2Set.this);
             aa.show(getFragmentManager(),"show");
         }
@@ -276,11 +265,6 @@ public class HysteresisStep2Set extends Fragment {
             {
                 Common.showToast(activity, measureStartNotExist);
                 return;
-            }
-            if(tcpClient!=null)
-            {
-                tcpClient.cancelHomeTcpClient();
-                tcpClient=null;
             }
             HysteresisStep1 hysteresisStep1=new HysteresisStep1();
             Common.switchFragment(hysteresisStep1,getFragmentManager());
