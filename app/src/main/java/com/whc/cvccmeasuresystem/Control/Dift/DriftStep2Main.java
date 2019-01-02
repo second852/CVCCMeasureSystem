@@ -94,8 +94,9 @@ public class DriftStep2Main extends Fragment {
         SharedPreferences sharedPreferences=activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         sharedPreferences.edit().putBoolean(Common.endModule,false).apply();
         boolean endMeasure=sharedPreferences.getBoolean(Common.endMeasure,true);
+        boolean endModule=sharedPreferences.getBoolean(Common.endModule, true);
         startMeasure=(!endMeasure);
-        if(endMeasure)
+        if(endModule)
         {
             Common.setSample(sharedPreferences,activity,dataBase);
         }else{

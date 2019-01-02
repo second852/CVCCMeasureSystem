@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 
 
@@ -18,8 +19,6 @@ import android.view.LayoutInflater;
 
 import android.view.View;
 import android.view.ViewGroup;
-
-
 
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
@@ -42,33 +41,25 @@ public class BatchStep2Main extends Fragment {
 
 
     private static Activity activity;
-    private SharedPreferences sharedPreferences;
-    private  SmartTabLayout viewPagerTab;
+    private SmartTabLayout viewPagerTab;
 
-    private static DataBase dataBase;
-
-
-
+    private DataBase dataBase;
     public static ViewPager batchViewPager;
     public static FragmentPagerItemAdapter adapter;
-
-
 
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof Activity)
-        {
-            activity=(Activity) context;
-        }else{
-            activity=getActivity();
+        if (context instanceof Activity) {
+            activity = (Activity) context;
+        } else {
+            activity = getActivity();
         }
 
         //init
         activity.setTitle("Batch Monitor Step2");
         dataBase = new DataBase(activity);
-        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -80,8 +71,8 @@ public class BatchStep2Main extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final View view = inflater.inflate(R.layout.batch_step2_main, container, false);
-        viewPagerTab =view.findViewById(R.id.viewPagerTab);
-        batchViewPager =  view.findViewById(R.id.batchViewPager);
+        viewPagerTab = view.findViewById(R.id.viewPagerTab);
+        batchViewPager = view.findViewById(R.id.batchViewPager);
 
         return view;
     }
@@ -90,32 +81,40 @@ public class BatchStep2Main extends Fragment {
     public void onStart() {
         super.onStart();
         //set Page
-        if(adapter==null)
-        {
+        if (adapter == null) {
             FragmentPagerItems pages = new FragmentPagerItems(activity);
             pages.add(FragmentPagerItem.of("Set", BatchStep2Set.class));
             pages.add(FragmentPagerItem.of("Chart", BatchStep2Chart.class));
             pages.add(FragmentPagerItem.of("Data", BatchStep2Data.class));
-            adapter = new FragmentPagerItemAdapter(getFragmentManager(),pages);
+            adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
             batchViewPager.setAdapter(adapter);
             batchViewPager.addOnPageChangeListener(new PageListener());
             viewPagerTab.setViewPager(batchViewPager);
         }
         //set Page
-        SharedPreferences sharedPreferences=activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-        boolean endMeasure=sharedPreferences.getBoolean(Common.endMeasure,true);
-        startMeasure=(!endMeasure);
-        if(endMeasure)
-        {
-            Common.setSample(sharedPreferences,activity,dataBase);
-        }else {
-            Common.setMeasureSample(sharedPreferences,activity,dataBase);
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+        boolean endMeasure = sharedPreferences.getBoolean(Common.endMeasure, true);
+        boolean endModule=sharedPreferences.getBoolean(Common.endModule, true);
+        startMeasure = (!endMeasure);
+        if (endModule) {
+            Common.setSample(sharedPreferences, activity, dataBase);
+        } else {
+            Common.setMeasureSample(sharedPreferences, activity, dataBase);
             batchViewPager.setCurrentItem(1);
-            JobService.handlerMessage= DriftStep2Main.handlerMessage;
+            JobService.handlerMessage = BatchStep2Main.handlerMessage;
         }
-        sharedPreferences.edit().putBoolean(onPause,false).apply();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        for (Fragment f : getFragmentManager().getFragments()) {
+            fragmentTransaction.remove(f);
+        }
+        fragmentTransaction.commit();
+        adapter = null;
+    }
 
     private class PageListener implements ViewPager.OnPageChangeListener {
         @Override
@@ -125,15 +124,14 @@ public class BatchStep2Main extends Fragment {
 
         @Override
         public void onPageSelected(int position) {
-            currentPage=position;
-            Fragment fragment=adapter.getPage(position);
+            currentPage = position;
+            Fragment fragment = adapter.getPage(position);
 
-            if(fragment instanceof  BatchStep2Chart)
-            {
-                BatchStep2Chart batchStep2Chart= (BatchStep2Chart) fragment;
+            if (fragment instanceof BatchStep2Chart) {
+                BatchStep2Chart batchStep2Chart = (BatchStep2Chart) fragment;
                 batchStep2Chart.setData();
-            }else if(fragment instanceof  BatchStep2Data){
-                BatchStep2Data batchStep2Data= (BatchStep2Data) fragment;
+            } else if (fragment instanceof BatchStep2Data) {
+                BatchStep2Data batchStep2Data = (BatchStep2Data) fragment;
                 batchStep2Data.setListView();
             }
 
@@ -146,85 +144,83 @@ public class BatchStep2Main extends Fragment {
     }
 
 
-
     //setList
     public static Handler handlerMessage = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             //data 處理
-            int currentPage=batchViewPager.getCurrentItem();
+            int currentPage = batchViewPager.getCurrentItem();
 
-            if(msg.what==1)
-            {
+            if (msg.what == 1) {
                 BatchStep2Main.batchViewPager.setCurrentItem(1);
-                Common.showToast(adapter.getPage(currentPage).getActivity(),"Measurement Start!");
+                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
                 BatchStart();
                 return;
             }
 
-            if(msg.what==2)
-            {
+            if (msg.what == 2) {
+                JobService.mRun = false;
+                startMeasure = false;
+                if (JobService.socket != null) {
+                    try {
+                        JobService.socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                indicateColor++;
+                SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+                sharedPreferences.edit().putBoolean(Common.endMeasure, true).apply();
                 BatchStep2Main.batchViewPager.setCurrentItem(1);
                 BatchStop();
-                Common.showToast(adapter.getPage(currentPage).getActivity(),"Measurement End!");
+                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
 
-            if(msg.what==4)
-            {
-                Common.showToast(adapter.getPage(currentPage).getActivity(),"Connecting fail! \n Please Reboot WiFi and \n Pressure \"Start\" again!");
+            if (msg.what == 4) {
+                Common.showToast(adapter.getPage(currentPage).getActivity(), "Connecting fail! \n Please Reboot WiFi and \n Pressure \"Start\" again!");
                 return;
             }
-
 
             choiceColor.add(oneColor);
-           dataMap.get(sample1).add(solution1);
-           dataMap.get(sample2).add(solution2);
-           dataMap.get(sample3).add(solution3);
-           dataMap.get(sample4).add(solution4);
+            dataMap.get(sample1).add(solution1);
+            dataMap.get(sample2).add(solution2);
+            dataMap.get(sample3).add(solution3);
+            dataMap.get(sample4).add(solution4);
 
-           if(adapter!=null)
-           {
-               Fragment fragment=adapter.getPage(currentPage);
-               if(fragment instanceof  BatchStep2Chart)
-               {
-                   BatchStep2Chart batchStep2Chart= (BatchStep2Chart) fragment;
-                   batchStep2Chart.setData();
-               }else if(fragment instanceof  BatchStep2Data){
-                   BatchStep2Data batchStep2Data= (BatchStep2Data) fragment;
-                   batchStep2Data.setListView();
-               }
-           }
+            if (adapter != null) {
+                Fragment fragment = adapter.getPage(currentPage);
+                if (fragment instanceof BatchStep2Chart) {
+                    BatchStep2Chart batchStep2Chart = (BatchStep2Chart) fragment;
+                    batchStep2Chart.setData();
+                } else if (fragment instanceof BatchStep2Data) {
+                    BatchStep2Data batchStep2Data = (BatchStep2Data) fragment;
+                    batchStep2Data.setListView();
+                }
+            }
 
         }
     };
 
-    public static void BatchStart()
-    {
-        Fragment fragment= BatchStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof BatchStep2Chart)
-        {
+    public static void BatchStart() {
+        Fragment fragment = BatchStep2Main.adapter.getPage(currentPage);
+        if (fragment instanceof BatchStep2Chart) {
             BatchStep2Chart.message.setText(R.string.measure_start);
             BatchStep2Chart.message.setTextColor(Color.BLUE);
         }
     }
 
-    public static void BatchStop()
-    {
+    public static void BatchStop() {
 
-
-        indicateColor++;
-        startMeasure=false;
-        SharedPreferences sharedPreferences=activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-        sharedPreferences.edit().putBoolean(Common.endModule ,true).apply();
-
-        Fragment fragment= BatchStep2Main.adapter.getPage(currentPage);
-        if(fragment instanceof BatchStep2Chart)
-        {
-            BatchStep2Chart.message.setText(R.string.measure_stop);
-            BatchStep2Chart.message.setTextColor(Color.RED);
+        if (BatchStep2Main.adapter != null) {
+            Fragment fragment = BatchStep2Main.adapter.getPage(currentPage);
+            if (fragment instanceof BatchStep2Chart) {
+                BatchStep2Chart.message.setText(R.string.measure_stop);
+                BatchStep2Chart.message.setTextColor(Color.RED);
+            }
         }
+
     }
 
 

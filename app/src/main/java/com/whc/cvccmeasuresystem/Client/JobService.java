@@ -29,6 +29,7 @@ import java.sql.Timestamp;
 import static com.whc.cvccmeasuresystem.Common.Common.Drift2Set;
 import static com.whc.cvccmeasuresystem.Common.Common.arrayColor;
 import static com.whc.cvccmeasuresystem.Common.Common.endMeasure;
+import static com.whc.cvccmeasuresystem.Common.Common.endModule;
 import static com.whc.cvccmeasuresystem.Common.Common.finalFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
 import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
@@ -52,7 +53,6 @@ public class JobService extends android.app.job.JobService{
     public static String measureDuration;
     public static String measureTime;
     public static Handler handlerMessage;
-    public static Object object;
     public static boolean mRun;
     public static String measureType;
     public static String measureFragment;
@@ -142,6 +142,7 @@ public class JobService extends android.app.job.JobService{
                     {
                         case "$D,Start,#":
                             startMeasure=true;
+                            sharedPreferences.edit().putBoolean(endModule,false).apply();
                             sharedPreferences.edit().putString(finalFragment,measureFragment).apply();
                             sharedPreferences.edit().putBoolean(endMeasure,false).apply();
                             handlerMessage.sendEmptyMessage(1);

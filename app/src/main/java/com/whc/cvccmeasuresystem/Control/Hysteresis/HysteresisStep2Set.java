@@ -1,7 +1,11 @@
 package com.whc.cvccmeasuresystem.Control.Hysteresis;
 
 import android.app.Activity;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -16,9 +20,13 @@ import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapDropDown;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.beardedhen.androidbootstrap.BootstrapText;
+import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.HomeDialogFragment;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
+import com.whc.cvccmeasuresystem.Control.ChoiceFunction;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
@@ -42,13 +50,12 @@ public class HysteresisStep2Set extends Fragment {
     private BootstrapDropDown loop;
     private List<BootstrapText> bootstrapTexts;
     public static String[] loopIonType={"7","4","7","10","7"};
-
-
+    private SharedPreferences sharedPreferences;
 
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onPause() {
+        super.onPause();
         pageCon=new PageCon();
         String ionOne = ion1.getText().toString();
         String ionTwo = ion2.getText().toString();
@@ -70,8 +77,10 @@ public class HysteresisStep2Set extends Fragment {
         {
             pageCon.setCon4(ionFour);
         }
-
+        Common.savePageParameter(sharedPreferences,pageCon);
     }
+
+
 
     @Override
     public void onAttach(Context context) {
@@ -82,6 +91,7 @@ public class HysteresisStep2Set extends Fragment {
             activity = getActivity();
         }
         bootstrapTexts=loopList(activity);
+        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
     }
 
     @Nullable
@@ -163,9 +173,12 @@ public class HysteresisStep2Set extends Fragment {
         SaveFile saveFile=saveFileDB.findOldSaveFileById(sample1.getFileID());
         saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
         saveFileDB.update(saveFile);
+
+        needSet = false;
+        pageCon = null;
+        sharedPreferences.edit().putBoolean(endModule,true).apply();
         oldFragment.remove(oldFragment.size()-1);
-        needSet=false;
-        Common.switchFragment(new HysteresisStep1(),getFragmentManager());
+        Common.switchFragment(new ChoiceFunction(),getFragmentManager());
     }
 
 
@@ -221,15 +234,32 @@ public class HysteresisStep2Set extends Fragment {
                 return;
             }
             //connection
-
             solution1=new Solution(ionOne,sample1.getID());
             solution2=new Solution(ionTwo,sample2.getID());
             solution3=new Solution(ionThree,sample3.getID());
             solution4=new Solution(ionFour,sample4.getID());
-
-
             Common.showToast(activity,"Wifi Connecting");
             measureTimes=0;
+
+            JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobService.handlerMessage= HysteresisStep2Main.handlerMessage;
+            JobService.measureDuration="1";
+            JobService.measureTime=String.valueOf(HysteresisStep1.pointLoop);
+            JobService.mRun=true;
+            JobService.measureType="4";
+            JobService.measureFragment=Common.Hys2;
+
+
+            ComponentName mServiceComponent = new ComponentName(activity, JobService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);
+            tm.cancelAll();
+
+            builder.setMinimumLatency(1);
+            builder.setOverrideDeadline(2);
+            builder.setRequiresCharging(false);
+            builder.setRequiresDeviceIdle(false);
+            tm.schedule(builder.build());
+
         }
     }
 

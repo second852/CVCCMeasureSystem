@@ -228,7 +228,6 @@ public class DriftStep2Set extends Fragment {
 
             JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
             JobService.handlerMessage=DriftStep2Main.handlerMessage;
-            JobService.object=DriftStep2Set.this;
             JobService.measureDuration="5";
             JobService.measureTime=mTime;
             JobService.mRun=true;

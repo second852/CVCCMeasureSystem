@@ -2,13 +2,17 @@ package com.whc.cvccmeasuresystem.Common;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
 
 import com.whc.cvccmeasuresystem.Control.MainActivity;
+
+import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
 
 /**
@@ -49,6 +53,8 @@ public class OutDialogFragment extends DialogFragment implements  DialogInterfac
         switch (which) {
             case DialogInterface.BUTTON_POSITIVE:
                 MainActivity mainActivity= (MainActivity) object;
+                SharedPreferences sharedPreferences=mainActivity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+                sharedPreferences.edit().putBoolean(Common.endModule,true).apply();
                 mainActivity.finish();
                 System.exit(0);
                 break;

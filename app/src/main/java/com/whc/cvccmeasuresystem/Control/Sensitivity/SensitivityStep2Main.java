@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +21,9 @@ import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItem;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
+import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
@@ -68,65 +71,108 @@ public class SensitivityStep2Main extends Fragment {
         final View view = inflater.inflate(R.layout.sen_step2_main, container, false);
         senViewPagerTab = view.findViewById(R.id.senViewPagerTab);
         senViewPager = view.findViewById(R.id.senViewPager);
-        FragmentPagerItems pages = new FragmentPagerItems(activity);
-        pages.add(FragmentPagerItem.of("Set", SensitivityStep2Set.class));
-        pages.add(FragmentPagerItem.of("Chart(V-T)", SensitivityStep2TimeChart.class));
-        pages.add(FragmentPagerItem.of("Chart(mV-Ion)", SensitivityStep2ConChart.class));
-        pages.add(FragmentPagerItem.of("Data", SensitivityStep2Data.class));
-        adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
-        senViewPager.setAdapter(adapter);
-        senViewPager.addOnPageChangeListener(new PageListener());
-        senViewPagerTab.setViewPager(senViewPager);
+
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        if (adapter == null) {
+            FragmentPagerItems pages = new FragmentPagerItems(activity);
+            pages.add(FragmentPagerItem.of("Set", SensitivityStep2Set.class));
+            pages.add(FragmentPagerItem.of("Chart(V-T)", SensitivityStep2TimeChart.class));
+            pages.add(FragmentPagerItem.of("Chart(mV-Ion)", SensitivityStep2ConChart.class));
+            pages.add(FragmentPagerItem.of("Data", SensitivityStep2Data.class));
+            adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
+            senViewPager.setAdapter(adapter);
+            senViewPager.addOnPageChangeListener(new PageListener());
+            senViewPagerTab.setViewPager(senViewPager);
+        }
         //set Page
-        setSample();
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+        boolean endMeasure = sharedPreferences.getBoolean(Common.endMeasure, true);
+        boolean endModule=sharedPreferences.getBoolean(Common.endModule, true);
+        startMeasure = (!endMeasure);
+        volCon = new HashMap<>();
+        if (endModule) {
+            Common.setSample(sharedPreferences, activity, dataBase);
+            volCon.put(sample1, new HashMap<String, List<Solution>>());
+            volCon.put(sample2, new HashMap<String, List<Solution>>());
+            volCon.put(sample3, new HashMap<String, List<Solution>>());
+            volCon.put(sample4, new HashMap<String, List<Solution>>());
+        } else {
+            setMeasureSample(sharedPreferences, activity, dataBase);
+            senViewPager.setCurrentItem(1);
+            JobService.handlerMessage = SensitivityStep2Main.handlerMessage;
+        }
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onPause() {
+        super.onPause();
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        for (Fragment f : getFragmentManager().getFragments()) {
+            fragmentTransaction.remove(f);
+        }
+        fragmentTransaction.commit();
+        adapter = null;
     }
 
-    private void setSample() {
+    public void setMeasureSample(SharedPreferences sharedPreferences, Activity activity, DataBase dataBase) {
         dataMap = new HashMap<>();
         samples = new ArrayList<>();
-        volCon = new HashMap<>();
         choiceColor = new ArrayList<>();
+        volCon = new HashMap<>();
+        List<Solution> solutions;
 
-        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         dataBase = new DataBase(activity);
         SampleDB sampleDB = new SampleDB(dataBase);
-
-
+        SolutionDB solutionDB = new SolutionDB(dataBase);
         //sample 1
-        int sampleID = sharedPreferences.getInt(sample1String, 0);
+        int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
         sample1 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample1, new ArrayList<Solution>());
-        volCon.put(sample1, new HashMap<String, List<Solution>>());
+        solutions = solutionDB.getSampleAll(sampleID);
+        dataMap.put(sample1, solutions);
         samples.add(sample1);
+        volCon.put(sample1, new HashMap<String, List<Solution>>());
+        for (Solution solution : solutions) {
+            volCon.put(sample1, setMapData(volCon.get(sample1), solution));
+        }
         //sample 2
-        sampleID = sharedPreferences.getInt(sample2String, 0);
+        sampleID = sharedPreferences.getInt(Common.sample2String, 0);
         sample2 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample2, new ArrayList<Solution>());
-        volCon.put(sample2, new HashMap<String, List<Solution>>());
+        solutions = solutionDB.getSampleAll(sampleID);
+        dataMap.put(sample2, solutions);
         samples.add(sample2);
+        volCon.put(sample2, new HashMap<String, List<Solution>>());
+        for (Solution solution : solutions) {
+            volCon.put(sample2, setMapData(volCon.get(sample2), solution));
+        }
         //sample 3
-        sampleID = sharedPreferences.getInt(sample3String, 0);
+        sampleID = sharedPreferences.getInt(Common.sample3String, 0);
         sample3 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample3, new ArrayList<Solution>());
-        volCon.put(sample3, new HashMap<String, List<Solution>>());
+        solutions = solutionDB.getSampleAll(sampleID);
+        dataMap.put(sample3, solutions);
         samples.add(sample3);
+        volCon.put(sample3, new HashMap<String, List<Solution>>());
+        for (Solution solution : solutions) {
+            volCon.put(sample3, setMapData(volCon.get(sample3), solution));
+        }
         //sample 4
-        sampleID = sharedPreferences.getInt(sample4String, 0);
+        sampleID = sharedPreferences.getInt(Common.sample4String, 0);
         sample4 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample4, new ArrayList<Solution>());
-        volCon.put(sample4, new HashMap<String, List<Solution>>());
+        solutions = solutionDB.getSampleAll(sampleID);
+        dataMap.put(sample4, solutions);
         samples.add(sample4);
+        volCon.put(sample4, new HashMap<String, List<Solution>>());
+        for (Solution solution : solutions) {
+            volCon.put(sample4, setMapData(volCon.get(sample4), solution));
+        }
+
+        for (Solution solution : dataMap.get(sample1)) {
+            choiceColor.add(solution.getColor());
+        }
     }
 
 
@@ -171,11 +217,26 @@ public class SensitivityStep2Main extends Fragment {
             if (msg.what == 1) {
                 SensitivityStep2Main.senViewPager.setCurrentItem(1);
                 startMeasure();
+                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
                 return;
             }
 
             if (msg.what == 2) {
+
+                JobService.mRun = false;
+                startMeasure = false;
+                if (JobService.socket != null) {
+                    try {
+                        JobService.socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                indicateColor++;
+                SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+                sharedPreferences.edit().putBoolean(Common.endMeasure, true).apply();
                 SensitivityStep2Main.senViewPager.setCurrentItem(1);
+                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 endMeasure();
                 return;
             }
@@ -186,58 +247,7 @@ public class SensitivityStep2Main extends Fragment {
             }
 
 
-            String result = (String) msg.obj;
-            String[] voltages = result.split(",");
-            try {
-                new Integer(voltages[2]);
-            } catch (Exception e) {
-                return;
-            }
-
-
-            Solution solution1 = new Solution(Common.solution1.getConcentration(), sample1.getID());
-            Solution solution2 = new Solution(Common.solution2.getConcentration(), sample2.getID());
-            Solution solution3 = new Solution(Common.solution3.getConcentration(), sample3.getID());
-            Solution solution4 = new Solution(Common.solution4.getConcentration(), sample4.getID());
-
-
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-
-            solution1.setVoltage(new Integer(voltages[1]));
-            solution2.setVoltage(new Integer(voltages[2]));
-            solution3.setVoltage(new Integer(voltages[3]));
-            solution4.setVoltage(new Integer(voltages[4]));
-
-
-            solution1.setTime(timestamp);
-            solution2.setTime(timestamp);
-            solution3.setTime(timestamp);
-            solution4.setTime(timestamp);
-
-
-            solution1.setMeasureType("2");
-            solution2.setMeasureType("2");
-            solution3.setMeasureType("2");
-            solution4.setMeasureType("2");
-
-            solution1.setNumber(String.valueOf(measureTimes));
-            solution2.setNumber(String.valueOf(measureTimes));
-            solution3.setNumber(String.valueOf(measureTimes));
-            solution4.setNumber(String.valueOf(measureTimes));
-            measureTimes++;
-
-            int color =Color.parseColor(arrayColor[indicateColor%arrayColor.length]);
-            solution1.setColor(color);
-            solution2.setColor(color);
-            solution3.setColor(color);
-            solution4.setColor(color);
-            choiceColor.add(color);
-
-            SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
-            solutionDB.insert(solution1);
-            solutionDB.insert(solution2);
-            solutionDB.insert(solution3);
-            solutionDB.insert(solution4);
+            choiceColor.add(oneColor);
 
             dataMap.get(sample1).add(solution1);
             dataMap.get(sample2).add(solution2);
@@ -250,17 +260,20 @@ public class SensitivityStep2Main extends Fragment {
             volCon.put(sample4, setMapData(volCon.get(sample4), solution4));
 
 
-            Fragment fragment = adapter.getPage(currentPage);
-            if (fragment instanceof SensitivityStep2TimeChart) {
-                SensitivityStep2TimeChart sensitivityStep2TimeChart = (SensitivityStep2TimeChart) fragment;
-                sensitivityStep2TimeChart.setData();
-            } else if (fragment instanceof SensitivityStep2ConChart) {
-                SensitivityStep2ConChart sensitivityStep2ConChart = (SensitivityStep2ConChart) fragment;
-                sensitivityStep2ConChart.setData();
-            } else if (fragment instanceof SensitivityStep2Data) {
-                SensitivityStep2Data sensitivityStep2Data = (SensitivityStep2Data) fragment;
-                sensitivityStep2Data.setListView();
+            if (adapter != null) {
+                Fragment fragment = adapter.getPage(currentPage);
+                if (fragment instanceof SensitivityStep2TimeChart) {
+                    SensitivityStep2TimeChart sensitivityStep2TimeChart = (SensitivityStep2TimeChart) fragment;
+                    sensitivityStep2TimeChart.setData();
+                } else if (fragment instanceof SensitivityStep2ConChart) {
+                    SensitivityStep2ConChart sensitivityStep2ConChart = (SensitivityStep2ConChart) fragment;
+                    sensitivityStep2ConChart.setData();
+                } else if (fragment instanceof SensitivityStep2Data) {
+                    SensitivityStep2Data sensitivityStep2Data = (SensitivityStep2Data) fragment;
+                    sensitivityStep2Data.setListView();
+                }
             }
+
         }
     };
 
@@ -274,20 +287,20 @@ public class SensitivityStep2Main extends Fragment {
             SensitivityStep2ConChart.message.setText(R.string.measure_start);
             SensitivityStep2ConChart.message.setTextColor(Color.BLUE);
         }
-        Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement Start!");
     }
 
     public static void endMeasure() {
-        indicateColor++;
-        Fragment fragment = SensitivityStep2Main.adapter.getPage(currentPage);
-        if (fragment instanceof SensitivityStep2TimeChart) {
-            SensitivityStep2TimeChart.message.setText(R.string.measure_stop);
-            SensitivityStep2TimeChart.message.setTextColor(Color.RED);
-        } else if (fragment instanceof SensitivityStep2ConChart) {
-            SensitivityStep2ConChart.message.setText(R.string.measure_stop);
-            SensitivityStep2ConChart.message.setTextColor(Color.RED);
+
+        if (adapter != null) {
+            Fragment fragment = SensitivityStep2Main.adapter.getPage(currentPage);
+            if (fragment instanceof SensitivityStep2TimeChart) {
+                SensitivityStep2TimeChart.message.setText(R.string.measure_stop);
+                SensitivityStep2TimeChart.message.setTextColor(Color.RED);
+            } else if (fragment instanceof SensitivityStep2ConChart) {
+                SensitivityStep2ConChart.message.setText(R.string.measure_stop);
+                SensitivityStep2ConChart.message.setTextColor(Color.RED);
+            }
         }
-        Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
     }
 
 

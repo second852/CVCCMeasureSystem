@@ -227,11 +227,12 @@ public class BatchStep2Set extends Fragment {
 
             JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
             JobService.handlerMessage= BatchStep2Main.handlerMessage;
-            JobService.object=BatchStep2Set.this;
             JobService.measureDuration="1";
             JobService.measureTime=mTime;
             JobService.mRun=true;
             JobService.measureType="3";
+            JobService.measureFragment=Common.BS2;
+
 
             ComponentName mServiceComponent = new ComponentName(activity, JobService.class);
             JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);
@@ -242,10 +243,6 @@ public class BatchStep2Set extends Fragment {
             builder.setRequiresCharging(false);
             builder.setRequiresDeviceIdle(false);
             tm.schedule(builder.build());
-
-
-            sharedPreferences.edit().putString(finalFragment,Drift2Set).apply();
-            sharedPreferences.edit().putBoolean(endMeasure,false).apply();
         }
     }
 

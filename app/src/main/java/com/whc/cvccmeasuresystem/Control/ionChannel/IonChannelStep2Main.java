@@ -90,19 +90,32 @@ public class IonChannelStep2Main extends Fragment {
         final View view = inflater.inflate(R.layout.ion_step2_main, container, false);
         viewPagerTab = view.findViewById(R.id.viewPagerTab);
         priceViewPager = view.findViewById(R.id.batchViewPager);
-        FragmentPagerItems pages = new FragmentPagerItems(activity);
-        pages.add(FragmentPagerItem.of("Set", IonChannelStep2Set.class));
-        pages.add(FragmentPagerItem.of("Data", IonChannelStep2Data.class));
-        adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
-        priceViewPager.setAdapter(adapter);
-        priceViewPager.addOnPageChangeListener(new PageListener());
-        viewPagerTab.setViewPager(priceViewPager);
+
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        if(adapter==null)
+        {
+            FragmentPagerItems pages = new FragmentPagerItems(activity);
+            pages.add(FragmentPagerItem.of("Set", IonChannelStep2Set.class));
+            pages.add(FragmentPagerItem.of("Data", IonChannelStep2Data.class));
+            adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
+            priceViewPager.setAdapter(adapter);
+            priceViewPager.addOnPageChangeListener(new PageListener());
+            viewPagerTab.setViewPager(priceViewPager);
+        }
+
+
+
+
+
+
+
+
+
         //set Page
         if(initParameter)
         {

@@ -52,8 +52,13 @@ public class Common {
     public static final String measureStartNotExist = "Measuring Now! Please pressure \"Stop\" !";
     public static final String CFName = "ChoiceFunction";
     public static final String BS1 = "BatchStep1";
+    public static final String BS2 = "BatchStep2Main";
+
     public static final String Sen1 = "SensitivityStep1";
+    public static final String Sen2 = "SensitivityStep2Main";
+
     public static final String Hys1 = "HysteresisStep1";
+    public static final String Hys2 = "HysteresisStep2Main";
 
     public static final String Drift1 = "Drift";
     public static final String Drift2Set = "Drift2Set";

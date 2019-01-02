@@ -25,7 +25,9 @@ import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Main;
 import com.whc.cvccmeasuresystem.Control.History.HistoryMain;
 import com.whc.cvccmeasuresystem.Control.History.HistoryShowMain;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
+import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep1;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
@@ -73,6 +75,18 @@ public class MainActivity extends AppCompatActivity {
                 case Common.Drift2Set:
                     oldFragment.add(Common.Drift1);
                     switchFragment(new DriftStep2Main(), getSupportFragmentManager());
+                    break;
+                case Common.BS2:
+                    oldFragment.add(Common.BS1);
+                    switchFragment(new BatchStep2Main(), getSupportFragmentManager());
+                    break;
+                case Common.Hys2:
+                    oldFragment.add(Common.Hys1);
+                    switchFragment(new HysteresisStep2Main(), getSupportFragmentManager());
+                    break;
+                case Common.Sen2:
+                    oldFragment.add(Common.Sen2);
+                    switchFragment(new SensitivityStep2Main(), getSupportFragmentManager());
                     break;
                   default:
                       switchFragment(new SignIn(), getSupportFragmentManager());
@@ -146,6 +160,8 @@ public class MainActivity extends AppCompatActivity {
                     case CFName:
                         Common.switchFragment(new ChoiceFunction(), getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
+                        SharedPreferences sharedPreferences=this.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+                        sharedPreferences.edit().putBoolean(Common.endModule,true).apply();
                         break;
                     case BS1:
                         Common.switchFragment(new BatchStep1(), getSupportFragmentManager());
