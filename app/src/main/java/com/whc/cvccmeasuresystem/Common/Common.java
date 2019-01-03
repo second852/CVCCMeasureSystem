@@ -65,6 +65,7 @@ public class Common {
 
 
     public static final String IonChannel1 = "IonChannel1";
+    public static final String IonChannel1Set = "IonChannel1";
     public static final String IonChannel2Set = "IonChannel2Set";
     public static final String HistoryMain = "HistoryMain";
 
@@ -73,7 +74,8 @@ public class Common {
     public static final String finalPage = "finalPage";
     public static final String onPause = "onPause";
     public static final String endModule = "endModule";
-
+    public static final String finalPage1 = "finalPage1";
+    public static final String finalPage2= "finalPage2";
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;
     public static HashMap<Sample, List<Solution>> dataMap;
@@ -325,6 +327,16 @@ public class Common {
         Gson gson = new Gson();
         String json = gson.toJson(pageCon);
         prefsEditor.putString(finalPage,json);
+        prefsEditor.apply();
+    }
+
+    public static void savePageParameter(SharedPreferences sharedPreferences,PageCon pageCon,String key)
+    {
+
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(pageCon);
+        prefsEditor.putString(key,json);
         prefsEditor.apply();
     }
 

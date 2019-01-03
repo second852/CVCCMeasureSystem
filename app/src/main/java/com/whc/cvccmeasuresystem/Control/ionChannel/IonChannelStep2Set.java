@@ -1,7 +1,11 @@
 package com.whc.cvccmeasuresystem.Control.ionChannel;
 
 import android.app.Activity;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -14,8 +18,11 @@ import android.view.ViewGroup;
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 
+import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
@@ -34,7 +41,7 @@ public class IonChannelStep2Set extends Fragment {
     private BootstrapButton conS1, conS2, conS3, conS4, startS, stopS, next, warring,clearF,clearS;
     private BootstrapEditText ionF1, ionF2, ionF3, ionF4;
     private BootstrapEditText ionS1, ionS2, ionS3, ionS4;
-
+    private SharedPreferences sharedPreferences;
 
 
     public static PageCon pageCon1, pageCon2;
@@ -48,6 +55,7 @@ public class IonChannelStep2Set extends Fragment {
         } else {
             activity = getActivity();
         }
+        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
     }
 
     @Nullable
@@ -80,7 +88,7 @@ public class IonChannelStep2Set extends Fragment {
                 ionF4.setText(pageCon1.getCon4());
             }
         }
-
+        Common.savePageParameter(sharedPreferences,pageCon,Common.finalPage1);
         if(pageCon2!=null)
         {
             if(pageCon2.getCon1()!=null)
@@ -100,6 +108,7 @@ public class IonChannelStep2Set extends Fragment {
                 ionS4.setText(pageCon2.getCon4());
             }
         }
+        Common.savePageParameter(sharedPreferences,pageCon,Common.finalPage2);
     }
 
     private void setIonType() {
@@ -309,6 +318,26 @@ public class IonChannelStep2Set extends Fragment {
             solution4 = new Solution(ionFour, sample4.getID());
             Common.showToast(activity, "Wifi Connecting");
             measureTimes = 1;
+
+
+            JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobService.handlerMessage= IonChannelStep2Main.handlerMessage;
+            JobService.measureDuration="1";
+            JobService.measureTime="1";
+            JobService.mRun=true;
+            JobService.measureType="1";
+            JobService.measureFragment=Common.IonChannel1Set;
+
+
+            ComponentName mServiceComponent = new ComponentName(activity, JobService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);
+            tm.cancelAll();
+
+            builder.setMinimumLatency(1);
+            builder.setOverrideDeadline(2);
+            builder.setRequiresCharging(false);
+            builder.setRequiresDeviceIdle(false);
+            tm.schedule(builder.build());
         }
     }
 
@@ -458,6 +487,26 @@ public class IonChannelStep2Set extends Fragment {
             solution4 = new Solution(ionFour, sample4.getID());
             Common.showToast(activity, "Wifi Connecting");
             measureTimes = 2;
+
+
+            JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobService.handlerMessage= IonChannelStep2Main.handlerMessage;
+            JobService.measureDuration="1";
+            JobService.measureTime="1";
+            JobService.mRun=true;
+            JobService.measureType="1";
+            JobService.measureFragment=Common.IonChannel1Set;
+
+
+            ComponentName mServiceComponent = new ComponentName(activity, JobService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);
+            tm.cancelAll();
+
+            builder.setMinimumLatency(1);
+            builder.setOverrideDeadline(2);
+            builder.setRequiresCharging(false);
+            builder.setRequiresDeviceIdle(false);
+            tm.schedule(builder.build());
         }
     }
 

@@ -42,10 +42,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.beardedhen:androidbootstrap:2.3.2'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
-    compile 'com.ogaclejapan.smarttablayout:utils-v4:1.6.1@aar'
-    compile 'com.ogaclejapan.smarttablayout:library:1.6.1@aar'
+    api 'com.ogaclejapan.smarttablayout:utils-v4:1.6.1@aar'
+    api 'com.ogaclejapan.smarttablayout:library:1.6.1@aar'
     implementation files('libs/poi-3.17.jar')
-    compile 'com.google.android.gms:play-services-drive:8.4.0'
-    compile 'com.google.code.gson:gson:2.8.5'
+    api 'com.google.android.gms:play-services-drive:8.4.0'
+    api 'com.google.code.gson:gson:2.8.5'
 
 }

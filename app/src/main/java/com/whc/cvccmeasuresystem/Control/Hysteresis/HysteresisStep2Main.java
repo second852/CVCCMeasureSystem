@@ -180,7 +180,6 @@ public class HysteresisStep2Main extends Fragment {
                 return;
             }
 
-
             choiceColor.add(oneColor);
             dataMap.get(sample1).add(solution1);
             dataMap.get(sample2).add(solution2);
