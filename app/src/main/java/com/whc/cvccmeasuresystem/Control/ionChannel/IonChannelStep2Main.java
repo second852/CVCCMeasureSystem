@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,38 +25,21 @@ import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Chart;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Data;
-import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
-import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
+import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.arrayColor;
-import static com.whc.cvccmeasuresystem.Common.Common.choiceColor;
-import static com.whc.cvccmeasuresystem.Common.Common.currentPage;
-import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
-import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
-import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
-import static com.whc.cvccmeasuresystem.Common.Common.needSet;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4;
-import static com.whc.cvccmeasuresystem.Common.Common.samples;
-import static com.whc.cvccmeasuresystem.Common.Common.solution1;
-import static com.whc.cvccmeasuresystem.Common.Common.solution2;
-import static com.whc.cvccmeasuresystem.Common.Common.solution3;
-import static com.whc.cvccmeasuresystem.Common.Common.solution4;
-import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+
+import static com.whc.cvccmeasuresystem.Common.Common.*;
+
 
 
 public class IonChannelStep2Main extends Fragment {
@@ -71,9 +53,9 @@ public class IonChannelStep2Main extends Fragment {
 
     public static ViewPager priceViewPager;
     public static FragmentPagerItemAdapter adapter;
-    public static List<String> errorSample;
-    public static boolean initParameter;
-    public static boolean needOldData;
+    public boolean reBack;
+
+
 
 
     @Override
@@ -97,6 +79,7 @@ public class IonChannelStep2Main extends Fragment {
         final View view = inflater.inflate(R.layout.ion_step2_main, container, false);
         viewPagerTab = view.findViewById(R.id.viewPagerTab);
         priceViewPager = view.findViewById(R.id.batchViewPager);
+        reBack= (boolean) getArguments().getSerializable(Common.reBack);
         return view;
     }
 
@@ -121,12 +104,22 @@ public class IonChannelStep2Main extends Fragment {
         boolean endMeasure = sharedPreferences.getBoolean(Common.endMeasure, true);
         boolean endModule=sharedPreferences.getBoolean(Common.endModule, true);
         startMeasure = (!endMeasure);
-        if (endModule) {
-            Common.setSample(sharedPreferences, activity, dataBase);
-        } else {
-            Common.setMeasureSample(sharedPreferences, activity, dataBase);
-            priceViewPager.setCurrentItem(1);
-            JobService.handlerMessage = IonChannelStep2Main.handlerMessage;
+        errorSample=new ArrayList<>();
+
+        if(reBack)
+        {
+            Common.setIonMeasureSample(sharedPreferences, activity, "1");
+            List<PageCon> pageCons=Common.getPagCon(sharedPreferences,activity,"11");
+            IonChannelStep2Set.pageCon1=pageCons.get(0);
+            IonChannelStep2Set.pageCon1=pageCons.get(1);
+        }else{
+            if (endModule) {
+                Common.setSample(sharedPreferences, activity, dataBase);
+            } else {
+                Common.setIonMeasureSample(sharedPreferences, activity, "1");
+                priceViewPager.setCurrentItem(1);
+                JobService.handlerMessage = IonChannelStep2Main.handlerMessage;
+            }
         }
 
     }
@@ -260,9 +253,7 @@ public class IonChannelStep2Main extends Fragment {
                 }
                 SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
                 sharedPreferences.edit().putBoolean(Common.endMeasure, true).apply();
-                IonChannelStep2Main.priceViewPager.setCurrentItem(1);
                 IonChannelStep2Stop();
-                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
 
@@ -279,12 +270,15 @@ public class IonChannelStep2Main extends Fragment {
             dataMap.get(sample4).add(solution4);
 
 
-            Fragment fragment = adapter.getPage(1);
-
-            if (fragment instanceof IonChannelStep2Data) {
-                IonChannelStep2Data ionChannelStep2Data = (IonChannelStep2Data) fragment;
-                ionChannelStep2Data.setListView();
+            if(adapter!=null)
+            {
+                Fragment fragment = adapter.getPage(1);
+                if (fragment instanceof IonChannelStep2Data) {
+                    IonChannelStep2Data ionChannelStep2Data = (IonChannelStep2Data) fragment;
+                    ionChannelStep2Data.setListView();
+                }
             }
+
         }
     };
 
@@ -302,13 +296,19 @@ public class IonChannelStep2Main extends Fragment {
 
     public static void IonChannelStep2Stop()
     {
-        startMeasure=false;
-        Fragment fragment= IonChannelStep2Main.adapter.getPage(1);
-        if(fragment instanceof IonChannelStep2Data)
+
+        if (adapter!=null)
         {
-            IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
-            ionChannelStep2Data.senMessage.setTextColor(Color.RED);
-            ionChannelStep2Data.senMessage.setText(R.string.measure_stop);
+            Fragment fragment= IonChannelStep2Main.adapter.getPage(1);
+            if(fragment instanceof IonChannelStep2Data)
+            {
+                IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
+                ionChannelStep2Data.senMessage.setTextColor(Color.RED);
+                ionChannelStep2Data.senMessage.setText(R.string.measure_stop);
+            }
+            IonChannelStep2Main.priceViewPager.setCurrentItem(1);
+            Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
         }
+
     }
 }

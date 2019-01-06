@@ -14,7 +14,6 @@ import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Main;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Set;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Set;
-import com.whc.cvccmeasuresystem.Control.MainActivity;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;

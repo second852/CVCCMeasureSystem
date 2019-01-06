@@ -169,9 +169,7 @@ public class HysteresisStep2Main extends Fragment {
                 indicateColor++;
                 SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
                 sharedPreferences.edit().putBoolean(Common.endMeasure, true).apply();
-                HysteresisStep2Main.hisViewPager.setCurrentItem(1);
                 HysteresisEnd();
-                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
 
@@ -215,6 +213,9 @@ public class HysteresisStep2Main extends Fragment {
                 HysteresisStep2Chart.message.setText(R.string.measure_stop);
                 HysteresisStep2Chart.message.setTextColor(Color.RED);
             }
+
+            HysteresisStep2Main.hisViewPager.setCurrentItem(1);
+            Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
         }
     }
 }

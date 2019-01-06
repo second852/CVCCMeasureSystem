@@ -8,11 +8,38 @@ import java.io.Serializable;
 
 public class PageCon implements Serializable{
 
+    private int id;
     private String con1;
     private String con2;
     private String con3;
     private String con4;
     private String expTime;
+    private String step;
+    private int fileId;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getStep() {
+        return step;
+    }
+
+    public void setStep(String step) {
+        this.step = step;
+    }
+
+    public int getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(int fileId) {
+        this.fileId = fileId;
+    }
 
     public String getExpTime() {
         return expTime;

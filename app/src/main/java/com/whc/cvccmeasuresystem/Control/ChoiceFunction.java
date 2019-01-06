@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
-import static com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main.initParameter;
 import static com.whc.cvccmeasuresystem.Control.History.HistoryMain.saveFiles;
 
 
@@ -98,9 +97,7 @@ public class ChoiceFunction extends Fragment {
             pageCon=null;
             oldFragment=new ArrayList<>();
             needSet=false;
-            initParameter=true;
             saveFiles=null;
-            IonChannelStep3Main.noInitParameter=false;
             switch (i){
                 case 0:
                     fragment=new BatchStep1();

@@ -167,7 +167,7 @@ public class IonChannelStep2Data extends Fragment{
 
             if(solution.isNoNormalV())
             {
-                IonChannelStep2Main.errorSample.add(sample1String);
+                errorSample.add(sample1String);
             }
 
             solutions.add(solution);
@@ -195,7 +195,7 @@ public class IonChannelStep2Data extends Fragment{
 
             if(solution.isNoNormalV())
             {
-                IonChannelStep2Main.errorSample.add(sample2String);
+                errorSample.add(sample2String);
             }
             solutions.add(solution);
         }
@@ -224,7 +224,7 @@ public class IonChannelStep2Data extends Fragment{
 
             if(solution.isNoNormalV())
             {
-                IonChannelStep2Main.errorSample.add(sample3String);
+                errorSample.add(sample3String);
             }
             solutions.add(solution);
         }
@@ -253,7 +253,7 @@ public class IonChannelStep2Data extends Fragment{
 
             if(solution.isNoNormalV())
             {
-                IonChannelStep2Main.errorSample.add(sample4String);
+                errorSample.add(sample4String);
             }
             solutions.add(solution);
         }

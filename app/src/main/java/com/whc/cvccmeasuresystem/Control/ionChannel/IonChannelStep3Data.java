@@ -18,7 +18,7 @@ import com.whc.cvccmeasuresystem.R;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import static com.whc.cvccmeasuresystem.Common.Common.*;
 
 
 public class IonChannelStep3Data extends Fragment{
@@ -57,9 +57,9 @@ public class IonChannelStep3Data extends Fragment{
     {
         List<Solution> solutions=new ArrayList<>();
         solutions.add(new Solution());
-        for(Sample sample:IonChannelStep3Main.samples)
+        for(Sample sample:samples)
         {
-            solutions.addAll(IonChannelStep3Main.dataMap.get(sample));
+            solutions.addAll(dataMap.get(sample));
         }
         listData.setAdapter(new SolutionAdapter(activity,solutions));
     }

@@ -175,10 +175,10 @@ public class DriftStep2Main extends Fragment {
                     }
                 }
                 activity.getSharedPreferences(userShare, Context.MODE_PRIVATE).edit().putBoolean(Common.endMeasure,true).apply();
-                DriftStep2Main.driftViewPager.setCurrentItem(1);
+
                 indicateColor++;
                 DriftEnd();
-                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
+
                 return;
             }
 
@@ -229,6 +229,8 @@ public class DriftStep2Main extends Fragment {
                 DriftStep2Chart.message.setText(R.string.measure_stop);
                 DriftStep2Chart.message.setTextColor(Color.RED);
             }
+            DriftStep2Main.driftViewPager.setCurrentItem(1);
+            Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
         }
     }
 }

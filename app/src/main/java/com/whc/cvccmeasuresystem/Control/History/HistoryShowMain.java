@@ -131,7 +131,6 @@ public class HistoryShowMain extends Fragment {
             case "1":
                 Common.dataMap=sampleDB.setMapSampeSolutionToIC(showFileDate.getID(),"1");
                 pages.add(FragmentPagerItem.of("Data", IonChannelStep2Data.class));
-                IonChannelStep3Main.dataMap=sampleDB.setMapSampeSolutionToIC(showFileDate.getID(),"11");
                 choiceColor=new ArrayList<>();
                 for (Solution solution:dataMap.get(Common.sample1))
                 {

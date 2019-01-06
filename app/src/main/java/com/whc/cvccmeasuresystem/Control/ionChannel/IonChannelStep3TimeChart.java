@@ -94,7 +94,7 @@ public class IonChannelStep3TimeChart extends Fragment{
             message.setTextColor(Color.RED);
         }
 
-        HashMap<Sample,List<Solution>> dataMap=IonChannelStep3Main.dataMap;
+
         List<Solution> solutions=dataMap.get(sample1);
 //        Solution solution=new Solution();
 //        solution.setVoltage(200);

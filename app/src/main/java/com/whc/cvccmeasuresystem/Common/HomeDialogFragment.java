@@ -17,6 +17,7 @@ import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Set;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Set;
 
 
+
 /**
  * Created by Wang on 2018/1/3.
  */
@@ -91,13 +92,12 @@ public class HomeDialogFragment extends DialogFragment implements  DialogInterfa
                 {
                     HysteresisStep2Set hysteresisStep2Set= (HysteresisStep2Set) object;
                     hysteresisStep2Set.finishMeasure();
-                }else if(object instanceof DriftStep2Set)
-                {
-                    DriftStep2Set driftStep2Set= (DriftStep2Set) object;
+                }else if(object instanceof DriftStep2Set) {
+                    DriftStep2Set driftStep2Set = (DriftStep2Set) object;
                     driftStep2Set.finishMeasure();
                 }else if(object instanceof IonChannelStep3Set)
                 {
-                    IonChannelStep3Set ionChannelStep3Set = (IonChannelStep3Set) object;
+                    IonChannelStep3Set ionChannelStep3Set= (IonChannelStep3Set) object;
                     ionChannelStep3Set.finishMeasure();
                 }
                 break;

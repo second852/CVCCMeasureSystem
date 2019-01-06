@@ -17,6 +17,7 @@ import com.beardedhen.androidbootstrap.BootstrapText;
 import com.github.mikephil.charting.components.Description;
 import com.google.gson.Gson;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
+import com.whc.cvccmeasuresystem.DataBase.PagConDB;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
@@ -63,10 +64,12 @@ public class Common {
     public static final String Drift1 = "Drift";
     public static final String Drift2Set = "Drift2Set";
 
-
+    public static final String reBack = "reBack";
     public static final String IonChannel1 = "IonChannel1";
     public static final String IonChannel1Set = "IonChannel1";
     public static final String IonChannel2Set = "IonChannel2Set";
+    public static final String IonChannel3Set = "IonChannel3Set";
+
     public static final String HistoryMain = "HistoryMain";
 
     public static final String finalFragment = "finalFragment";
@@ -75,7 +78,7 @@ public class Common {
     public static final String onPause = "onPause";
     public static final String endModule = "endModule";
     public static final String finalPage1 = "finalPage1";
-    public static final String finalPage2= "finalPage2";
+    public static final String finalPage2 = "finalPage2";
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;
     public static HashMap<Sample, List<Solution>> dataMap;
@@ -94,8 +97,8 @@ public class Common {
     public static PageCon pageCon;
     public static List<String> oldFragment;
     public static boolean needSet;
-    public static DecimalFormat nf=new DecimalFormat("#,##0.00");
-
+    public static DecimalFormat nf = new DecimalFormat("#,##0.00");
+    public static List<String> errorSample;
 
     public static HashMap<String, String> MeasureType() {
         HashMap<String, String> hashMap = new HashMap<>();
@@ -108,14 +111,27 @@ public class Common {
     }
 
 
+    public static HashMap<String, String> pageConStep() {
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("0", "BatchStep");
+        hashMap.put("1", "Ion channels step2");
+        hashMap.put("11", "Ion channels step3");
+        hashMap.put("2", "Sensitivity");
+        hashMap.put("3", "Drift");
+        hashMap.put("4", "Hysteresis");
+        return hashMap;
+    }
+
+
     public static void clossKeyword(Activity context) {
         InputMethodManager imm = (InputMethodManager) context
                 .getSystemService(INPUT_METHOD_SERVICE);
-        View view=context.getWindow().getCurrentFocus();
+        View view = context.getWindow().getCurrentFocus();
         imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
+
     public static String doubleRemoveZero(String s) {
-        double d=Double.valueOf(s);
+        double d = Double.valueOf(s);
         int a = (int) d;
         if (a == d) {
             return String.valueOf(a);
@@ -128,7 +144,7 @@ public class Common {
         Double b, a, con;
         b = Double.valueOf(sample.getIntercept());
         a = (Double.valueOf(sample.getSlope()));
-        con = (Voltage - b)/ a;
+        con = (Voltage - b) / a;
         return String.valueOf(con);
     }
 
@@ -252,10 +268,10 @@ public class Common {
     }
 
 
-    public  static void  setSample(SharedPreferences sharedPreferences,Activity activity,DataBase dataBase) {
-        dataMap=new HashMap<>();
-        samples=new ArrayList<>();
-        choiceColor=new ArrayList<>();
+    public static void setSample(SharedPreferences sharedPreferences, Activity activity, DataBase dataBase) {
+        dataMap = new HashMap<>();
+        samples = new ArrayList<>();
+        choiceColor = new ArrayList<>();
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
 
         dataBase = new DataBase(activity);
@@ -265,34 +281,34 @@ public class Common {
         //sample 1
         int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
         sample1 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample1,new ArrayList<Solution>());
+        dataMap.put(sample1, new ArrayList<Solution>());
         samples.add(sample1);
         //sample 2
         sampleID = sharedPreferences.getInt(Common.sample2String, 0);
         sample2 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample2,new ArrayList<Solution>());
+        dataMap.put(sample2, new ArrayList<Solution>());
         samples.add(sample2);
         //sample 3
         sampleID = sharedPreferences.getInt(Common.sample3String, 0);
         sample3 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample3,new ArrayList<Solution>());
+        dataMap.put(sample3, new ArrayList<Solution>());
         samples.add(sample3);
         //sample 4
         sampleID = sharedPreferences.getInt(Common.sample4String, 0);
         sample4 = sampleDB.findOldSample(sampleID);
-        dataMap.put(sample4,new ArrayList<Solution>());
+        dataMap.put(sample4, new ArrayList<Solution>());
         samples.add(sample4);
     }
 
 
-    public static void setMeasureSample(SharedPreferences sharedPreferences,Activity activity,DataBase dataBase) {
+    public static void setMeasureSample(SharedPreferences sharedPreferences, Activity activity, DataBase dataBase) {
         dataMap = new HashMap<>();
         samples = new ArrayList<>();
         choiceColor = new ArrayList<>();
 
         dataBase = new DataBase(activity);
         SampleDB sampleDB = new SampleDB(dataBase);
-        SolutionDB solutionDB=new SolutionDB(dataBase);
+        SolutionDB solutionDB = new SolutionDB(dataBase);
         //sample 1
         int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
         sample1 = sampleDB.findOldSample(sampleID);
@@ -313,30 +329,73 @@ public class Common {
         sample4 = sampleDB.findOldSample(sampleID);
         dataMap.put(sample4, solutionDB.getSampleAll(sampleID));
         samples.add(sample4);
-        for(Solution solution:dataMap.get(sample1))
-        {
+        for (Solution solution : dataMap.get(sample1)) {
             choiceColor.add(solution.getColor());
         }
     }
 
 
-    public static void savePageParameter(SharedPreferences sharedPreferences,PageCon pageCon)
-    {
+    public static void setIonMeasureSample(SharedPreferences sharedPreferences, Activity activity, String measureType) {
+        dataMap = new HashMap<>();
+        samples = new ArrayList<>();
+        choiceColor = new ArrayList<>();
+
+        DataBase dataBase = new DataBase(activity);
+        SampleDB sampleDB = new SampleDB(dataBase);
+        SolutionDB solutionDB = new SolutionDB(dataBase);
+        //sample 1
+        int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
+        sample1 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample1, solutionDB.getSampleAByIdByMeasureType(sampleID, measureType));
+        samples.add(sample1);
+        //sample 2
+        sampleID = sharedPreferences.getInt(Common.sample2String, 0);
+        sample2 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample2, solutionDB.getSampleAByIdByMeasureType(sampleID, measureType));
+        samples.add(sample2);
+        //sample 3
+        sampleID = sharedPreferences.getInt(Common.sample3String, 0);
+        sample3 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample3, solutionDB.getSampleAByIdByMeasureType(sampleID, measureType));
+        samples.add(sample3);
+        //sample 4
+        sampleID = sharedPreferences.getInt(Common.sample4String, 0);
+        sample4 = sampleDB.findOldSample(sampleID);
+        dataMap.put(sample4, solutionDB.getSampleAByIdByMeasureType(sampleID, measureType));
+        samples.add(sample4);
+        for (Solution solution : dataMap.get(sample1)) {
+            choiceColor.add(solution.getColor());
+        }
+    }
+
+
+    public static List<PageCon> getPagCon(SharedPreferences sharedPreferences, Activity activity, String step) {
+        DataBase dataBase = new DataBase(activity);
+        SampleDB sampleDB = new SampleDB(dataBase);
+        //sample 1
+        int sampleID = sharedPreferences.getInt(Common.sample1String, 0);
+        Sample sample = sampleDB.findOldSample(sampleID);
+
+        PagConDB pagConDB = new PagConDB(dataBase);
+        return pagConDB.getStepPagCon(step, sample.getFileID());
+    }
+
+
+    public static void savePageParameter(SharedPreferences sharedPreferences, PageCon pageCon) {
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(pageCon);
-        prefsEditor.putString(finalPage,json);
+        prefsEditor.putString(finalPage, json);
         prefsEditor.apply();
     }
 
-    public static void savePageParameter(SharedPreferences sharedPreferences,PageCon pageCon,String key)
-    {
+    public static void savePageParameter(SharedPreferences sharedPreferences, PageCon pageCon, String key) {
 
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(pageCon);
-        prefsEditor.putString(key,json);
+        prefsEditor.putString(key, json);
         prefsEditor.apply();
     }
 

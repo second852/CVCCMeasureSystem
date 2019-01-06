@@ -23,11 +23,15 @@ import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
+import com.whc.cvccmeasuresystem.DataBase.DataBase;
+import com.whc.cvccmeasuresystem.DataBase.PagConDB;
+import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
 
@@ -205,15 +209,15 @@ public class IonChannelStep2Set extends Fragment {
                 return;
             }
 
-            if(IonChannelStep2Main.errorSample.size()>0)
+            if(errorSample.size()>0)
             {
                 StringBuilder stringBuilder=new StringBuilder();
                 stringBuilder.append("Data of ");
-                for(String error:IonChannelStep2Main.errorSample)
+                for(String error:errorSample)
                 {
                     stringBuilder.append(error+" ");
                 }
-                if(IonChannelStep2Main.errorSample.size()>1)
+                if(errorSample.size()>1)
                 {
                     stringBuilder.append("are unusual");
                 }else {
@@ -376,15 +380,15 @@ public class IonChannelStep2Set extends Fragment {
                 return;
             }
 
-            if(IonChannelStep2Main.errorSample.size()>0)
+            if(errorSample.size()>0)
             {
                 StringBuilder stringBuilder=new StringBuilder();
                 stringBuilder.append("Data of ");
-                for(String error:IonChannelStep2Main.errorSample)
+                for(String error:errorSample)
                 {
                     stringBuilder.append(error+" ");
                 }
-                if(IonChannelStep2Main.errorSample.size()>1)
+                if(errorSample.size()>1)
                 {
                     stringBuilder.append("are unusual");
                 }else {
@@ -510,10 +514,9 @@ public class IonChannelStep2Set extends Fragment {
         }
     }
 
-
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onPause() {
+        super.onPause();
         saveListPage();
     }
 
@@ -553,6 +556,17 @@ public class IonChannelStep2Set extends Fragment {
         if (ionFour != null) {
             pageCon2.setCon4(ionFour);
         }
+        PagConDB pagConDB =new PagConDB(new DataBase(activity));
+        List<PageCon> pageCons=Common.getPagCon(sharedPreferences,activity,"11");
+        if(pageCons.size()>0)
+        {
+            pagConDB.update(pageCon1);
+            pagConDB.update(pageCon2);
+        }else {
+            pagConDB.insert(pageCon1);
+            pagConDB.insert(pageCon2);
+        }
+
     }
 
 
@@ -577,7 +591,13 @@ public class IonChannelStep2Set extends Fragment {
             {
                 fragment.setListView();
             }
-            IonChannelStep2Main.errorSample=new ArrayList<>();
+
+            SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
+            solutionDB.deleteBySampleId(sample1.getID());
+            solutionDB.deleteBySampleId(sample2.getID());
+            solutionDB.deleteBySampleId(sample3.getID());
+            solutionDB.deleteBySampleId(sample4.getID());
+            errorSample=new ArrayList<>();
             Common.showToast(activity,"Data clear!");
         }
     }
@@ -596,7 +616,6 @@ public class IonChannelStep2Set extends Fragment {
                 Common.showToast(activity,"Calibrating  isn't complete");
                 return;
             }
-
 
             saveListPage();
             oldFragment.add(IonChannel2Set);

@@ -34,7 +34,6 @@ import static com.whc.cvccmeasuresystem.Common.Common.solution4;
 import static com.whc.cvccmeasuresystem.Common.Common.userId;
 import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 import static com.whc.cvccmeasuresystem.Control.History.HistoryMain.saveFiles;
-import static com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main.initParameter;
 
 public class SignIn extends Fragment{
     private View view;
@@ -72,7 +71,6 @@ public class SignIn extends Fragment{
         pageCon=null;
         oldFragment=new ArrayList<>();
         needSet=false;
-        initParameter=true;
         saveFiles=null;
         return view;
     }

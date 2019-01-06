@@ -210,11 +210,6 @@ public class SampleDB {
         Common.sample2=samples.get(1);
         Common.sample3=samples.get(2);
         Common.sample4=samples.get(3);
-        IonChannelStep3Main.samples=new ArrayList<>();
-        IonChannelStep3Main.samples.add(Common.sample1);
-        IonChannelStep3Main.samples.add(Common.sample2);
-        IonChannelStep3Main.samples.add(Common.sample3);
-        IonChannelStep3Main.samples.add(Common.sample4);
         cursor.close();
         return dataMap;
     }

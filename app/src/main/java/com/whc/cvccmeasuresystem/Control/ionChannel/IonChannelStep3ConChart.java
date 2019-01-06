@@ -32,13 +32,8 @@ import com.whc.cvccmeasuresystem.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.DoubleToInt;
-import static com.whc.cvccmeasuresystem.Common.Common.description;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4;
-import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
+import static com.whc.cvccmeasuresystem.Common.Common.*;
+
 
 
 public class IonChannelStep3ConChart extends Fragment{
@@ -108,16 +103,16 @@ public class IonChannelStep3ConChart extends Fragment{
 
 
 
-        setLineChart(lineCharts[0],IonChannelStep3Main.dataMap.get(sample1),"sample1",sample1);
+        setLineChart(lineCharts[0],dataMap.get(sample1),"sample1",sample1);
 
 
-        setLineChart(lineCharts[1],IonChannelStep3Main.dataMap.get(sample2),"sample2",sample2);
+        setLineChart(lineCharts[1],dataMap.get(sample2),"sample2",sample2);
 //
 //
-        setLineChart(lineCharts[2],IonChannelStep3Main.dataMap.get(sample3),"sample3",sample3);
+        setLineChart(lineCharts[2],dataMap.get(sample3),"sample3",sample3);
 //
 //
-        setLineChart(lineCharts[3],IonChannelStep3Main.dataMap.get(sample4),"sample4",sample4);
+        setLineChart(lineCharts[3],dataMap.get(sample4),"sample4",sample4);
     }
 
 

@@ -172,9 +172,7 @@ public class BatchStep2Main extends Fragment {
                 indicateColor++;
                 SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
                 sharedPreferences.edit().putBoolean(Common.endMeasure, true).apply();
-                BatchStep2Main.batchViewPager.setCurrentItem(1);
                 BatchStop();
-                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
 
@@ -219,6 +217,8 @@ public class BatchStep2Main extends Fragment {
                 BatchStep2Chart.message.setText(R.string.measure_stop);
                 BatchStep2Chart.message.setTextColor(Color.RED);
             }
+            BatchStep2Main.batchViewPager.setCurrentItem(1);
+            Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
         }
 
     }

@@ -1,7 +1,11 @@
 package com.whc.cvccmeasuresystem.Control.ionChannel;
 
 import android.app.Activity;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -17,9 +21,11 @@ import android.widget.ImageView;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
+import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.HomeDialogFragment;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
+import com.whc.cvccmeasuresystem.Control.ChoiceFunction;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
 import com.whc.cvccmeasuresystem.Model.SaveFile;
@@ -28,11 +34,10 @@ import com.whc.cvccmeasuresystem.R;
 
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
-import static com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main.initParameter;
+
 
 
 public class IonChannelStep3Set extends Fragment {
@@ -44,6 +49,8 @@ public class IonChannelStep3Set extends Fragment {
     private BootstrapEditText measureTime;
     private BootstrapButton start,stop,finish,step02,step01,step04;
     private String mType;
+    private SharedPreferences sharedPreferences;
+    private static String time;
 
 
 
@@ -55,6 +62,7 @@ public class IonChannelStep3Set extends Fragment {
         } else {
             activity = getActivity();
         }
+        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
     }
 
     @Nullable
@@ -66,9 +74,14 @@ public class IonChannelStep3Set extends Fragment {
     }
 
 
-
-
-
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(measureTime.getText()!=null)
+        {
+            time=measureTime.getText().toString();
+        }
+    }
 
     @Override
     public void onStart() {
@@ -83,7 +96,7 @@ public class IonChannelStep3Set extends Fragment {
         animation.setInterpolator(new LinearInterpolator());
         animation.setRepeatCount(Animation.INFINITE);
         animation.setRepeatMode(Animation.REVERSE);
-        List<Solution> sampleSolution=IonChannelStep3Main.dataMap.get(sample1);
+        List<Solution> sampleSolution=dataMap.get(sample1);
         for(Solution solution:sampleSolution)
         {
             if(solution.getVoltage()>Integer.valueOf(sample1.getLimitHighVoltage()))
@@ -101,11 +114,11 @@ public class IonChannelStep3Set extends Fragment {
 
             if(solution.isNoNormalV())
             {
-                IonChannelStep2Main.errorSample.add(sample1String);
+                errorSample.add(sample1String);
             }
         }
 
-        sampleSolution=IonChannelStep3Main.dataMap.get(sample2);
+        sampleSolution=dataMap.get(sample2);
         for(Solution solution:sampleSolution)
         {
             if(solution.getVoltage()>Integer.valueOf(sample2.getLimitHighVoltage()))
@@ -123,11 +136,11 @@ public class IonChannelStep3Set extends Fragment {
 
             if(solution.isNoNormalV())
             {
-                IonChannelStep2Main.errorSample.add(sample2String);
+                errorSample.add(sample2String);
             }
         }
 
-        sampleSolution=IonChannelStep3Main.dataMap.get(sample3);
+        sampleSolution=dataMap.get(sample3);
         for(Solution solution:sampleSolution)
         {
             if(solution.getVoltage()>Integer.valueOf(sample3.getLimitHighVoltage()))
@@ -147,12 +160,12 @@ public class IonChannelStep3Set extends Fragment {
 
             if(solution.isNoNormalV())
             {
-                IonChannelStep2Main.errorSample.add(sample3String);
+                errorSample.add(sample3String);
             }
 
         }
 
-        sampleSolution=IonChannelStep3Main.dataMap.get(sample4);
+        sampleSolution=dataMap.get(sample4);
         for(Solution solution:sampleSolution)
         {
             if(solution.getVoltage()>Integer.valueOf(sample4.getLimitHighVoltage()))
@@ -171,7 +184,7 @@ public class IonChannelStep3Set extends Fragment {
             }
             if(solution.isNoNormalV())
             {
-                IonChannelStep2Main.errorSample.add(sample4String);
+                errorSample.add(sample4String);
             }
         }
     }
@@ -196,6 +209,13 @@ public class IonChannelStep3Set extends Fragment {
 //        sample4N.setText(sample4.getName());
 
         measureTime=view.findViewById(R.id.measureTime);
+
+
+        if(time!=null)
+        {
+            measureTime.setText(time);
+        }
+
         start=view.findViewById(R.id.start);
         start.setOnClickListener(new startMeasureData());
         stop=view.findViewById(R.id.stop);
@@ -238,6 +258,31 @@ public class IonChannelStep3Set extends Fragment {
                 Common.showToast(activity, "Please connect BCS_Device");
                 return;
             }
+
+            solution1 = new Solution("0", sample1.getID());
+            solution2 = new Solution("0", sample2.getID());
+            solution3 = new Solution("0", sample3.getID());
+            solution4 = new Solution("0", sample4.getID());
+
+            JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobService.handlerMessage= IonChannelStep3Main.handlerMessage;
+            JobService.measureDuration="1";
+            JobService.measureTime=mType;
+            JobService.mRun=true;
+            JobService.measureType="11";
+            JobService.measureFragment=Common.IonChannel3Set;
+
+
+            ComponentName mServiceComponent = new ComponentName(activity, JobService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);
+            tm.cancelAll();
+
+            builder.setMinimumLatency(1);
+            builder.setOverrideDeadline(2);
+            builder.setRequiresCharging(false);
+            builder.setRequiresDeviceIdle(false);
+            tm.schedule(builder.build());
+
         }
     }
 
@@ -272,14 +317,14 @@ public class IonChannelStep3Set extends Fragment {
         SaveFile saveFile=saveFileDB.findOldSaveFileById(sample1.getFileID());
         saveFile.setEndTime(new Timestamp(System.currentTimeMillis()));
         saveFileDB.update(saveFile);
-        oldFragment=new ArrayList<>();
-        oldFragment.add(Common.CFName);
+
+
         IonChannelStep2Set.pageCon1=null;
         IonChannelStep2Set.pageCon1=null;
-        needSet=false;
-        Common.switchFragment(new IonChannelStep1(),getFragmentManager());
-        initParameter=true;
-        IonChannelStep3Main.noInitParameter=false;
+
+        sharedPreferences.edit().putBoolean(endModule,true).apply();
+        oldFragment.remove(oldFragment.size()-1);
+        Common.switchFragment(new ChoiceFunction(),getFragmentManager());
     }
 
     private class step02OnClick implements View.OnClickListener {
@@ -291,8 +336,6 @@ public class IonChannelStep3Set extends Fragment {
             }
             switchFragment(new IonChannelStep2Main(),getFragmentManager());
             oldFragment.remove(oldFragment.size() - 1);
-            IonChannelStep2Main.needOldData=true;
-            IonChannelStep3Main.noInitParameter=true;
         }
     }
 
@@ -303,7 +346,6 @@ public class IonChannelStep3Set extends Fragment {
                 Common.showToast(activity, measureStartNotExist);
                 return;
             }
-            IonChannelStep3Main.noInitParameter=true;
             needSet=true;
             IonChannelStep1 ionChannelStep1=new IonChannelStep1();
             oldFragment.remove(oldFragment.size() - 1);
