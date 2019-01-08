@@ -92,7 +92,6 @@ public class IonChannelStep2Set extends Fragment {
                 ionF4.setText(pageCon1.getCon4());
             }
         }
-        Common.savePageParameter(sharedPreferences,pageCon,Common.finalPage1);
         if(pageCon2!=null)
         {
             if(pageCon2.getCon1()!=null)
@@ -112,7 +111,6 @@ public class IonChannelStep2Set extends Fragment {
                 ionS4.setText(pageCon2.getCon4());
             }
         }
-        Common.savePageParameter(sharedPreferences,pageCon,Common.finalPage2);
     }
 
     private void setIonType() {
@@ -540,33 +538,41 @@ public class IonChannelStep2Set extends Fragment {
         if (ionFour != null) {
             pageCon1.setCon4(ionFour);
         }
-        ionOne = ionS1.getText().toString();
-        ionTwo = ionS2.getText().toString();
-        ionThree = ionS3.getText().toString();
-        ionFour = ionS4.getText().toString();
-        if (ionOne != null) {
-            pageCon2.setCon1(ionOne);
+        String ionSOne = ionS1.getText().toString();
+        String ionSTwo = ionS2.getText().toString();
+        String ionSThree = ionS3.getText().toString();
+        String ionSFour = ionS4.getText().toString();
+        if (ionSOne != null) {
+            pageCon2.setCon1(ionSOne);
         }
-        if (ionTwo != null) {
-            pageCon2.setCon2(ionTwo);
+        if (ionSTwo != null) {
+            pageCon2.setCon2(ionSTwo);
         }
-        if (ionThree != null) {
-            pageCon2.setCon3(ionThree);
+        if (ionSThree != null) {
+            pageCon2.setCon3(ionSThree);
         }
-        if (ionFour != null) {
-            pageCon2.setCon4(ionFour);
+        if (ionSFour != null) {
+            pageCon2.setCon4(ionSFour);
         }
+        pageCon1.setFileId(sample1.getFileID());
+        pageCon2.setFileId(sample1.getFileID());
+        pageCon1.setStep("11A");
+        pageCon2.setStep("11B");
         PagConDB pagConDB =new PagConDB(new DataBase(activity));
-        List<PageCon> pageCons=Common.getPagCon(sharedPreferences,activity,"11");
-        if(pageCons.size()>0)
+        PageCon old1=Common.getPagCon(sharedPreferences,activity,"11A");
+        if(old1!=null)
         {
             pagConDB.update(pageCon1);
-            pagConDB.update(pageCon2);
-        }else {
+        }else{
             pagConDB.insert(pageCon1);
+        }
+        PageCon old2=Common.getPagCon(sharedPreferences,activity,"11B");
+        if(old2!=null)
+        {
+            pagConDB.update(pageCon2);
+        }else{
             pagConDB.insert(pageCon2);
         }
-
     }
 
 

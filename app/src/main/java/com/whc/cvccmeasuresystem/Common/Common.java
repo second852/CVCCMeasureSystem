@@ -4,6 +4,8 @@ package com.whc.cvccmeasuresystem.Common;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Paint;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -100,6 +102,7 @@ public class Common {
     public static DecimalFormat nf = new DecimalFormat("#,##0.00");
     public static List<String> errorSample;
 
+
     public static HashMap<String, String> MeasureType() {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("0", "BatchStep");
@@ -122,6 +125,34 @@ public class Common {
         return hashMap;
     }
 
+
+    //新增table
+    public static void tableExist(String table,String sql,SQLiteDatabase db) {
+        Cursor cursor=null;
+        //如果有就return
+        try {
+            String searchSql = "SELECT sql FROM sqlite_master where name = '"+table+"' ;";
+            cursor = db.rawQuery(searchSql, null);
+            if (cursor.moveToNext()) {
+                cursor.close();
+                return;
+            }
+        }catch (Exception e)
+        {
+
+        }
+
+        //新增table
+        try {
+            db.execSQL(sql);
+        } catch (Exception e) {
+
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 
     public static void clossKeyword(Activity context) {
         InputMethodManager imm = (InputMethodManager) context
@@ -369,7 +400,7 @@ public class Common {
     }
 
 
-    public static List<PageCon> getPagCon(SharedPreferences sharedPreferences, Activity activity, String step) {
+    public static PageCon getPagCon(SharedPreferences sharedPreferences, Activity activity, String step) {
         DataBase dataBase = new DataBase(activity);
         SampleDB sampleDB = new SampleDB(dataBase);
         //sample 1

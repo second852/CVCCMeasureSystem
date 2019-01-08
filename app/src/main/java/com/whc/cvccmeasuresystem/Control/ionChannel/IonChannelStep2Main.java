@@ -109,9 +109,8 @@ public class IonChannelStep2Main extends Fragment {
         if(reBack)
         {
             Common.setIonMeasureSample(sharedPreferences, activity, "1");
-            List<PageCon> pageCons=Common.getPagCon(sharedPreferences,activity,"11");
-            IonChannelStep2Set.pageCon1=pageCons.get(0);
-            IonChannelStep2Set.pageCon1=pageCons.get(1);
+            IonChannelStep2Set.pageCon1=Common.getPagCon(sharedPreferences,activity,"11A");
+            IonChannelStep2Set.pageCon2=Common.getPagCon(sharedPreferences,activity,"11B");
         }else{
             if (endModule) {
                 Common.setSample(sharedPreferences, activity, dataBase);
@@ -119,6 +118,8 @@ public class IonChannelStep2Main extends Fragment {
                 Common.setIonMeasureSample(sharedPreferences, activity, "1");
                 priceViewPager.setCurrentItem(1);
                 JobService.handlerMessage = IonChannelStep2Main.handlerMessage;
+                IonChannelStep2Set.pageCon1=Common.getPagCon(sharedPreferences,activity,"11A");
+                IonChannelStep2Set.pageCon2=Common.getPagCon(sharedPreferences,activity,"11B");
             }
         }
 

@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +30,8 @@ import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep1;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
+import com.whc.cvccmeasuresystem.DataBase.DataBase;
+import com.whc.cvccmeasuresystem.DataBase.PagConDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.R;
 
@@ -46,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         TypefaceProvider.registerDefaultIconSets();
         setContentView(R.layout.activity_main);
+        DataBase dataBase=new DataBase(this);
+        Common.tableExist("PageCon", DataBase.Table_PageCon,dataBase.getWritableDatabase());
     }
 
     @Override
@@ -69,12 +74,9 @@ public class MainActivity extends AppCompatActivity {
             oldFragment.add(Common.CFName);
             switch (finalFragment) {
                 case Common.Drift2Set:
-                    Fragment fragment=new IonChannelStep2Main();
-                    Bundle bundle=new Bundle();
-                    bundle.putSerializable(Common.reBack,false);
-                    fragment.setArguments(bundle);
+
                     oldFragment.add(Common.Drift1);
-                    switchFragment(fragment, getSupportFragmentManager());
+                    switchFragment(new DriftStep2Main(), getSupportFragmentManager());
                     break;
                 case Common.BS2:
                     oldFragment.add(Common.BS1);
@@ -89,8 +91,12 @@ public class MainActivity extends AppCompatActivity {
                     switchFragment(new SensitivityStep2Main(), getSupportFragmentManager());
                     break;
                 case Common.IonChannel1Set:
+                    Fragment fragment=new IonChannelStep2Main();
+                    Bundle bundle=new Bundle();
+                    bundle.putSerializable(Common.reBack,false);
+                    fragment.setArguments(bundle);
                     oldFragment.add(Common.IonChannel1);
-                    switchFragment(new IonChannelStep2Main(), getSupportFragmentManager());
+                    switchFragment(fragment, getSupportFragmentManager());
                     break;
                 case Common.IonChannel3Set:
                     oldFragment.add(Common.IonChannel1);

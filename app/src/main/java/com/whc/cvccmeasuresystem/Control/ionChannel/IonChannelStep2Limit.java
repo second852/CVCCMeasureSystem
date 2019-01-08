@@ -179,7 +179,11 @@ public class IonChannelStep2Limit extends Fragment {
             sampleDB.update(sample2);
             sampleDB.update(sample3);
             sampleDB.update(sample4);
-            Common.switchFragment(new IonChannelStep2Main(),getFragmentManager());
+            Fragment fragment=new IonChannelStep2Main();
+            Bundle bundle=new Bundle();
+            bundle.putSerializable(Common.reBack,true);
+            fragment.setArguments(bundle);
+            Common.switchFragment(fragment,getFragmentManager());
         }
     }
 }

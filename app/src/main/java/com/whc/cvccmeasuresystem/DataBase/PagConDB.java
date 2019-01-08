@@ -24,9 +24,7 @@ public class PagConDB {
         this.db = sq.getWritableDatabase();
     }
 
-    public PagConDB(SQLiteDatabase sq) {
-        this.db = sq;
-    }
+
 
 
     public List<PageCon> getAll() {
@@ -45,19 +43,19 @@ public class PagConDB {
            pageCon.setExpTime(cursor.getString(5));
            pageCon.setStep(cursor.getString(6));
            pageCon.setFileId(cursor.getInt(7));
+           pageCons.add(pageCon);
         }
         cursor.close();
         return pageCons;
     }
 
 
-    public List<PageCon> getStepPagCon(String step,Integer fileId) {
+    public PageCon getStepPagCon(String step,Integer fileId) {
         String sql = "SELECT * FROM PageCon where step = '"+step+"' and fileId = '"+fileId+"' order by id ;";
         String[] args = {};
         Cursor cursor = db.rawQuery(sql, args);
-        List<PageCon> pageCons = new ArrayList<>();
-        PageCon pageCon;
-        while (cursor.moveToNext()) {
+        PageCon pageCon=null;
+        if (cursor.moveToNext()) {
             pageCon=new PageCon();
             pageCon.setId(cursor.getInt(0));
             pageCon.setCon1(cursor.getString(1));
@@ -69,7 +67,7 @@ public class PagConDB {
             pageCon.setFileId(cursor.getInt(7));
         }
         cursor.close();
-        return pageCons;
+        return pageCon;
     }
 
 
@@ -91,7 +89,7 @@ public class PagConDB {
 
     public int update(PageCon pageCon) {
         ContentValues values = new ContentValues();
-        values.put("id", pageCon.getId());
+//        values.put("id", pageCon.getId());
         values.put("con1", pageCon.getCon1());
         values.put("con2", pageCon.getCon2());
         values.put("con3", pageCon.getCon3());
