@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.whc.cvccmeasuresystem.Common.SolutionAdapterIonChannel;
 import com.whc.cvccmeasuresystem.Common.SolutionAdapterSlope;
+import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
@@ -38,6 +39,7 @@ import static com.whc.cvccmeasuresystem.Common.Common.sample3String;
 import static com.whc.cvccmeasuresystem.Common.Common.sample4;
 import static com.whc.cvccmeasuresystem.Common.Common.sample4String;
 import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
+import static com.whc.cvccmeasuresystem.Control.History.HistoryMain.showFileDate;
 
 
 public class HisIonChannelStep2Data extends Fragment{
@@ -49,7 +51,7 @@ public class HisIonChannelStep2Data extends Fragment{
     public TextView senMessage;
     public SampleDB sampleDB;
     public Integer[] index={0,0,1};
-    public static HashMap<Sample, List<Solution>> ionMap;
+    public HashMap<Sample, List<Solution>> ionMap;
 
 
     @Override
@@ -66,6 +68,10 @@ public class HisIonChannelStep2Data extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.ion_channel_step2_data, container, false);
+
+        SampleDB sampleDB=new SampleDB(new DataBase(activity));
+        ionMap= sampleDB.setMapSampleSolutionToIC(showFileDate.getID(),"1");
+
         listData=view.findViewById(R.id.listData);
         listSlope=view.findViewById(R.id.listSlope);
 

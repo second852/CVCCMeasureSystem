@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -99,8 +100,19 @@ public class HistoryShowMain extends Fragment {
                 backToSearch();
             }
         });
-        setShowViewPager();
+
         return view;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        adapter=null;
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        for (Fragment f : getFragmentManager().getFragments()) {
+            fragmentTransaction.remove(f);
+        }
+        fragmentTransaction.commit();
     }
 
 
@@ -110,7 +122,11 @@ public class HistoryShowMain extends Fragment {
         FragmentPagerItems pages = new FragmentPagerItems(activity);
         DataBase dataBase=new DataBase(activity);
         SampleDB sampleDB=new SampleDB(dataBase);
-
+        historyMainViewPager.removeAllViews();
+        historyMainViewPager.setAdapter(null);
+        historyMainViewPager.invalidate();
+        historyMainTag.setViewPager(null);
+        historyMainTag.invalidate();
         switch (measureType)
         {
             case "0":
@@ -129,7 +145,7 @@ public class HistoryShowMain extends Fragment {
                 pages.add(FragmentPagerItem.of("Data", HysteresisStep2Data.class));
                 break;
             case "1":
-                HisIonChannelStep2Data.ionMap=sampleDB.setMapSampleSolutionToIC(showFileDate.getID(),"1");
+
                 pages.add(FragmentPagerItem.of("Data", HisIonChannelStep2Data.class));
 
                 Common.dataMap=sampleDB.setMapSampleSolutionToIC(showFileDate.getID(),"11");
@@ -163,7 +179,9 @@ public class HistoryShowMain extends Fragment {
         }
         adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
         historyMainViewPager.setAdapter(adapter);
+        historyMainViewPager.invalidate();
         historyMainTag.setViewPager(historyMainViewPager);
+        historyMainTag.invalidate();
     }
 
     @Override
@@ -175,7 +193,10 @@ public class HistoryShowMain extends Fragment {
             backToSearch();
             return ;
         }
-
+        if(adapter==null)
+        {
+            setShowViewPager();
+        }
     }
 
 
