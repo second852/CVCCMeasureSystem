@@ -241,7 +241,7 @@ public class SensitivityStep2Set extends Fragment {
             solution3=new Solution(ionThree,sample3.getID());
             solution4=new Solution(ionFour,sample4.getID());
             Common.showToast(activity,"Wifi Connecting");
-            measureTimes=0;
+
 
 
             JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);

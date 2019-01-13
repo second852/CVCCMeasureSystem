@@ -63,8 +63,18 @@ public class MainActivity extends AppCompatActivity {
 
         if(endModule)
         {
-            SignIn.signIn = false;
-            switchFragment(new SignIn(), getSupportFragmentManager());
+
+            if(finalFragment.equals(IonChannel3Set))
+            {
+                oldFragment=new ArrayList<>();
+                oldFragment.add(Common.IonChannel1);
+                oldFragment.add(Common.IonChannel2Set);
+                switchFragment(new IonChannelStep3Main(), getSupportFragmentManager());
+            }else{
+                SignIn.signIn = false;
+                switchFragment(new SignIn(), getSupportFragmentManager());
+            }
+
         }else{
             SignIn.signIn = true;
             Gson gson = new Gson();

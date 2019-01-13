@@ -239,7 +239,6 @@ public class HysteresisStep2Set extends Fragment {
             solution3=new Solution(ionThree,sample3.getID());
             solution4=new Solution(ionFour,sample4.getID());
             Common.showToast(activity,"Wifi Connecting");
-            measureTimes=0;
 
             JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
             JobService.handlerMessage= HysteresisStep2Main.handlerMessage;
@@ -304,6 +303,11 @@ public class HysteresisStep2Set extends Fragment {
     private class changeLoop implements BootstrapDropDown.OnDropDownItemClickListener {
         @Override
         public void onItemClick(ViewGroup parent, View v, int id) {
+            if(startMeasure)
+            {
+                Common.showToast(activity, measureStartNotExist);
+                return;
+            }
             loopIndex=id;
             loop.setText(bootstrapTexts.get(id));
             ion1.setText(loopIonType[id]);

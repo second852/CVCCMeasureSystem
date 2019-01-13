@@ -105,6 +105,7 @@ public class SensitivityStep2Main extends Fragment {
             setMeasureSample(sharedPreferences, activity, dataBase);
             senViewPager.setCurrentItem(1);
             JobService.handlerMessage = SensitivityStep2Main.handlerMessage;
+            Common.setMeasureTimes();
         }
     }
 

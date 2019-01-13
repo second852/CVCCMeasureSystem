@@ -79,8 +79,7 @@ public class Common {
     public static final String finalPage = "finalPage";
     public static final String onPause = "onPause";
     public static final String endModule = "endModule";
-    public static final String finalPage1 = "finalPage1";
-    public static final String finalPage2 = "finalPage2";
+    public static final String solutionTimes = "solutionTimes";
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;
     public static HashMap<Sample, List<Solution>> dataMap;
@@ -101,6 +100,18 @@ public class Common {
     public static boolean needSet;
     public static DecimalFormat nf = new DecimalFormat("#,##0.00");
     public static List<String> errorSample;
+
+
+    public static void setMeasureTimes()
+    {
+        List<Solution> solutions=dataMap.get(sample1);
+        if(solutions==null||solutions.size()<=0)
+        {
+            measureTimes=0;
+        }else{
+            measureTimes=Integer.valueOf(solutions.get(solutions.size()-1).getNumber())+1;
+        }
+    }
 
 
     public static HashMap<String, String> MeasureType() {

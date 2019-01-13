@@ -81,6 +81,7 @@ public class IonChannelStep3Set extends Fragment {
         {
             time=measureTime.getText().toString();
         }
+        sharedPreferences.edit().putInt("solutionTimes",measureTimes).apply();
     }
 
     @Override
@@ -325,6 +326,7 @@ public class IonChannelStep3Set extends Fragment {
         sharedPreferences.edit().putBoolean(endModule,true).apply();
         oldFragment.remove(oldFragment.size()-1);
         Common.switchFragment(new ChoiceFunction(),getFragmentManager());
+        sharedPreferences.edit().putString(Common.finalFragment,CFName).apply();
     }
 
     private class step02OnClick implements View.OnClickListener {

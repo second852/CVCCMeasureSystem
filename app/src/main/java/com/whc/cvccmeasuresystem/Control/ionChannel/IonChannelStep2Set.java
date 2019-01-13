@@ -626,6 +626,8 @@ public class IonChannelStep2Set extends Fragment {
             saveListPage();
             oldFragment.add(IonChannel2Set);
             switchFragment(new IonChannelStep3Main(),getFragmentManager());
+            sharedPreferences.edit().putBoolean(endModule,true).apply();
+            sharedPreferences.edit().putString(Common.finalFragment,IonChannel3Set).apply();
         }
     }
 }

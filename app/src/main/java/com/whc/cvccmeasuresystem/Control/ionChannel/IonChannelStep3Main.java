@@ -101,10 +101,12 @@ public class IonChannelStep3Main extends Fragment {
         errorSample=new ArrayList<>();
         if (endModule) {
             Common.setSample(sharedPreferences, activity, dataBase);
+            measureTimes=0;
         } else {
-            Common.setMeasureSample(sharedPreferences, activity, dataBase);
+            Common.setIonMeasureSample(sharedPreferences, activity, "11");
             ionViewPager.setCurrentItem(1);
             JobService.handlerMessage = IonChannelStep3Main.handlerMessage;
+            measureTimes=sharedPreferences.getInt("solutionTimes",measureTimes);
         }
 
     }

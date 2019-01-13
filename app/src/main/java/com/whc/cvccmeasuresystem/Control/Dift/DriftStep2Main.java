@@ -92,17 +92,18 @@ public class DriftStep2Main extends Fragment {
 
         //set Page
         SharedPreferences sharedPreferences=activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-        sharedPreferences.edit().putBoolean(Common.endModule,false).apply();
         boolean endMeasure=sharedPreferences.getBoolean(Common.endMeasure,true);
         boolean endModule=sharedPreferences.getBoolean(Common.endModule, true);
         startMeasure=(!endMeasure);
         if(endModule)
         {
             Common.setSample(sharedPreferences,activity,dataBase);
+            measureTimes=0;
         }else{
             Common.setMeasureSample(sharedPreferences,activity,dataBase);
             driftViewPager.setCurrentItem(1);
             JobService.handlerMessage=DriftStep2Main.handlerMessage;
+            Common.setMeasureTimes();
         }
     }
 

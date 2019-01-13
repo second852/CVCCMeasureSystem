@@ -96,10 +96,12 @@ public class HysteresisStep2Main extends Fragment {
         startMeasure = (!endMeasure);
         if (endModule) {
             Common.setSample(sharedPreferences, activity, dataBase);
+            measureTimes=0;
         } else {
             Common.setMeasureSample(sharedPreferences, activity, dataBase);
             hisViewPager.setCurrentItem(1);
             JobService.handlerMessage = HysteresisStep2Main.handlerMessage;
+            Common.setMeasureTimes();
         }
     }
 

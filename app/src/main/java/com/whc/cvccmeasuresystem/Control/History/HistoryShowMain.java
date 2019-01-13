@@ -114,34 +114,36 @@ public class HistoryShowMain extends Fragment {
         switch (measureType)
         {
             case "0":
-                Common.dataMap=sampleDB.setMapSampeSolution(showFileDate.getID());
+                Common.dataMap=sampleDB.setMapSampleSolution(showFileDate.getID());
                 pages.add(FragmentPagerItem.of("Chart", BatchStep2Chart.class));
                 pages.add(FragmentPagerItem.of("Data", BatchStep2Data.class));
                 break;
             case "3":
-                Common.dataMap=sampleDB.setMapSampeSolution(showFileDate.getID());
+                Common.dataMap=sampleDB.setMapSampleSolution(showFileDate.getID());
                 pages.add(FragmentPagerItem.of("Chart", DriftStep2Chart.class));
                 pages.add(FragmentPagerItem.of("Data", DriftStep2Data.class));
                 break;
             case "4":
-                Common.dataMap=sampleDB.setMapSampeSolution(showFileDate.getID());
+                Common.dataMap=sampleDB.setMapSampleSolution(showFileDate.getID());
                 pages.add(FragmentPagerItem.of("Chart", HysteresisStep2Chart.class));
                 pages.add(FragmentPagerItem.of("Data", HysteresisStep2Data.class));
                 break;
             case "1":
-                Common.dataMap=sampleDB.setMapSampeSolutionToIC(showFileDate.getID(),"1");
-                pages.add(FragmentPagerItem.of("Data", IonChannelStep2Data.class));
+                HisIonChannelStep2Data.ionMap=sampleDB.setMapSampleSolutionToIC(showFileDate.getID(),"1");
+                pages.add(FragmentPagerItem.of("Data", HisIonChannelStep2Data.class));
+
+                Common.dataMap=sampleDB.setMapSampleSolutionToIC(showFileDate.getID(),"11");
+                pages.add(FragmentPagerItem.of("Chart(V-T)", IonChannelStep3TimeChart.class));
+                pages.add(FragmentPagerItem.of("Chart(Ion-T)",IonChannelStep3ConChart.class));
+                pages.add(FragmentPagerItem.of("Data", IonChannelStep3Data.class));
                 choiceColor=new ArrayList<>();
                 for (Solution solution:dataMap.get(Common.sample1))
                 {
                     choiceColor.add(solution.getColor());
                 }
-                pages.add(FragmentPagerItem.of("Chart(V-T)", IonChannelStep3TimeChart.class));
-                pages.add(FragmentPagerItem.of("Chart(Ion-T)",IonChannelStep3ConChart.class));
-                pages.add(FragmentPagerItem.of("Data", IonChannelStep3Data.class));
                 break;
             case "2":
-                Common.dataMap=sampleDB.setMapSampeSolution(showFileDate.getID());
+                Common.dataMap=sampleDB.setMapSampleSolution(showFileDate.getID());
                 volCon=new HashMap<>();
                 volCon.put(sample1,new HashMap<String, List<Solution>>());
                 volCon.put(sample2,new HashMap<String, List<Solution>>());
