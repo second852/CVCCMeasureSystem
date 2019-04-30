@@ -77,9 +77,21 @@ public class SolutionDB {
         return solutions;
     }
 
+    public Integer getOneSolutionByTimeId(int id,long time) {
+        String sql = "SELECT id FROM Solution where sampleID = '" + id + "' and time = '"+time+"' order by time;";
+        String[] args = {};
+        Cursor cursor = db.rawQuery(sql, args);
+        int result=0;
+        if (cursor.moveToNext()) {
+            result=cursor.getInt(0);
+        }
+        cursor.close();
+        return result;
+    }
+
 
     public List<Solution> getSampleAByIdByMeasureType(int id,String measureType) {
-        String sql = "SELECT * FROM Solution where sampleID = '" + id + "' and measureType = '"+measureType+"' order by id desc;";
+        String sql = "SELECT * FROM Solution where sampleID = '" + id + "' and measureType = '"+measureType+"' order by id;";
         String[] args = {};
         Cursor cursor = db.rawQuery(sql, args);
         List<Solution> solutions = new ArrayList<>();
@@ -98,6 +110,12 @@ public class SolutionDB {
         }
         cursor.close();
         return solutions;
+    }
+
+
+    public void deleteBySampleId(int id) {
+        String sql = "delete FROM Solution where sampleID = '" + id + "';";
+        db.execSQL(sql);
     }
 
     public long insert(Solution solution) {

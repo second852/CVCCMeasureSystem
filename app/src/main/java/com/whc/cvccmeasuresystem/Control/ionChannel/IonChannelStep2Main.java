@@ -11,8 +11,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,36 +21,25 @@ import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItem;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
+import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Chart;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Data;
-import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
+import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.whc.cvccmeasuresystem.Common.Common.arrayColor;
-import static com.whc.cvccmeasuresystem.Common.Common.choiceColor;
-import static com.whc.cvccmeasuresystem.Common.Common.currentPage;
-import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
-import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
-import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
-import static com.whc.cvccmeasuresystem.Common.Common.needSet;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4;
-import static com.whc.cvccmeasuresystem.Common.Common.samples;
-import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+
+import static com.whc.cvccmeasuresystem.Common.Common.*;
+
 
 
 public class IonChannelStep2Main extends Fragment {
@@ -64,9 +53,9 @@ public class IonChannelStep2Main extends Fragment {
 
     public static ViewPager priceViewPager;
     public static FragmentPagerItemAdapter adapter;
-    public static List<String> errorSample;
-    public static boolean initParameter;
-    public static boolean needOldData;
+    public boolean reBack;
+
+
 
 
     @Override
@@ -90,7 +79,7 @@ public class IonChannelStep2Main extends Fragment {
         final View view = inflater.inflate(R.layout.ion_step2_main, container, false);
         viewPagerTab = view.findViewById(R.id.viewPagerTab);
         priceViewPager = view.findViewById(R.id.batchViewPager);
-
+        reBack= (boolean) getArguments().getSerializable(Common.reBack);
         return view;
     }
 
@@ -110,26 +99,42 @@ public class IonChannelStep2Main extends Fragment {
 
 
 
-
-
-
-
-
-
         //set Page
-        if(initParameter)
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+        boolean endMeasure = sharedPreferences.getBoolean(Common.endMeasure, true);
+        boolean endModule=sharedPreferences.getBoolean(Common.endModule, true);
+        startMeasure = (!endMeasure);
+        errorSample=new ArrayList<>();
+
+        if(reBack)
         {
-            setSample();
+            Common.setIonMeasureSample(sharedPreferences, activity, "1");
+            IonChannelStep2Set.pageCon1=Common.getPagCon(sharedPreferences,activity,"11A");
+            IonChannelStep2Set.pageCon2=Common.getPagCon(sharedPreferences,activity,"11B");
         }else{
-            if(dataMap==null||dataMap.size()<=0)
-            {
-                setSample();
+            if (endModule) {
+                Common.setSample(sharedPreferences, activity, dataBase);
+            } else {
+                Common.setIonMeasureSample(sharedPreferences, activity, "1");
+                priceViewPager.setCurrentItem(1);
+                JobService.handlerMessage = IonChannelStep2Main.handlerMessage;
+                IonChannelStep2Set.pageCon1=Common.getPagCon(sharedPreferences,activity,"11A");
+                IonChannelStep2Set.pageCon2=Common.getPagCon(sharedPreferences,activity,"11B");
             }
         }
-        if(needOldData)
-        {
-            setOldSample();
+
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        for (Fragment f : getFragmentManager().getFragments()) {
+            fragmentTransaction.remove(f);
         }
+        fragmentTransaction.commit();
+        adapter = null;
     }
 
     private void setOldSample() {
@@ -237,9 +242,19 @@ public class IonChannelStep2Main extends Fragment {
             }
 
             if (msg.what == 2) {
-                IonChannelStep2Main.priceViewPager.setCurrentItem(1);
+
+                JobService.mRun = false;
+                startMeasure = false;
+                if (JobService.socket != null) {
+                    try {
+                        JobService.socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+                sharedPreferences.edit().putBoolean(Common.endMeasure, true).apply();
                 IonChannelStep2Stop();
-                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
 
@@ -249,58 +264,6 @@ public class IonChannelStep2Main extends Fragment {
             }
 
 
-            String result = (String) msg.obj;
-            String[] voltages = result.split(",");
-            try {
-                new Integer(voltages[2]);
-            } catch (Exception e) {
-                return;
-            }
-
-
-            Solution solution1 = new Solution(Common.solution1.getConcentration(), sample1.getID());
-            Solution solution2 = new Solution(Common.solution2.getConcentration(), sample2.getID());
-            Solution solution3 = new Solution(Common.solution3.getConcentration(), sample3.getID());
-            Solution solution4 = new Solution(Common.solution4.getConcentration(), sample4.getID());
-
-
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-
-            solution1.setVoltage(new Integer(voltages[1]));
-            solution2.setVoltage(new Integer(voltages[2]));
-            solution3.setVoltage(new Integer(voltages[3]));
-            solution4.setVoltage(new Integer(voltages[4]));
-
-
-            solution1.setTime(timestamp);
-            solution2.setTime(timestamp);
-            solution3.setTime(timestamp);
-            solution4.setTime(timestamp);
-
-            solution1.setMeasureType("1");
-            solution2.setMeasureType("1");
-            solution3.setMeasureType("1");
-            solution4.setMeasureType("1");
-
-
-            int color =Color.BLACK;
-            solution1.setColor(color);
-            solution2.setColor(color);
-            solution3.setColor(color);
-            solution4.setColor(color);
-
-
-            SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
-            solutionDB.insert(solution1);
-            solutionDB.insert(solution2);
-            solutionDB.insert(solution3);
-            solutionDB.insert(solution4);
-
-            solution1.setNumber(String.valueOf(measureTimes));
-            solution2.setNumber(String.valueOf(measureTimes));
-            solution3.setNumber(String.valueOf(measureTimes));
-            solution4.setNumber(String.valueOf(measureTimes));
-
 
             dataMap.get(sample1).add(solution1);
             dataMap.get(sample2).add(solution2);
@@ -308,12 +271,15 @@ public class IonChannelStep2Main extends Fragment {
             dataMap.get(sample4).add(solution4);
 
 
-            Fragment fragment = adapter.getPage(1);
-
-            if (fragment instanceof IonChannelStep2Data) {
-                IonChannelStep2Data ionChannelStep2Data = (IonChannelStep2Data) fragment;
-                ionChannelStep2Data.setListView();
+            if(adapter!=null)
+            {
+                Fragment fragment = adapter.getPage(1);
+                if (fragment instanceof IonChannelStep2Data) {
+                    IonChannelStep2Data ionChannelStep2Data = (IonChannelStep2Data) fragment;
+                    ionChannelStep2Data.setListView();
+                }
             }
+
         }
     };
 
@@ -331,13 +297,19 @@ public class IonChannelStep2Main extends Fragment {
 
     public static void IonChannelStep2Stop()
     {
-        startMeasure=false;
-        Fragment fragment= IonChannelStep2Main.adapter.getPage(1);
-        if(fragment instanceof IonChannelStep2Data)
+
+        if (adapter!=null)
         {
-            IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
-            ionChannelStep2Data.senMessage.setTextColor(Color.RED);
-            ionChannelStep2Data.senMessage.setText(R.string.measure_stop);
+            Fragment fragment= IonChannelStep2Main.adapter.getPage(1);
+            if(fragment instanceof IonChannelStep2Data)
+            {
+                IonChannelStep2Data ionChannelStep2Data= (IonChannelStep2Data) fragment;
+                ionChannelStep2Data.senMessage.setTextColor(Color.RED);
+                ionChannelStep2Data.senMessage.setText(R.string.measure_stop);
+            }
+            IonChannelStep2Main.priceViewPager.setCurrentItem(1);
+            Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
         }
+
     }
 }

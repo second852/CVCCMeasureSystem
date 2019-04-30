@@ -238,7 +238,11 @@ public class IonChannelStep1 extends Fragment {
                 //Sample 4
                 insert(sample4String,getFourthName,fourthType.getText().toString(),nowFile.getID(),sampleDB);
             }
-            switchFragment(new IonChannelStep2Main(),getFragmentManager());
+            Fragment fragment=new IonChannelStep2Main();
+            Bundle bundle=new Bundle();
+            bundle.putSerializable(Common.reBack,false);
+            fragment.setArguments(bundle);
+            switchFragment(fragment,getFragmentManager());
             oldFragment.add(IonChannel1);
             startMeasure=false;
             indicateColor=0;

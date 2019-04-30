@@ -24,6 +24,10 @@ public class DataBase extends SQLiteOpenHelper {
             "CREATE TABLE Solution ( id INTEGER PRIMARY KEY AUTOINCREMENT, concentration TEXT NOT NULL," +
                     "number text,time DATETIME, voltage INTEGER, sampleID INTEGER,measureType TEXT,color INTEGER) ;";
 
+    public static final String Table_PageCon =
+            "CREATE TABLE PageCon ( id INTEGER PRIMARY KEY AUTOINCREMENT, con1 TEXT ," +
+                    "con2 TEXT,con3 TEXT, con4 TEXT, expTime TEXT ,step TEXT,fileId Integer) ;";
+
 
     public DataBase(Context context) {
         super(context, DB_NAME, null, DB_VERSION);

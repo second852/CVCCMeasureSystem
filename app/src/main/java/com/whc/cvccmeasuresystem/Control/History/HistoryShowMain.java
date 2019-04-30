@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -99,8 +100,19 @@ public class HistoryShowMain extends Fragment {
                 backToSearch();
             }
         });
-        setShowViewPager();
+
         return view;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        adapter=null;
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        for (Fragment f : getFragmentManager().getFragments()) {
+            fragmentTransaction.remove(f);
+        }
+        fragmentTransaction.commit();
     }
 
 
@@ -110,39 +122,44 @@ public class HistoryShowMain extends Fragment {
         FragmentPagerItems pages = new FragmentPagerItems(activity);
         DataBase dataBase=new DataBase(activity);
         SampleDB sampleDB=new SampleDB(dataBase);
-
+        historyMainViewPager.removeAllViews();
+        historyMainViewPager.setAdapter(null);
+        historyMainViewPager.invalidate();
+        historyMainTag.setViewPager(null);
+        historyMainTag.invalidate();
         switch (measureType)
         {
             case "0":
-                Common.dataMap=sampleDB.setMapSampeSolution(showFileDate.getID());
+                Common.dataMap=sampleDB.setMapSampleSolution(showFileDate.getID());
                 pages.add(FragmentPagerItem.of("Chart", BatchStep2Chart.class));
                 pages.add(FragmentPagerItem.of("Data", BatchStep2Data.class));
                 break;
             case "3":
-                Common.dataMap=sampleDB.setMapSampeSolution(showFileDate.getID());
+                Common.dataMap=sampleDB.setMapSampleSolution(showFileDate.getID());
                 pages.add(FragmentPagerItem.of("Chart", DriftStep2Chart.class));
                 pages.add(FragmentPagerItem.of("Data", DriftStep2Data.class));
                 break;
             case "4":
-                Common.dataMap=sampleDB.setMapSampeSolution(showFileDate.getID());
+                Common.dataMap=sampleDB.setMapSampleSolution(showFileDate.getID());
                 pages.add(FragmentPagerItem.of("Chart", HysteresisStep2Chart.class));
                 pages.add(FragmentPagerItem.of("Data", HysteresisStep2Data.class));
                 break;
             case "1":
-                Common.dataMap=sampleDB.setMapSampeSolutionToIC(showFileDate.getID(),"1");
-                pages.add(FragmentPagerItem.of("Data", IonChannelStep2Data.class));
-                IonChannelStep3Main.dataMap=sampleDB.setMapSampeSolutionToIC(showFileDate.getID(),"11");
+
+                pages.add(FragmentPagerItem.of("Data", HisIonChannelStep2Data.class));
+
+                Common.dataMap=sampleDB.setMapSampleSolutionToIC(showFileDate.getID(),"11");
+                pages.add(FragmentPagerItem.of("Chart(V-T)", IonChannelStep3TimeChart.class));
+                pages.add(FragmentPagerItem.of("Chart(Ion-T)",IonChannelStep3ConChart.class));
+                pages.add(FragmentPagerItem.of("Data", IonChannelStep3Data.class));
                 choiceColor=new ArrayList<>();
                 for (Solution solution:dataMap.get(Common.sample1))
                 {
                     choiceColor.add(solution.getColor());
                 }
-                pages.add(FragmentPagerItem.of("Chart(V-T)", IonChannelStep3TimeChart.class));
-                pages.add(FragmentPagerItem.of("Chart(Ion-T)",IonChannelStep3ConChart.class));
-                pages.add(FragmentPagerItem.of("Data", IonChannelStep3Data.class));
                 break;
             case "2":
-                Common.dataMap=sampleDB.setMapSampeSolution(showFileDate.getID());
+                Common.dataMap=sampleDB.setMapSampleSolution(showFileDate.getID());
                 volCon=new HashMap<>();
                 volCon.put(sample1,new HashMap<String, List<Solution>>());
                 volCon.put(sample2,new HashMap<String, List<Solution>>());
@@ -162,7 +179,9 @@ public class HistoryShowMain extends Fragment {
         }
         adapter = new FragmentPagerItemAdapter(getFragmentManager(), pages);
         historyMainViewPager.setAdapter(adapter);
+        historyMainViewPager.invalidate();
         historyMainTag.setViewPager(historyMainViewPager);
+        historyMainTag.invalidate();
     }
 
     @Override
@@ -174,7 +193,10 @@ public class HistoryShowMain extends Fragment {
             backToSearch();
             return ;
         }
-
+        if(adapter==null)
+        {
+            setShowViewPager();
+        }
     }
 
 

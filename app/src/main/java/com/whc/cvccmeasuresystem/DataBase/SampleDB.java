@@ -24,6 +24,7 @@ public class SampleDB {
     private String TABLE_NAME="Sample";
 
 
+
     public SampleDB(SQLiteOpenHelper sq)
     {
         this.db=sq.getWritableDatabase();
@@ -139,7 +140,7 @@ public class SampleDB {
     }
 
 
-    public HashMap<Sample, List<Solution>> setMapSampeSolution(Integer fileID) {
+    public HashMap<Sample, List<Solution>> setMapSampleSolution(Integer fileID) {
         SolutionDB solutionDB=new SolutionDB(db);
         HashMap<Sample, List<Solution>> dataMap=new HashMap<>();
         String sql = "SELECT * FROM Sample where fileID = '"+fileID+"';";
@@ -178,14 +179,14 @@ public class SampleDB {
     }
 
 
-    public HashMap<Sample, List<Solution>> setMapSampeSolutionToIC(Integer fileID,String measureType) {
+    public HashMap<Sample, List<Solution>> setMapSampleSolutionToIC(Integer fileID,String measureType) {
         SolutionDB solutionDB=new SolutionDB(db);
         HashMap<Sample, List<Solution>> dataMap=new HashMap<>();
         String sql = "SELECT * FROM Sample where fileID = '"+fileID+"';";
         String[] args = {};
         Cursor cursor = db.rawQuery(sql, args);
         Sample sample;
-        List<Sample> samples=new ArrayList<>();
+        samples=new ArrayList<>();
         while (cursor.moveToNext()) {
             sample=new Sample();
             sample.setID(cursor.getInt(0));
@@ -210,11 +211,6 @@ public class SampleDB {
         Common.sample2=samples.get(1);
         Common.sample3=samples.get(2);
         Common.sample4=samples.get(3);
-        IonChannelStep3Main.samples=new ArrayList<>();
-        IonChannelStep3Main.samples.add(Common.sample1);
-        IonChannelStep3Main.samples.add(Common.sample2);
-        IonChannelStep3Main.samples.add(Common.sample3);
-        IonChannelStep3Main.samples.add(Common.sample4);
         cursor.close();
         return dataMap;
     }

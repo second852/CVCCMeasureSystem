@@ -29,9 +29,11 @@ import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Main;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
+import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.io.IOException;
+import java.util.List;
 
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
@@ -97,11 +99,13 @@ public class BatchStep2Main extends Fragment {
         boolean endModule=sharedPreferences.getBoolean(Common.endModule, true);
         startMeasure = (!endMeasure);
         if (endModule) {
+            measureTimes=0;
             Common.setSample(sharedPreferences, activity, dataBase);
         } else {
             Common.setMeasureSample(sharedPreferences, activity, dataBase);
             batchViewPager.setCurrentItem(1);
             JobService.handlerMessage = BatchStep2Main.handlerMessage;
+            Common.setMeasureTimes();
         }
     }
 
@@ -172,9 +176,7 @@ public class BatchStep2Main extends Fragment {
                 indicateColor++;
                 SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
                 sharedPreferences.edit().putBoolean(Common.endMeasure, true).apply();
-                BatchStep2Main.batchViewPager.setCurrentItem(1);
                 BatchStop();
-                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 return;
             }
 
@@ -219,6 +221,8 @@ public class BatchStep2Main extends Fragment {
                 BatchStep2Chart.message.setText(R.string.measure_stop);
                 BatchStep2Chart.message.setTextColor(Color.RED);
             }
+            BatchStep2Main.batchViewPager.setCurrentItem(1);
+            Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
         }
 
     }

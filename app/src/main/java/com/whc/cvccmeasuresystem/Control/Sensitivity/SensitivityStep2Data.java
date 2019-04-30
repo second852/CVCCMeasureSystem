@@ -16,6 +16,7 @@ import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
@@ -59,7 +60,13 @@ public class SensitivityStep2Data extends Fragment{
         solutions.add(new Solution());
         for(Sample sample:samples)
         {
-            solutions.addAll(dataMap.get(sample));
+
+            List<Solution> s=dataMap.get(sample);
+            int length=s.size()-1;
+            for(int i=length;i>=0;i--)
+            {
+                solutions.add(s.get(i));
+            }
         }
         listData.setAdapter(new SolutionAdapter(activity,solutions));
     }

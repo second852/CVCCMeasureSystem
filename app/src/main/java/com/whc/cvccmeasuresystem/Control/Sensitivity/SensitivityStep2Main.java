@@ -105,6 +105,7 @@ public class SensitivityStep2Main extends Fragment {
             setMeasureSample(sharedPreferences, activity, dataBase);
             senViewPager.setCurrentItem(1);
             JobService.handlerMessage = SensitivityStep2Main.handlerMessage;
+            Common.setMeasureTimes();
         }
     }
 
@@ -235,8 +236,6 @@ public class SensitivityStep2Main extends Fragment {
                 indicateColor++;
                 SharedPreferences sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
                 sharedPreferences.edit().putBoolean(Common.endMeasure, true).apply();
-                SensitivityStep2Main.senViewPager.setCurrentItem(1);
-                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
                 endMeasure();
                 return;
             }
@@ -300,6 +299,8 @@ public class SensitivityStep2Main extends Fragment {
                 SensitivityStep2ConChart.message.setText(R.string.measure_stop);
                 SensitivityStep2ConChart.message.setTextColor(Color.RED);
             }
+            SensitivityStep2Main.senViewPager.setCurrentItem(1);
+            Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
         }
     }
 

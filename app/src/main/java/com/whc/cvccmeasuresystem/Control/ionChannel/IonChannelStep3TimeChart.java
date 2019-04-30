@@ -74,9 +74,13 @@ public class IonChannelStep3TimeChart extends Fragment{
         int i=1;
         for(LineChart lineChart:lineCharts)
         {
+            lineChart.clear();
+            lineChart.setData(null);
             Paint p = lineChart.getPaint(Chart.PAINT_INFO);
             p.setTextSize(60);
             lineChart.setNoDataText("Sample"+i+" don't have any data!");
+            lineChart.notifyDataSetChanged();
+            lineChart.invalidate();
             i++;
         }
         setData();
@@ -94,7 +98,7 @@ public class IonChannelStep3TimeChart extends Fragment{
             message.setTextColor(Color.RED);
         }
 
-        HashMap<Sample,List<Solution>> dataMap=IonChannelStep3Main.dataMap;
+
         List<Solution> solutions=dataMap.get(sample1);
 //        Solution solution=new Solution();
 //        solution.setVoltage(200);

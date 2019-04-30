@@ -1,7 +1,11 @@
 package com.whc.cvccmeasuresystem.Control.ionChannel;
 
 import android.app.Activity;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -14,13 +18,20 @@ import android.view.ViewGroup;
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 
+import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
+import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
+import com.whc.cvccmeasuresystem.DataBase.DataBase;
+import com.whc.cvccmeasuresystem.DataBase.PagConDB;
+import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
 
@@ -34,7 +45,7 @@ public class IonChannelStep2Set extends Fragment {
     private BootstrapButton conS1, conS2, conS3, conS4, startS, stopS, next, warring,clearF,clearS;
     private BootstrapEditText ionF1, ionF2, ionF3, ionF4;
     private BootstrapEditText ionS1, ionS2, ionS3, ionS4;
-
+    private SharedPreferences sharedPreferences;
 
 
     public static PageCon pageCon1, pageCon2;
@@ -48,6 +59,7 @@ public class IonChannelStep2Set extends Fragment {
         } else {
             activity = getActivity();
         }
+        sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
     }
 
     @Nullable
@@ -80,7 +92,6 @@ public class IonChannelStep2Set extends Fragment {
                 ionF4.setText(pageCon1.getCon4());
             }
         }
-
         if(pageCon2!=null)
         {
             if(pageCon2.getCon1()!=null)
@@ -196,15 +207,15 @@ public class IonChannelStep2Set extends Fragment {
                 return;
             }
 
-            if(IonChannelStep2Main.errorSample.size()>0)
+            if(errorSample.size()>0)
             {
                 StringBuilder stringBuilder=new StringBuilder();
                 stringBuilder.append("Data of ");
-                for(String error:IonChannelStep2Main.errorSample)
+                for(String error:errorSample)
                 {
                     stringBuilder.append(error+" ");
                 }
-                if(IonChannelStep2Main.errorSample.size()>1)
+                if(errorSample.size()>1)
                 {
                     stringBuilder.append("are unusual");
                 }else {
@@ -309,6 +320,26 @@ public class IonChannelStep2Set extends Fragment {
             solution4 = new Solution(ionFour, sample4.getID());
             Common.showToast(activity, "Wifi Connecting");
             measureTimes = 1;
+
+
+            JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobService.handlerMessage= IonChannelStep2Main.handlerMessage;
+            JobService.measureDuration="1";
+            JobService.measureTime="1";
+            JobService.mRun=true;
+            JobService.measureType="1";
+            JobService.measureFragment=Common.IonChannel1Set;
+
+
+            ComponentName mServiceComponent = new ComponentName(activity, JobService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);
+            tm.cancelAll();
+
+            builder.setMinimumLatency(1);
+            builder.setOverrideDeadline(2);
+            builder.setRequiresCharging(false);
+            builder.setRequiresDeviceIdle(false);
+            tm.schedule(builder.build());
         }
     }
 
@@ -347,15 +378,15 @@ public class IonChannelStep2Set extends Fragment {
                 return;
             }
 
-            if(IonChannelStep2Main.errorSample.size()>0)
+            if(errorSample.size()>0)
             {
                 StringBuilder stringBuilder=new StringBuilder();
                 stringBuilder.append("Data of ");
-                for(String error:IonChannelStep2Main.errorSample)
+                for(String error:errorSample)
                 {
                     stringBuilder.append(error+" ");
                 }
-                if(IonChannelStep2Main.errorSample.size()>1)
+                if(errorSample.size()>1)
                 {
                     stringBuilder.append("are unusual");
                 }else {
@@ -458,13 +489,32 @@ public class IonChannelStep2Set extends Fragment {
             solution4 = new Solution(ionFour, sample4.getID());
             Common.showToast(activity, "Wifi Connecting");
             measureTimes = 2;
+
+
+            JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobService.handlerMessage= IonChannelStep2Main.handlerMessage;
+            JobService.measureDuration="1";
+            JobService.measureTime="1";
+            JobService.mRun=true;
+            JobService.measureType="1";
+            JobService.measureFragment=Common.IonChannel1Set;
+
+
+            ComponentName mServiceComponent = new ComponentName(activity, JobService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);
+            tm.cancelAll();
+
+            builder.setMinimumLatency(1);
+            builder.setOverrideDeadline(2);
+            builder.setRequiresCharging(false);
+            builder.setRequiresDeviceIdle(false);
+            tm.schedule(builder.build());
         }
     }
 
-
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onPause() {
+        super.onPause();
         saveListPage();
     }
 
@@ -488,21 +538,40 @@ public class IonChannelStep2Set extends Fragment {
         if (ionFour != null) {
             pageCon1.setCon4(ionFour);
         }
-        ionOne = ionS1.getText().toString();
-        ionTwo = ionS2.getText().toString();
-        ionThree = ionS3.getText().toString();
-        ionFour = ionS4.getText().toString();
-        if (ionOne != null) {
-            pageCon2.setCon1(ionOne);
+        String ionSOne = ionS1.getText().toString();
+        String ionSTwo = ionS2.getText().toString();
+        String ionSThree = ionS3.getText().toString();
+        String ionSFour = ionS4.getText().toString();
+        if (ionSOne != null) {
+            pageCon2.setCon1(ionSOne);
         }
-        if (ionTwo != null) {
-            pageCon2.setCon2(ionTwo);
+        if (ionSTwo != null) {
+            pageCon2.setCon2(ionSTwo);
         }
-        if (ionThree != null) {
-            pageCon2.setCon3(ionThree);
+        if (ionSThree != null) {
+            pageCon2.setCon3(ionSThree);
         }
-        if (ionFour != null) {
-            pageCon2.setCon4(ionFour);
+        if (ionSFour != null) {
+            pageCon2.setCon4(ionSFour);
+        }
+        pageCon1.setFileId(sample1.getFileID());
+        pageCon2.setFileId(sample1.getFileID());
+        pageCon1.setStep("11A");
+        pageCon2.setStep("11B");
+        PagConDB pagConDB =new PagConDB(new DataBase(activity));
+        PageCon old1=Common.getPagCon(sharedPreferences,activity,"11A");
+        if(old1!=null)
+        {
+            pagConDB.update(pageCon1);
+        }else{
+            pagConDB.insert(pageCon1);
+        }
+        PageCon old2=Common.getPagCon(sharedPreferences,activity,"11B");
+        if(old2!=null)
+        {
+            pagConDB.update(pageCon2);
+        }else{
+            pagConDB.insert(pageCon2);
         }
     }
 
@@ -528,7 +597,13 @@ public class IonChannelStep2Set extends Fragment {
             {
                 fragment.setListView();
             }
-            IonChannelStep2Main.errorSample=new ArrayList<>();
+
+            SolutionDB solutionDB=new SolutionDB(new DataBase(activity));
+            solutionDB.deleteBySampleId(sample1.getID());
+            solutionDB.deleteBySampleId(sample2.getID());
+            solutionDB.deleteBySampleId(sample3.getID());
+            solutionDB.deleteBySampleId(sample4.getID());
+            errorSample=new ArrayList<>();
             Common.showToast(activity,"Data clear!");
         }
     }
@@ -548,10 +623,11 @@ public class IonChannelStep2Set extends Fragment {
                 return;
             }
 
-
             saveListPage();
             oldFragment.add(IonChannel2Set);
             switchFragment(new IonChannelStep3Main(),getFragmentManager());
+            sharedPreferences.edit().putBoolean(endModule,true).apply();
+            sharedPreferences.edit().putString(Common.finalFragment,IonChannel3Set).apply();
         }
     }
 }

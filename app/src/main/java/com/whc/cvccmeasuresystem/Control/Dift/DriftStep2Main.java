@@ -92,17 +92,18 @@ public class DriftStep2Main extends Fragment {
 
         //set Page
         SharedPreferences sharedPreferences=activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-        sharedPreferences.edit().putBoolean(Common.endModule,false).apply();
         boolean endMeasure=sharedPreferences.getBoolean(Common.endMeasure,true);
         boolean endModule=sharedPreferences.getBoolean(Common.endModule, true);
         startMeasure=(!endMeasure);
         if(endModule)
         {
             Common.setSample(sharedPreferences,activity,dataBase);
+            measureTimes=0;
         }else{
             Common.setMeasureSample(sharedPreferences,activity,dataBase);
             driftViewPager.setCurrentItem(1);
             JobService.handlerMessage=DriftStep2Main.handlerMessage;
+            Common.setMeasureTimes();
         }
     }
 
@@ -175,10 +176,10 @@ public class DriftStep2Main extends Fragment {
                     }
                 }
                 activity.getSharedPreferences(userShare, Context.MODE_PRIVATE).edit().putBoolean(Common.endMeasure,true).apply();
-                DriftStep2Main.driftViewPager.setCurrentItem(1);
+
                 indicateColor++;
                 DriftEnd();
-                Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
+
                 return;
             }
 
@@ -229,6 +230,8 @@ public class DriftStep2Main extends Fragment {
                 DriftStep2Chart.message.setText(R.string.measure_stop);
                 DriftStep2Chart.message.setTextColor(Color.RED);
             }
+            DriftStep2Main.driftViewPager.setCurrentItem(1);
+            Common.showToast(adapter.getPage(currentPage).getActivity(), "Measurement End!");
         }
     }
 }

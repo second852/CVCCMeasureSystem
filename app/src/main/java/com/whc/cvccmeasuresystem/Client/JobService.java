@@ -170,6 +170,7 @@ public class JobService extends android.app.job.JobService{
                             }
 
 
+
                             Solution solution1 = new Solution(Common.solution1.getConcentration(), sample1.getID());
                             Solution solution2 = new Solution(Common.solution2.getConcentration(), sample2.getID());
                             Solution solution3 = new Solution(Common.solution3.getConcentration(), sample3.getID());

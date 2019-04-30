@@ -23,7 +23,6 @@ import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep1;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Main;
 import com.whc.cvccmeasuresystem.Control.History.HistoryMain;
-import com.whc.cvccmeasuresystem.Control.History.HistoryShowMain;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
@@ -31,6 +30,8 @@ import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep1;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
+import com.whc.cvccmeasuresystem.DataBase.DataBase;
+import com.whc.cvccmeasuresystem.DataBase.PagConDB;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.R;
 
@@ -38,8 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
-import static com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main.initParameter;
-import static com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main.needOldData;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -50,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         TypefaceProvider.registerDefaultIconSets();
         setContentView(R.layout.activity_main);
+        DataBase dataBase=new DataBase(this);
+        Common.tableExist("PageCon", DataBase.Table_PageCon,dataBase.getWritableDatabase());
     }
 
     @Override
@@ -62,8 +63,18 @@ public class MainActivity extends AppCompatActivity {
 
         if(endModule)
         {
-            SignIn.signIn = false;
-            switchFragment(new SignIn(), getSupportFragmentManager());
+
+            if(finalFragment.equals(IonChannel3Set))
+            {
+                oldFragment=new ArrayList<>();
+                oldFragment.add(Common.IonChannel1);
+                oldFragment.add(Common.IonChannel2Set);
+                switchFragment(new IonChannelStep3Main(), getSupportFragmentManager());
+            }else{
+                SignIn.signIn = false;
+                switchFragment(new SignIn(), getSupportFragmentManager());
+            }
+
         }else{
             SignIn.signIn = true;
             Gson gson = new Gson();
@@ -73,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
             oldFragment.add(Common.CFName);
             switch (finalFragment) {
                 case Common.Drift2Set:
+
                     oldFragment.add(Common.Drift1);
                     switchFragment(new DriftStep2Main(), getSupportFragmentManager());
                     break;
@@ -87,6 +99,19 @@ public class MainActivity extends AppCompatActivity {
                 case Common.Sen2:
                     oldFragment.add(Common.Sen2);
                     switchFragment(new SensitivityStep2Main(), getSupportFragmentManager());
+                    break;
+                case Common.IonChannel1Set:
+                    Fragment fragment=new IonChannelStep2Main();
+                    Bundle bundle=new Bundle();
+                    bundle.putSerializable(Common.reBack,false);
+                    fragment.setArguments(bundle);
+                    oldFragment.add(Common.IonChannel1);
+                    switchFragment(fragment, getSupportFragmentManager());
+                    break;
+                case Common.IonChannel3Set:
+                    oldFragment.add(Common.IonChannel1);
+                    oldFragment.add(Common.IonChannel2Set);
+                    switchFragment(new IonChannelStep3Main(), getSupportFragmentManager());
                     break;
                   default:
                       switchFragment(new SignIn(), getSupportFragmentManager());
@@ -189,10 +214,13 @@ public class MainActivity extends AppCompatActivity {
                         needSet = true;
                         break;
                     case IonChannel2Set:
-                        switchFragment(new IonChannelStep2Main(), getSupportFragmentManager());
+                        Fragment fragment=new IonChannelStep2Main();
+                        Bundle bundle=new Bundle();
+                        bundle.putSerializable(Common.reBack,true);
+                        fragment.setArguments(bundle);
+                        oldFragment.add(Common.Drift1);
+                        switchFragment(fragment, getSupportFragmentManager());
                         oldFragment.remove(oldFragment.size() - 1);
-                        initParameter = false;
-                        needOldData = true;
                         break;
                     case HistoryMain:
                         switchFragment(new HistoryMain(), getSupportFragmentManager());
