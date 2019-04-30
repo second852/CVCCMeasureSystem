@@ -35,8 +35,8 @@ import java.util.List;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class Common {
-    public static String[] mainFunctionName = {"BatchStep1", "Ion channels", "Sensitivity", "Drift", "Hysteresis", "History"};
-    public static int[] mainFunctionImage = {R.drawable.batch, R.drawable.ionchannels, R.drawable.sensitivity, R.drawable.drift, R.drawable.hysteresis, R.drawable.history};
+    public static String[] mainFunctionName = {"BatchStep1", "Ion channels", "Sensitivity", "Drift", "Hysteresis","Humidity","History"};
+    public static int[] mainFunctionImage = {R.drawable.batch, R.drawable.ionchannels, R.drawable.sensitivity, R.drawable.drift, R.drawable.hysteresis,R.drawable.lighto, R.drawable.history};
     public static final String needName = "Please input this name";
     public static final String userShare = "CVCCUser";
     public static final String userId = "userId";

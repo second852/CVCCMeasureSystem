@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#f5f5f5"
+    >
+    <LinearLayout
+        android:id="@+id/timeEndL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:orientation="horizontal">
+
+        <com.beardedhen.androidbootstrap.AwesomeTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="20dp"
+            android:gravity="center_vertical"
+            android:text="量測時間"
+            android:textSize="18sp"
+            app:bootstrapBrand="primary" />
+
+        <com.beardedhen.androidbootstrap.BootstrapButton
+            android:id="@+id/timeEndN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="20dp"
+            android:gravity="center_vertical"
+            android:text="00:00:00"
+            android:inputType="text"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:textColorHint="#AAAAAA"
+            app:showOutline="true"
+            app:bootstrapBrand="regular"
+            app:bootstrapSize="md"
+            app:roundedCorners="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/countDownL"
+        android:layout_below="@+id/timeEndL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal">
+
+        <com.beardedhen.androidbootstrap.AwesomeTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="20dp"
+            android:gravity="center_vertical"
+            android:text="倒數時間"
+            android:textSize="18sp"
+            app:bootstrapBrand="primary" />
+
+        <com.beardedhen.androidbootstrap.BootstrapButton
+            android:layout_marginStart="20dp"
+            android:id="@+id/day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:text="00"
+            android:inputType="text"
+            android:singleLine="true"
+            app:showOutline="true"
+            app:bootstrapBrand="warning"
+            app:bootstrapSize="md"
+            app:roundedCorners="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=":"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:textColor="#000000"
+            android:layout_marginStart="10dp"
+            />
+        <com.beardedhen.androidbootstrap.BootstrapButton
+            android:layout_marginStart="20dp"
+            android:id="@+id/hour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:text="00"
+            android:inputType="text"
+            android:singleLine="true"
+            app:showOutline="true"
+            app:bootstrapBrand="warning"
+            app:bootstrapSize="md"
+            app:roundedCorners="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=":"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:textColor="#000000"
+            android:layout_marginStart="10dp"
+            />
+        <com.beardedhen.androidbootstrap.BootstrapButton
+            android:layout_marginStart="20dp"
+            android:id="@+id/minute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:text="00"
+            android:inputType="text"
+            android:singleLine="true"
+            app:showOutline="true"
+            app:bootstrapBrand="warning"
+            app:bootstrapSize="md"
+            app:roundedCorners="true" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:orientation="horizontal">
+
+        <com.beardedhen.androidbootstrap.BootstrapButton
+            android:id="@+id/start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#000000"
+            app:bootstrapBrand="success"
+            app:bootstrapSize="md"
+            app:bootstrapText="start"
+            app:buttonMode="regular"
+            app:roundedCorners="true"
+            app:showOutline="false" />
+
+        <TextView
+            android:id="@+id/stop"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="20dp"
+            android:textColor="#000000"
+            android:visibility="invisible" />
+
+        <com.beardedhen.androidbootstrap.BootstrapButton
+            android:id="@+id/finish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="20dp"
+            android:textColor="#000000"
+            app:bootstrapBrand="danger"
+            app:bootstrapSize="md"
+            app:bootstrapText="stop"
+            app:buttonMode="regular"
+            app:roundedCorners="true"
+            app:showOutline="false" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <ImageView
+
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/lighte"
+            />
+        <com.beardedhen.androidbootstrap.AwesomeTextView
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="濕度警示燈"
+            android:textSize="18sp"
+            app:bootstrapBrand="regular" />
+    </LinearLayout>
+
+
+</LinearLayout>
