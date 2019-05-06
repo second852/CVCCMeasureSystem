@@ -6,6 +6,11 @@
     <string name="home">Home</string>
     <string name="exit">Exit</string>
     <string name="measure_start_not_exit">Measuring Now! Please pressure "Stop" ! </string>
+
+
+    <string name="error_little_time">Time must be ahead of now time</string>
+
+
     <string-array name="ion">
         <item>pH</item>
         <item>pK</item>

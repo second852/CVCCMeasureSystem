@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -37,30 +38,74 @@ import com.whc.cvccmeasuresystem.R;
 import java.io.IOException;
 import java.util.Calendar;
 
-import static com.whc.cvccmeasuresystem.Common.Common.choiceColor;
-import static com.whc.cvccmeasuresystem.Common.Common.currentPage;
-import static com.whc.cvccmeasuresystem.Common.Common.dataMap;
-import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
-import static com.whc.cvccmeasuresystem.Common.Common.oneColor;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4;
-import static com.whc.cvccmeasuresystem.Common.Common.solution1;
-import static com.whc.cvccmeasuresystem.Common.Common.solution2;
-import static com.whc.cvccmeasuresystem.Common.Common.solution3;
-import static com.whc.cvccmeasuresystem.Common.Common.solution4;
-import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.userShare;
+import static com.whc.cvccmeasuresystem.Common.Common.*;
+
 
 
 public class HumidityMain extends Fragment {
 
 
     private static Activity activity;
-    private BootstrapButton timeEndN;
+    private BootstrapButton timeEndN,start,hour,minute,second;
+    private Long endTime,nowTime;
+    private Integer endMin,endHour,showHour,showMin,showSecond;
 
 
+    private Handler showTimeHandler=new Handler(Looper.myLooper()){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            if(msg.what==1)
+            {
+                showHour=0;
+                showMin=0;
+                showSecond=0;
+            }
+
+            second.setText(String.format("%02d", showSecond));
+            minute.setText(String.format("%02d", showMin));
+            hour.setText(String.format("%02d", showHour));
+        }
+    };
+
+    private Runnable calculateTime=new Runnable() {
+        @Override
+        public void run() {
+
+            while (endTime>nowTime)
+            {
+                nowTime=System.currentTimeMillis();
+                if(nowTime%1000==0) {
+                    showSecond=showSecond-1;
+                    if(showSecond<0)
+                    {
+                        showSecond=59;
+                        showMin=showMin-1;
+                    }
+                    if(showMin<0)
+                    {
+                        showHour=showHour-1;
+                        showMin=59;
+                    }
+                    if(showHour<0)
+                    {
+                        showHour=0;
+                        showMin=0;
+                        showSecond=0;
+                    }
+                    showTimeHandler.sendEmptyMessage(0);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            showTimeHandler.sendEmptyMessage(1);
+        }
+    };
 
     @Override
     public void onAttach(Context context) {
@@ -84,9 +129,18 @@ public class HumidityMain extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final View view = inflater.inflate(R.layout.humidity_main, container, false);
-        timeEndN=view.findViewById(R.id.timeEndN);
+        findViewById(view);
         timeEndN.setOnClickListener(new showTime());
+        start.setOnClickListener(new startAction());
         return view;
+    }
+
+    private void findViewById(View view) {
+        timeEndN=view.findViewById(R.id.timeEndN);
+        hour=view.findViewById(R.id.hour);
+        minute=view.findViewById(R.id.minute);
+        second=view.findViewById(R.id.second);
+        start=view.findViewById(R.id.start);
     }
 
     @Override
@@ -111,10 +165,52 @@ public class HumidityMain extends Fragment {
             new TimePickerDialog(activity, new TimePickerDialog.OnTimeSetListener(){
                 @Override
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                    timeEndN.setText(hourOfDay + ":" + minute);
+                    timeEndN.setText((hourOfDay + ":" + minute));
+                    Calendar calendar=Calendar.getInstance();
+                    calendar.set(Calendar.HOUR_OF_DAY,hourOfDay);
+                    calendar.set(Calendar.MINUTE,minute);
+
+                    endTime=calendar.getTimeInMillis();
+                    endHour=hourOfDay;
+                    endMin=minute;
                 }
             }, hour, minute, false).show();
         }
+    }
+
+
+    private class startAction implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+
+
+            nowTime=System.currentTimeMillis();
+            Calendar nowCalendar=Calendar.getInstance();
+            int nowMin=nowCalendar.get(Calendar.MINUTE);
+            int nowHour=nowCalendar.get(Calendar.HOUR_OF_DAY);
+            showMin=endMin-nowMin;
+            showHour=endHour-nowHour;
+            showSecond=00;
+
+
+            if(showMin<0)
+            {
+                showMin=59;
+                showHour=showHour-1;
+            }
+
+            if(showHour<0)
+            {
+                timeEndN.setError(getString(R.string.error_little_time));
+                return;
+            }
+
+            second.setText(String.format("%02d", showSecond));
+            minute.setText(String.format("%02d", showMin));
+            hour.setText(String.format("%02d", showHour));
+
+            new Thread(calculateTime).start();
         }
     }
+}
 

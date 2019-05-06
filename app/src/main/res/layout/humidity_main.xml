@@ -32,7 +32,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="20dp"
             android:gravity="center_vertical"
-            android:text="00:00:00"
+            android:text="00:00"
             android:inputType="text"
             android:singleLine="true"
             android:textColor="#000000"
@@ -61,30 +61,6 @@
             android:textSize="18sp"
             app:bootstrapBrand="primary" />
 
-        <com.beardedhen.androidbootstrap.BootstrapButton
-            android:layout_marginStart="20dp"
-            android:id="@+id/day"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:gravity="center_vertical"
-            android:text="00"
-            android:inputType="text"
-            android:singleLine="true"
-            app:showOutline="true"
-            app:bootstrapBrand="warning"
-            app:bootstrapSize="md"
-            app:roundedCorners="true" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=":"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textSize="12sp"
-            android:textColor="#000000"
-            android:layout_marginStart="10dp"
-            />
         <com.beardedhen.androidbootstrap.BootstrapButton
             android:layout_marginStart="20dp"
             android:id="@+id/hour"
@@ -123,6 +99,30 @@
             app:bootstrapBrand="warning"
             app:bootstrapSize="md"
             app:roundedCorners="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=":"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:textColor="#000000"
+            android:layout_marginStart="10dp"
+            />
+        <com.beardedhen.androidbootstrap.BootstrapButton
+            android:layout_marginStart="20dp"
+            android:id="@+id/second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:text="00"
+            android:inputType="text"
+            android:singleLine="true"
+            app:showOutline="true"
+            app:bootstrapBrand="warning"
+            app:bootstrapSize="md"
+            app:roundedCorners="true" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="wrap_content"
@@ -144,17 +144,25 @@
             app:roundedCorners="true"
             app:showOutline="false" />
 
-        <TextView
-            android:id="@+id/stop"
-            android:layout_width="50dp"
+        <com.beardedhen.androidbootstrap.BootstrapButton
+            android:id="@+id/con"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="20dp"
             android:textColor="#000000"
-            android:visibility="invisible" />
+            android:visibility="visible"
+            app:bootstrapBrand="warning"
+            app:bootstrapSize="md"
+            app:bootstrapText="continue"
+            app:buttonMode="regular"
+            app:roundedCorners="true"
+            app:showOutline="false"
+
+            />
 
         <com.beardedhen.androidbootstrap.BootstrapButton
-            android:id="@+id/finish"
+            android:id="@+id/stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -175,7 +183,7 @@
         android:orientation="vertical"
         >
         <ImageView
-
+            android:layout_gravity="center"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@drawable/lighte"
@@ -190,6 +198,23 @@
             android:textSize="18sp"
             app:bootstrapBrand="regular" />
     </LinearLayout>
+
+
+    <com.beardedhen.androidbootstrap.BootstrapButton
+        android:id="@+id/minimize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:textColor="#000000"
+        android:visibility="visible"
+        app:bootstrapBrand="regular"
+        app:bootstrapSize="md"
+        app:bootstrapText="minimize"
+        app:buttonMode="regular"
+        app:roundedCorners="true"
+        app:showOutline="false"
+        />
 
 
 </LinearLayout>
