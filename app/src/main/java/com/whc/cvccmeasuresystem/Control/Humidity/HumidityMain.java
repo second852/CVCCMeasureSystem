@@ -2,40 +2,23 @@ package com.whc.cvccmeasuresystem.Control.Humidity;
 
 
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TimePicker;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
-import com.beardedhen.androidbootstrap.BootstrapEditText;
-import com.ogaclejapan.smarttablayout.SmartTabLayout;
-import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItem;
-import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
-import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
-import com.whc.cvccmeasuresystem.Client.JobService;
-import com.whc.cvccmeasuresystem.Common.Common;
-import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Chart;
-import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Data;
-import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
-import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.R;
 
-import java.io.IOException;
+
 import java.util.Calendar;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
@@ -46,9 +29,11 @@ public class HumidityMain extends Fragment {
 
 
     private static Activity activity;
-    private BootstrapButton timeEndN,start,hour,minute,second;
+    private BootstrapButton timeEndN,start,hour,minute,second,con,stop;
     private Long endTime,nowTime;
     private Integer endMin,endHour,showHour,showMin,showSecond;
+    private Boolean timeBreak;
+    private String setTime;
 
 
     private Handler showTimeHandler=new Handler(Looper.myLooper()){
@@ -73,9 +58,16 @@ public class HumidityMain extends Fragment {
         @Override
         public void run() {
 
-            while (endTime>nowTime)
+            while (!timeBreak)
             {
                 nowTime=System.currentTimeMillis();
+
+                if(endTime<nowTime) {
+                    timeBreak=true;
+                    showTimeHandler.sendEmptyMessage(1);
+                }
+
+
                 if(nowTime%1000==0) {
                     showSecond=showSecond-1;
                     if(showSecond<0)
@@ -103,7 +95,7 @@ public class HumidityMain extends Fragment {
                 }
             }
 
-            showTimeHandler.sendEmptyMessage(1);
+
         }
     };
 
@@ -132,6 +124,8 @@ public class HumidityMain extends Fragment {
         findViewById(view);
         timeEndN.setOnClickListener(new showTime());
         start.setOnClickListener(new startAction());
+        con.setOnClickListener(new continueAction());
+        stop.setOnClickListener(new stopAction());
         return view;
     }
 
@@ -141,6 +135,8 @@ public class HumidityMain extends Fragment {
         minute=view.findViewById(R.id.minute);
         second=view.findViewById(R.id.second);
         start=view.findViewById(R.id.start);
+        con=view.findViewById(R.id.con);
+        stop=view.findViewById(R.id.stop);
     }
 
     @Override
@@ -165,7 +161,10 @@ public class HumidityMain extends Fragment {
             new TimePickerDialog(activity, new TimePickerDialog.OnTimeSetListener(){
                 @Override
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                    timeEndN.setText((hourOfDay + ":" + minute));
+
+                    setTime=String.format("%02d", hourOfDay)+" : "+String.format("%02d", minute);
+                    timeEndN.setText(setTime);
+
                     Calendar calendar=Calendar.getInstance();
                     calendar.set(Calendar.HOUR_OF_DAY,hourOfDay);
                     calendar.set(Calendar.MINUTE,minute);
@@ -182,7 +181,7 @@ public class HumidityMain extends Fragment {
     private class startAction implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-
+            timeBreak=false;
 
             nowTime=System.currentTimeMillis();
             Calendar nowCalendar=Calendar.getInstance();
@@ -208,8 +207,25 @@ public class HumidityMain extends Fragment {
             second.setText(String.format("%02d", showSecond));
             minute.setText(String.format("%02d", showMin));
             hour.setText(String.format("%02d", showHour));
-
             new Thread(calculateTime).start();
+        }
+    }
+
+    private class continueAction implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            if(timeBreak)
+            {
+                timeBreak=false;
+                new Thread(calculateTime).start();
+            }
+        }
+    }
+
+    private class stopAction implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            timeBreak=true;
         }
     }
 }
