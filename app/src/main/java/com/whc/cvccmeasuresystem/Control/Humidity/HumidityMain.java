@@ -3,7 +3,12 @@ package com.whc.cvccmeasuresystem.Control.Humidity;
 
 import android.app.Activity;
 import android.app.TimePickerDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,9 +18,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
 import android.widget.TimePicker;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
+import com.whc.cvccmeasuresystem.Client.JobService;
+import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 import com.whc.cvccmeasuresystem.R;
 
 
@@ -30,11 +42,35 @@ public class HumidityMain extends Fragment {
 
     private static Activity activity;
     private BootstrapButton timeEndN,start,hour,minute,second,con,stop;
-    private Long endTime,nowTime;
-    private Integer endMin,endHour,showHour,showMin,showSecond;
-    private Boolean timeBreak;
+    private long endTime,nowTime;
+    private int endMin,endHour,showHour,showMin,showSecond;
+    private boolean timeBreak;
     private String setTime;
+    private static ImageView sensor;
 
+
+    public static Handler showLightHandler=new Handler(Looper.myLooper()){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Animation animation = new AlphaAnimation(1, 0);
+            animation.setDuration(1000);
+            animation.setInterpolator(new LinearInterpolator());
+            animation.setRepeatCount(Animation.INFINITE);
+            animation.setRepeatMode(Animation.REVERSE);
+            switch (msg.what)
+            {
+                case 0:
+                    sensor.setImageResource(R.drawable.lighte);
+                    sensor.clearAnimation();
+                    break;
+                case 1:
+                    sensor.setImageResource(R.drawable.lighto);
+                    sensor.startAnimation(animation);
+                   break;
+            }
+        }
+    };
 
     private Handler showTimeHandler=new Handler(Looper.myLooper()){
         @Override
@@ -137,6 +173,7 @@ public class HumidityMain extends Fragment {
         start=view.findViewById(R.id.start);
         con=view.findViewById(R.id.con);
         stop=view.findViewById(R.id.stop);
+        sensor=view.findViewById(R.id.sensor);
     }
 
     @Override
@@ -161,7 +198,7 @@ public class HumidityMain extends Fragment {
             new TimePickerDialog(activity, new TimePickerDialog.OnTimeSetListener(){
                 @Override
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-
+                    timeEndN.setError(null);
                     setTime=String.format("%02d", hourOfDay)+" : "+String.format("%02d", minute);
                     timeEndN.setText(setTime);
 
@@ -191,6 +228,13 @@ public class HumidityMain extends Fragment {
             showHour=endHour-nowHour;
             showSecond=00;
 
+            if ((endTime-nowTime)<0)
+            {
+                timeEndN.setError(" ");
+                Common.showToast(activity,getString(R.string.error_little_time));
+                return;
+            }
+
 
             if(showMin<0)
             {
@@ -198,11 +242,41 @@ public class HumidityMain extends Fragment {
                 showHour=showHour-1;
             }
 
-            if(showHour<0)
-            {
-                timeEndN.setError(getString(R.string.error_little_time));
+            //重置圖片
+            showLightHandler.sendEmptyMessage(0);
+
+            //check Wifi
+            WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(activity.WIFI_SERVICE);
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            String ssId = wifiInfo.getSSID();
+            if (ssId == null || ssId.indexOf("BCS_Device") == -1) {
+                Common.showToast(activity, "Please connect BCS_Device");
                 return;
             }
+
+
+
+            JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobService.handlerMessage= HumidityMain.this.showLightHandler;
+            JobService.measureDuration="1";
+            JobService.measureTime=String.valueOf(showHour*60+showMin);
+            JobService.mRun=true;
+            JobService.measureType="5";
+            JobService.measureFragment=Common.HumidityMain;
+
+
+            ComponentName mServiceComponent = new ComponentName(activity, JobService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);
+            tm.cancelAll();
+
+            builder.setMinimumLatency(1);
+            builder.setOverrideDeadline(2);
+            builder.setRequiresCharging(false);
+            builder.setRequiresDeviceIdle(false);
+            tm.schedule(builder.build());
+
+
+
 
             second.setText(String.format("%02d", showSecond));
             minute.setText(String.format("%02d", showMin));

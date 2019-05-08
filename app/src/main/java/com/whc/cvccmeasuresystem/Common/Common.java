@@ -80,6 +80,10 @@ public class Common {
     public static final String onPause = "onPause";
     public static final String endModule = "endModule";
     public static final String solutionTimes = "solutionTimes";
+
+
+    public static final String HumidityMain = "HumidityMain";
+
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;
     public static HashMap<Sample, List<Solution>> dataMap;
@@ -121,6 +125,7 @@ public class Common {
         hashMap.put("2", "Sensitivity");
         hashMap.put("3", "Drift");
         hashMap.put("4", "Hysteresis");
+        hashMap.put("5", "Humidity");
         return hashMap;
     }
 
@@ -133,6 +138,7 @@ public class Common {
         hashMap.put("2", "Sensitivity");
         hashMap.put("3", "Drift");
         hashMap.put("4", "Hysteresis");
+        hashMap.put("5", "Humidity");
         return hashMap;
     }
 

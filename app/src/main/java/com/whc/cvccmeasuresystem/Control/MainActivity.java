@@ -113,6 +113,10 @@ public class MainActivity extends AppCompatActivity {
                     oldFragment.add(Common.IonChannel2Set);
                     switchFragment(new IonChannelStep3Main(), getSupportFragmentManager());
                     break;
+                case Common.HumidityMain:
+                    oldFragment.add(Common.HistoryMain);
+                    switchFragment(new HistoryMain(), getSupportFragmentManager());
+                    break;
                   default:
                       switchFragment(new SignIn(), getSupportFragmentManager());
                       break;

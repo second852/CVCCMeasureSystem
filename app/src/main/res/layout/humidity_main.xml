@@ -2,7 +2,6 @@
 <LinearLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -12,26 +11,27 @@
         android:id="@+id/timeEndL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:orientation="horizontal">
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"
+        android:orientation="vertical">
 
         <com.beardedhen.androidbootstrap.AwesomeTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="20dp"
-            android:gravity="center_vertical"
-            android:text="量測時間"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Measure Time"
             android:textSize="18sp"
             app:bootstrapBrand="primary" />
 
         <com.beardedhen.androidbootstrap.BootstrapButton
             android:id="@+id/timeEndN"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="20dp"
-            android:gravity="center_vertical"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
             android:text="00:00"
             android:inputType="text"
             android:singleLine="true"
@@ -42,27 +42,25 @@
             app:bootstrapSize="md"
             app:roundedCorners="true" />
     </LinearLayout>
-
+    <com.beardedhen.androidbootstrap.AwesomeTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"
+        android:gravity="center_vertical"
+        android:text="Countdown Time"
+        android:textSize="18sp"
+        app:bootstrapBrand="primary" />
     <LinearLayout
         android:id="@+id/countDownL"
         android:layout_below="@+id/timeEndL"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal">
-
-        <com.beardedhen.androidbootstrap.AwesomeTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="20dp"
-            android:gravity="center_vertical"
-            android:text="倒數時間"
-            android:textSize="18sp"
-            app:bootstrapBrand="primary" />
-
         <com.beardedhen.androidbootstrap.BootstrapButton
-            android:layout_marginStart="20dp"
             android:id="@+id/hour"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -86,7 +84,7 @@
             android:layout_marginStart="10dp"
             />
         <com.beardedhen.androidbootstrap.BootstrapButton
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="10dp"
             android:id="@+id/minute"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -110,7 +108,7 @@
             android:layout_marginStart="10dp"
             />
         <com.beardedhen.androidbootstrap.BootstrapButton
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="10dp"
             android:id="@+id/second"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -128,7 +126,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
         android:orientation="horizontal">
 
         <com.beardedhen.androidbootstrap.BootstrapButton
@@ -176,13 +174,14 @@
             app:showOutline="false" />
     </LinearLayout>
     <LinearLayout
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         >
         <ImageView
+            android:id="@+id/sensor"
             android:layout_gravity="center"
             android:layout_width="80dp"
             android:layout_height="80dp"
@@ -194,7 +193,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="濕度警示燈"
+            android:text="Humidity Sensor"
             android:textSize="18sp"
             app:bootstrapBrand="regular" />
     </LinearLayout>
