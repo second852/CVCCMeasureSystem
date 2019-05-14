@@ -78,6 +78,8 @@ public class JobHumidity extends android.app.job.JobService{
 
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
+        mRun=false;
+        sendEndMessage();
         return false;
     }
 
@@ -107,12 +109,12 @@ public class JobHumidity extends android.app.job.JobService{
     public void run() {
         try {
             //here you must put your computer's IP address.
-            InetAddress serverAddr = InetAddress.getByName(ServerIP);
+            InetAddress serverAddress = InetAddress.getByName(ServerIP);
 
             Log.e("TCP Client", "C: Connecting...");
 
             //create a socket to make the connection with the server
-            socket = new Socket(serverAddr, ServerPort);
+            socket = new Socket(serverAddress, ServerPort);
             socket.setKeepAlive(true);
             try {
 
@@ -150,7 +152,7 @@ public class JobHumidity extends android.app.job.JobService{
                         case "$D,End,#":
                             sharedPreferences.edit().putBoolean(endModule,true).apply();
                             sharedPreferences.edit().putBoolean(endMeasure,true).apply();
-                            sendEndMessage();
+
                             break;
 
                         default:
@@ -158,7 +160,9 @@ public class JobHumidity extends android.app.job.JobService{
                             {
                                 mRun=false;
                                 startMeasure=false;
+
                             }
+
 
 
 
@@ -178,7 +182,7 @@ public class JobHumidity extends android.app.job.JobService{
                             {
                                 for(int k=1;k<=4;k++)
                                 {
-                                    firstVoltage[k]=new Integer(voltages[k]);
+                                    firstVoltage[k-1]=new Integer(voltages[k]);
                                 }
                                 firstMeasure=false;
                             }
@@ -186,12 +190,14 @@ public class JobHumidity extends android.app.job.JobService{
                             overCounts=0;
                             for(int k=0;k<=3;k++)
                             {
+
                                 differV= nowVoltage[k]-firstVoltage[k];
                                 differV=Math.abs(differV);
                                 if(differV>0)
                                 {
                                     overCounts++;
                                 }
+                                Log.d("voltage",String.valueOf(k)+". old : "+firstVoltage[k]+" now :" +nowVoltage[k]+" differ :"+differV);
                             }
 
                             //show error
@@ -201,8 +207,9 @@ public class JobHumidity extends android.app.job.JobService{
                                 break;
                             }
                     }
-                    Log.d("XXXXXxx", str + " Time :" + (System.currentTimeMillis() - startTime));
+                    Log.d("voltage", str + " Time :" + (System.currentTimeMillis() - startTime));
                 }
+                sendEndMessage();
                 Log.e("RESPONSE FROM SERVER", " END");
             } catch (Exception e) {
 

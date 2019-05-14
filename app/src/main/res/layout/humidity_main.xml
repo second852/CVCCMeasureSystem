@@ -152,7 +152,7 @@
             android:visibility="visible"
             app:bootstrapBrand="warning"
             app:bootstrapSize="md"
-            app:bootstrapText="continue"
+            app:bootstrapText="break"
             app:buttonMode="regular"
             app:roundedCorners="true"
             app:showOutline="false"

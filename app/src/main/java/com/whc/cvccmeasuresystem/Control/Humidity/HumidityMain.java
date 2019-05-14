@@ -25,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.TimePicker;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
+import com.beardedhen.androidbootstrap.api.defaults.DefaultBootstrapBrand;
+import com.whc.cvccmeasuresystem.Client.JobHumidity;
 import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
@@ -41,7 +43,7 @@ public class HumidityMain extends Fragment {
 
 
     private static Activity activity;
-    private BootstrapButton timeEndN,start,hour,minute,second,con,stop;
+    private BootstrapButton timeEndN,start,hour,minute,second,con,stop,minimize;
     private long endTime,nowTime;
     private int endMin,endHour,showHour,showMin,showSecond;
     private boolean timeBreak;
@@ -82,6 +84,7 @@ public class HumidityMain extends Fragment {
                 showHour=0;
                 showMin=0;
                 showSecond=0;
+
             }
 
             second.setText(String.format("%02d", showSecond));
@@ -108,13 +111,13 @@ public class HumidityMain extends Fragment {
                     showSecond=showSecond-1;
                     if(showSecond<0)
                     {
-                        showSecond=59;
+                        showSecond=showSecond+60;
                         showMin=showMin-1;
                     }
                     if(showMin<0)
                     {
                         showHour=showHour-1;
-                        showMin=59;
+                        showMin=showMin+60;
                     }
                     if(showHour<0)
                     {
@@ -174,6 +177,7 @@ public class HumidityMain extends Fragment {
         con=view.findViewById(R.id.con);
         stop=view.findViewById(R.id.stop);
         sensor=view.findViewById(R.id.sensor);
+        minimize=view.findViewById(R.id.minimize);
     }
 
     @Override
@@ -238,7 +242,7 @@ public class HumidityMain extends Fragment {
 
             if(showMin<0)
             {
-                showMin=59;
+                showMin=showMin+60;
                 showHour=showHour-1;
             }
 
@@ -255,25 +259,7 @@ public class HumidityMain extends Fragment {
             }
 
 
-
-            JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            JobService.handlerMessage= HumidityMain.this.showLightHandler;
-            JobService.measureDuration="1";
-            JobService.measureTime=String.valueOf(showHour*60+showMin);
-            JobService.mRun=true;
-            JobService.measureType="5";
-            JobService.measureFragment=Common.HumidityMain;
-
-
-            ComponentName mServiceComponent = new ComponentName(activity, JobService.class);
-            JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);
-            tm.cancelAll();
-
-            builder.setMinimumLatency(1);
-            builder.setOverrideDeadline(2);
-            builder.setRequiresCharging(false);
-            builder.setRequiresDeviceIdle(false);
-            tm.schedule(builder.build());
+            startMeasure();
 
 
 
@@ -288,9 +274,20 @@ public class HumidityMain extends Fragment {
     private class continueAction implements View.OnClickListener {
         @Override
         public void onClick(View view) {
+
             if(timeBreak)
             {
+
+                con.setText("continue");
+                con.setBootstrapBrand(DefaultBootstrapBrand.INFO);
                 timeBreak=false;
+                stopMeasure();
+
+            }else{
+                con.setText("break");
+                con.setBootstrapBrand(DefaultBootstrapBrand.WARNING);
+                timeBreak=true;
+                startMeasure();
                 new Thread(calculateTime).start();
             }
         }
@@ -299,8 +296,41 @@ public class HumidityMain extends Fragment {
     private class stopAction implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            timeBreak=true;
+
         }
     }
+
+    private void stopMeasure()
+    {
+        JobHumidity.mRun=false;
+        JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        tm.cancelAll();
+    }
+
+
+
+    private void startMeasure()
+    {
+        JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        JobHumidity.handlerMessage= HumidityMain.this.showLightHandler;
+        JobHumidity.measureDuration="1";
+        JobHumidity.measureTime=String.valueOf(showHour*60+showMin);
+        JobHumidity.mRun=true;
+        JobHumidity.measureType="5";
+        JobHumidity.measureFragment=Common.HumidityMain;
+
+
+        ComponentName mServiceComponent = new ComponentName(activity, JobHumidity.class);
+        JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);
+        tm.cancelAll();
+
+        builder.setMinimumLatency(1);
+        builder.setOverrideDeadline(2);
+        builder.setRequiresCharging(false);
+        builder.setRequiresDeviceIdle(false);
+        tm.schedule(builder.build());
+
+    }
+
 }
 
