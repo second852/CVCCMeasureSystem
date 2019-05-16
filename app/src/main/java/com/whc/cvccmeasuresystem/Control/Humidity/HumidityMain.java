@@ -249,17 +249,10 @@ public class HumidityMain extends Fragment {
             //重置圖片
             showLightHandler.sendEmptyMessage(0);
 
-            //check Wifi
-            WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(activity.WIFI_SERVICE);
-            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-            String ssId = wifiInfo.getSSID();
-            if (ssId == null || ssId.indexOf("BCS_Device") == -1) {
-                Common.showToast(activity, "Please connect BCS_Device");
-                return;
-            }
 
 
-            startMeasure();
+
+//            startMeasure();
 
 
 
@@ -287,7 +280,7 @@ public class HumidityMain extends Fragment {
                 con.setText("break");
                 con.setBootstrapBrand(DefaultBootstrapBrand.WARNING);
                 timeBreak=true;
-                startMeasure();
+//                startMeasure();
                 new Thread(calculateTime).start();
             }
         }
@@ -311,6 +304,14 @@ public class HumidityMain extends Fragment {
 
     private void startMeasure()
     {
+        //check Wifi
+        WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(activity.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        String ssId = wifiInfo.getSSID();
+        if (ssId == null || ssId.indexOf("BCS_Device") == -1) {
+            Common.showToast(activity, "Please connect BCS_Device");
+            return;
+        }
         JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         JobHumidity.handlerMessage= HumidityMain.this.showLightHandler;
         JobHumidity.measureDuration="1";
