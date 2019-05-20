@@ -7,6 +7,7 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -29,10 +30,14 @@ import com.beardedhen.androidbootstrap.api.defaults.DefaultBootstrapBrand;
 import com.whc.cvccmeasuresystem.Client.JobHumidity;
 import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
+import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.R;
 
 
+import java.io.IOException;
 import java.util.Calendar;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
@@ -43,12 +48,15 @@ public class HumidityMain extends Fragment {
 
 
     private static Activity activity;
-    private BootstrapButton timeEndN,start,hour,minute,second,con,stop,minimize;
-    private long endTime,nowTime;
-    private int endMin,endHour,showHour,showMin,showSecond;
-    private boolean timeBreak;
-    private String setTime;
+    private static BootstrapButton timeEndN,start,hour,minute,second;
+
+    private BootstrapButton con,stop,minimize;
+
     private static ImageView sensor;
+    private String setTime;
+    public boolean timeBreak;
+    public Thread timeThread;
+    private SharedPreferences sharedPreferences;
 
 
     public static Handler showLightHandler=new Handler(Looper.myLooper()){
@@ -69,74 +77,24 @@ public class HumidityMain extends Fragment {
                 case 1:
                     sensor.setImageResource(R.drawable.lighto);
                     sensor.startAnimation(animation);
+                    break;
+                case 2:
+                    JobHumidity.showHour=0;
+                    JobHumidity.showMin=0;
+                    JobHumidity.showSecond=0;
+                    second.setText(String.format("%02d", JobHumidity.showSecond));
+                    minute.setText(String.format("%02d", JobHumidity.showMin));
+                    hour.setText(String.format("%02d", JobHumidity.showHour));
                    break;
+                case 3:
+                    second.setText(String.format("%02d", JobHumidity.showSecond));
+                    minute.setText(String.format("%02d", JobHumidity.showMin));
+                    hour.setText(String.format("%02d", JobHumidity.showHour));
+                    break;
             }
         }
     };
 
-    private Handler showTimeHandler=new Handler(Looper.myLooper()){
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-
-            if(msg.what==1)
-            {
-                showHour=0;
-                showMin=0;
-                showSecond=0;
-
-            }
-
-            second.setText(String.format("%02d", showSecond));
-            minute.setText(String.format("%02d", showMin));
-            hour.setText(String.format("%02d", showHour));
-        }
-    };
-
-    private Runnable calculateTime=new Runnable() {
-        @Override
-        public void run() {
-
-            while (!timeBreak)
-            {
-                nowTime=System.currentTimeMillis();
-
-                if(endTime<nowTime) {
-                    timeBreak=true;
-                    showTimeHandler.sendEmptyMessage(1);
-                }
-
-
-                if(nowTime%1000==0) {
-                    showSecond=showSecond-1;
-                    if(showSecond<0)
-                    {
-                        showSecond=showSecond+60;
-                        showMin=showMin-1;
-                    }
-                    if(showMin<0)
-                    {
-                        showHour=showHour-1;
-                        showMin=showMin+60;
-                    }
-                    if(showHour<0)
-                    {
-                        showHour=0;
-                        showMin=0;
-                        showSecond=0;
-                    }
-                    showTimeHandler.sendEmptyMessage(0);
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-
-        }
-    };
 
     @Override
     public void onAttach(Context context) {
@@ -183,12 +141,27 @@ public class HumidityMain extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        boolean end=sharedPreferences.getBoolean(Common.endMeasure, true);
+        if(!end)
+        {
+            timeEndN.setText(pageCon.getCon1());
+            hour.setText(pageCon.getCon2());
+            minute.setText(pageCon.getCon3());
+            second.setText(pageCon.getCon4());
+        }
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
+        pageCon = new PageCon();
+        pageCon.setCon1(timeEndN.getText().toString());
+        pageCon.setCon2(hour.getText().toString());
+        pageCon.setCon3(minute.getText().toString());
+        pageCon.setCon4(second.getText().toString());
+        pageCon.setExpTime(String.valueOf(System.currentTimeMillis()));
+        Common.savePageParameter(sharedPreferences,pageCon);
     }
 
 
@@ -210,9 +183,9 @@ public class HumidityMain extends Fragment {
                     calendar.set(Calendar.HOUR_OF_DAY,hourOfDay);
                     calendar.set(Calendar.MINUTE,minute);
 
-                    endTime=calendar.getTimeInMillis();
-                    endHour=hourOfDay;
-                    endMin=minute;
+                    JobHumidity.endTime=calendar.getTimeInMillis();
+                    JobHumidity.endHour=hourOfDay;
+                    JobHumidity.endMin=minute;
                 }
             }, hour, minute, false).show();
         }
@@ -222,17 +195,23 @@ public class HumidityMain extends Fragment {
     private class startAction implements View.OnClickListener {
         @Override
         public void onClick(View view) {
+
+            if(startMeasure)
+            {
+                return;
+            }
+
             timeBreak=false;
 
-            nowTime=System.currentTimeMillis();
+            JobHumidity.nowTime=System.currentTimeMillis();
             Calendar nowCalendar=Calendar.getInstance();
             int nowMin=nowCalendar.get(Calendar.MINUTE);
             int nowHour=nowCalendar.get(Calendar.HOUR_OF_DAY);
-            showMin=endMin-nowMin;
-            showHour=endHour-nowHour;
-            showSecond=00;
+            JobHumidity.showMin= JobHumidity.endMin-nowMin;
+            JobHumidity.showHour= JobHumidity.endHour-nowHour;
+            JobHumidity.showSecond=00;
 
-            if ((endTime-nowTime)<0)
+            if ((JobHumidity.endTime-JobHumidity.nowTime)<0)
             {
                 timeEndN.setError(" ");
                 Common.showToast(activity,getString(R.string.error_little_time));
@@ -240,27 +219,15 @@ public class HumidityMain extends Fragment {
             }
 
 
-            if(showMin<0)
+            if(JobHumidity.showMin<0)
             {
-                showMin=showMin+60;
-                showHour=showHour-1;
+                JobHumidity.showMin=JobHumidity.showMin+60;
+                JobHumidity.showHour=JobHumidity.showHour-1;
             }
 
             //重置圖片
             showLightHandler.sendEmptyMessage(0);
-
-
-
-
-//            startMeasure();
-
-
-
-
-            second.setText(String.format("%02d", showSecond));
-            minute.setText(String.format("%02d", showMin));
-            hour.setText(String.format("%02d", showHour));
-            new Thread(calculateTime).start();
+            startMeasure();
         }
     }
 
@@ -268,20 +235,25 @@ public class HumidityMain extends Fragment {
         @Override
         public void onClick(View view) {
 
+            if(!startMeasure)
+            {
+                return;
+            }
+
             if(timeBreak)
             {
-
-                con.setText("continue");
-                con.setBootstrapBrand(DefaultBootstrapBrand.INFO);
-                timeBreak=false;
-                stopMeasure();
-
-            }else{
                 con.setText("break");
                 con.setBootstrapBrand(DefaultBootstrapBrand.WARNING);
+                timeBreak=false;
+                timeThread.start();
+                startMeasure();
+
+            }else{
+                con.setText("continue");
+                con.setBootstrapBrand(DefaultBootstrapBrand.INFO);
                 timeBreak=true;
-//                startMeasure();
-                new Thread(calculateTime).start();
+                timeThread.interrupt();
+                stopMeasure();
             }
         }
     }
@@ -290,14 +262,29 @@ public class HumidityMain extends Fragment {
         @Override
         public void onClick(View view) {
 
+            StopDialogFragment aa= new StopDialogFragment();
+            aa.setObject(HumidityMain.this);
+            aa.show(getFragmentManager(),"show");
+            stopMeasure();
+
         }
     }
 
-    private void stopMeasure()
+    public void stopMeasure()
     {
+        sharedPreferences.edit().putBoolean(endModule,true).apply();
+        sharedPreferences.edit().putBoolean(endMeasure,true).apply();
         JobHumidity.mRun=false;
+        if(JobHumidity.socket!=null)
+        {
+            try {
+                JobHumidity.socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        tm.cancelAll();
+        tm.cancel(0);
     }
 
 
@@ -315,7 +302,6 @@ public class HumidityMain extends Fragment {
         JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         JobHumidity.handlerMessage= HumidityMain.this.showLightHandler;
         JobHumidity.measureDuration="1";
-        JobHumidity.measureTime=String.valueOf(showHour*60+showMin);
         JobHumidity.mRun=true;
         JobHumidity.measureType="5";
         JobHumidity.measureFragment=Common.HumidityMain;

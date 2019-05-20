@@ -12,6 +12,7 @@ import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Main;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Set;
+import com.whc.cvccmeasuresystem.Control.Humidity.HumidityMain;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Set;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep2Main;
@@ -21,7 +22,7 @@ import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Set;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Set;
 
-
+import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
 
 
 /**
@@ -73,6 +74,13 @@ public class StopDialogFragment extends DialogFragment implements DialogInterfac
                     IonChannelStep2Main.handlerMessage.sendEmptyMessage(2);
                 } else if (object instanceof IonChannelStep3Set) {
                     IonChannelStep3Main.handlerMessage.sendEmptyMessage(2);
+                }else if(object instanceof HumidityMain)
+                {
+                    HumidityMain humidityMain= (HumidityMain) object;
+                    humidityMain.timeBreak=true;
+                    startMeasure=false;
+                    humidityMain.timeThread.interrupt();
+                    humidityMain.stopMeasure();
                 }
                 break;
             default:

@@ -114,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
                     switchFragment(new IonChannelStep3Main(), getSupportFragmentManager());
                     break;
                 case Common.HumidityMain:
-                    oldFragment.add(Common.HistoryMain);
-                    switchFragment(new HistoryMain(), getSupportFragmentManager());
+                    oldFragment.add(Common.HumidityMain);
+                    switchFragment(new com.whc.cvccmeasuresystem.Control.Humidity.HumidityMain(), getSupportFragmentManager());
                     break;
                   default:
                       switchFragment(new SignIn(), getSupportFragmentManager());

@@ -61,6 +61,11 @@ public class JobHumidity extends android.app.job.JobService{
     private InputStream in;
     private PrintWriter out;
     private SharedPreferences sharedPreferences;
+    public static int endMin,endHour,showHour,showMin,showSecond;
+    public static long endTime,nowTime;
+
+
+
 
 
     @Override
@@ -82,6 +87,7 @@ public class JobHumidity extends android.app.job.JobService{
         sendEndMessage();
         return false;
     }
+
 
 
     public void sendStartMessage() {
@@ -149,22 +155,7 @@ public class JobHumidity extends android.app.job.JobService{
                             sharedPreferences.edit().putString(finalFragment,measureFragment).apply();
                             sharedPreferences.edit().putBoolean(endMeasure,false).apply();
                             break;
-                        case "$D,End,#":
-                            sharedPreferences.edit().putBoolean(endModule,true).apply();
-                            sharedPreferences.edit().putBoolean(endMeasure,true).apply();
-
-                            break;
-
                         default:
-                            if(i>times)
-                            {
-                                mRun=false;
-                                startMeasure=false;
-
-                            }
-
-
-
 
                             String[] voltages = str.split(",");
                             try {
@@ -207,9 +198,49 @@ public class JobHumidity extends android.app.job.JobService{
                                 break;
                             }
                     }
+
+
+
+                    nowTime=System.currentTimeMillis();
+                    if(endTime<nowTime) {
+                        mRun=false;
+                        startMeasure=false;
+                        sharedPreferences.edit().putBoolean(endModule,true).apply();
+                        sharedPreferences.edit().putBoolean(endMeasure,true).apply();
+                        sendEndMessage();
+                        handlerMessage.sendEmptyMessage(3);
+                        break;
+                    }
+
+
+                    if(nowTime%1000==0) {
+                        showSecond=showSecond-1;
+                        if(showSecond<0)
+                        {
+                            showSecond=showSecond+60;
+                            showMin=showMin-1;
+                        }
+                        if(showMin<0)
+                        {
+                            showHour=showHour-1;
+                            showMin=showMin+60;
+                        }
+                        if(showHour<0)
+                        {
+                            showHour=0;
+                            showMin=0;
+                            showSecond=0;
+                        }
+                        handlerMessage.sendEmptyMessage(4);
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     Log.d("voltage", str + " Time :" + (System.currentTimeMillis() - startTime));
                 }
-                sendEndMessage();
                 Log.e("RESPONSE FROM SERVER", " END");
             } catch (Exception e) {
 
