@@ -1,16 +1,23 @@
 package com.whc.cvccmeasuresystem.Client;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.job.JobParameters;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Handler;
 import android.util.Log;
 
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Control.MainActivity;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.Model.Solution;
+import com.whc.cvccmeasuresystem.R;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -42,6 +49,7 @@ import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
 public class JobHumidity extends android.app.job.JobService{
 
+    private NotificationManager notificationManager;
     public static final String ServerIP = "192.168.4.1"; //your computer IP address
     public static final int ServerPort = 23;
     public static String measureDuration;
@@ -50,6 +58,7 @@ public class JobHumidity extends android.app.job.JobService{
     public static boolean mRun;
     public static String measureType;
     public static String measureFragment;
+    public static boolean onPause;
 
     public static Socket socket;
     public static boolean firstMeasure;
@@ -71,13 +80,10 @@ public class JobHumidity extends android.app.job.JobService{
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         sharedPreferences = this.getSharedPreferences(userShare, Context.MODE_PRIVATE);
+
         firstMeasure=true;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-              JobHumidity.this.run();
-            }
-        }).start();
+        new Thread(measureRun).start();
+        new Thread(timeRun).start();
         return false;
     }
 
@@ -111,153 +117,183 @@ public class JobHumidity extends android.app.job.JobService{
 
 
 
+    public Runnable timeRun =new Runnable() {
+        @Override
+        public void run() {
 
-    public void run() {
-        try {
-            //here you must put your computer's IP address.
-            InetAddress serverAddress = InetAddress.getByName(ServerIP);
+               while (mRun)
+               {
 
-            Log.e("TCP Client", "C: Connecting...");
+                   nowTime=System.currentTimeMillis();
+                   Log.d("voltage nowTime", String.valueOf(nowTime));
+                   Log.d("voltage endTime", String.valueOf(endTime));
+                   if(endTime<nowTime) {
+                       mRun=false;
+                       startMeasure=false;
+                       sharedPreferences.edit().putBoolean(endMeasure,true).apply();
+                       sendEndMessage();
+                       handlerMessage.sendEmptyMessage(2);
 
-            //create a socket to make the connection with the server
-            socket = new Socket(serverAddress, ServerPort);
-            socket.setKeepAlive(true);
-            try {
-
-                //send the message to the server
-                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-                sendStartMessage();
-                Log.e("TCP Client", "C: Sent.");
-                Log.e("TCP Client", "C: Done.");
-
-                in = socket.getInputStream();
-                //in this while the client listens for the messages sent by the server
-                int i=0;
-                int times=Integer.valueOf(measureTime)/Integer.valueOf(measureDuration);
-                String str;
-                while (mRun) {
-
-                    if(in==null)
-                    {
-                        mRun=false;
-                        startMeasure=false;
-                        break;
-                    }
-
-                    long startTime = System.currentTimeMillis();
-                    byte[] bytes = readStream(in);
-                    str = new String(bytes, Charset.forName("UTF-8"));
-                    switch (str)
-                    {
-                        case "$D,Start,#":
-                            startMeasure=true;
-                            sharedPreferences.edit().putBoolean(endModule,false).apply();
-                            sharedPreferences.edit().putString(finalFragment,measureFragment).apply();
-                            sharedPreferences.edit().putBoolean(endMeasure,false).apply();
-                            break;
-                        default:
-
-                            String[] voltages = str.split(",");
-                            try {
-                                new Integer(voltages[2]);
-                            } catch (Exception e) {
-                                continue;
-                            }
-
-                             for(int k=1;k<=4;k++)
-                             {
-                                 nowVoltage[k-1]=new Integer(voltages[k]);
-                             }
-
-                            if(firstMeasure)
-                            {
-                                for(int k=1;k<=4;k++)
-                                {
-                                    firstVoltage[k-1]=new Integer(voltages[k]);
-                                }
-                                firstMeasure=false;
-                            }
-
-                            overCounts=0;
-                            for(int k=0;k<=3;k++)
-                            {
-
-                                differV= nowVoltage[k]-firstVoltage[k];
-                                differV=Math.abs(differV);
-                                if(differV>0)
-                                {
-                                    overCounts++;
-                                }
-                                Log.d("voltage",String.valueOf(k)+". old : "+firstVoltage[k]+" now :" +nowVoltage[k]+" differ :"+differV);
-                            }
-
-                            //show error
-                            if(overCounts>=3)
-                            {
-                                handlerMessage.sendEmptyMessage(1);
-                                break;
-                            }
-                    }
+                       if(onPause)
+                       {
+                           if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                               showNotification1("Measurement has been completed!");
+                           }else{
+                               showNotification2("Measurement has been completed!");
+                           }
+                       }
 
 
-
-                    nowTime=System.currentTimeMillis();
-                    if(endTime<nowTime) {
-                        mRun=false;
-                        startMeasure=false;
-                        sharedPreferences.edit().putBoolean(endModule,true).apply();
-                        sharedPreferences.edit().putBoolean(endMeasure,true).apply();
-                        sendEndMessage();
-                        handlerMessage.sendEmptyMessage(3);
-                        break;
-                    }
+                       break;
+                   }
 
 
-                    if(nowTime%1000==0) {
-                        showSecond=showSecond-1;
-                        if(showSecond<0)
-                        {
-                            showSecond=showSecond+60;
-                            showMin=showMin-1;
-                        }
-                        if(showMin<0)
-                        {
-                            showHour=showHour-1;
-                            showMin=showMin+60;
-                        }
-                        if(showHour<0)
-                        {
-                            showHour=0;
-                            showMin=0;
-                            showSecond=0;
-                        }
-                        handlerMessage.sendEmptyMessage(4);
+                   if(nowTime%1000==0) {
+                       showSecond=showSecond-1;
+                       if(showSecond<0)
+                       {
+                           showSecond=showSecond+60;
+                           showMin=showMin-1;
+                       }
+                       if(showMin<0)
+                       {
+                           showHour=showHour-1;
+                           showMin=showMin+60;
+                       }
+                       if(showHour<0)
+                       {
+                           showHour=0;
+                           showMin=0;
+                           showSecond=0;
+                       }
+                       handlerMessage.sendEmptyMessage(3);
+
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
+                   }
+               }
+
+        }
+    };
+
+    public Runnable measureRun =new Runnable() {
+        @Override
+        public void run() {
+            try {
+                //here you must put your computer's IP address.
+                InetAddress serverAddress = InetAddress.getByName(ServerIP);
+
+                Log.e("TCP Client", "C: Connecting...");
+
+                //create a socket to make the connection with the server
+                socket = new Socket(serverAddress, ServerPort);
+                socket.setKeepAlive(true);
+                try {
+
+                    //send the message to the server
+                    out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+                    sendStartMessage();
+                    Log.e("TCP Client", "C: Sent.");
+                    Log.e("TCP Client", "C: Done.");
+
+                    in = socket.getInputStream();
+                    //in this while the client listens for the messages sent by the server
+                    String str;
+                    while (mRun) {
+
+                        if(in==null)
+                        {
+                            mRun=false;
+                            startMeasure=false;
+                            break;
+                        }
+
+                        long startTime = System.currentTimeMillis();
+                        byte[] bytes = readStream(in);
+                        str = new String(bytes, Charset.forName("UTF-8"));
+                        switch (str)
+                        {
+                            case "$D,Start,#":
+                                startMeasure=true;
+                                sharedPreferences.edit().putBoolean(endMeasure,false).apply();
+                                break;
+                            default:
+
+                                String[] voltages = str.split(",");
+                                try {
+                                    new Integer(voltages[2]);
+                                } catch (Exception e) {
+                                    continue;
+                                }
+
+                                for(int k=1;k<=4;k++)
+                                {
+                                    nowVoltage[k-1]=new Integer(voltages[k]);
+                                }
+
+                                if(firstMeasure)
+                                {
+                                    for(int k=1;k<=4;k++)
+                                    {
+                                        firstVoltage[k-1]=new Integer(voltages[k]);
+                                    }
+                                    firstMeasure=false;
+                                }
+
+                                overCounts=0;
+                                for(int k=0;k<=3;k++)
+                                {
+
+                                    differV= nowVoltage[k]-firstVoltage[k];
+                                    differV=Math.abs(differV);
+                                    if(differV>0)
+                                    {
+                                        overCounts++;
+                                    }
+                                    Log.d("voltage",String.valueOf(k)+". old : "+firstVoltage[k]+" now :" +nowVoltage[k]+" differ :"+differV);
+                                }
+
+                                //show error
+                                if(overCounts>=3)
+                                {
+                                    handlerMessage.sendEmptyMessage(1);
+                                    if(onPause)
+                                    {
+                                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                            showNotification1("Very Wet!");
+                                        }else{
+                                            showNotification2("Very Wet!");
+                                        }
+                                    }
+
+                                }
+                        }
+
+                        Log.d("voltage", str + " Time :" + (System.currentTimeMillis() - startTime));
                     }
+                    Log.e("RESPONSE FROM SERVER", " END");
+                } catch (Exception e) {
 
-                    Log.d("voltage", str + " Time :" + (System.currentTimeMillis() - startTime));
+                    Log.e("TCP", "S: Error", e);
+
+                } finally {
+                    //the socket must be closed. It is not possible to reconnect to this socket
+                    // after it is closed, which means a new socket instance has to be created.
+                    socket.close();
                 }
-                Log.e("RESPONSE FROM SERVER", " END");
+
             } catch (Exception e) {
-
-                Log.e("TCP", "S: Error", e);
-
-            } finally {
-                //the socket must be closed. It is not possible to reconnect to this socket
-                // after it is closed, which means a new socket instance has to be created.
-                socket.close();
+                Log.e("TCP", "C: Error", e);
+                Common.showToast(JobHumidity.this, "Connecting fail! \n Please Reboot WiFi and \n Pressure \"Start\" again!");
             }
 
-        } catch (Exception e) {
-            Log.e("TCP", "C: Error", e);
-            Common.showToast(this, "Connecting fail! \n Please Reboot WiFi and \n Pressure \"Start\" again!");
         }
+    };
 
-    }
+
 
     public byte[] readStream(InputStream inStream) throws Exception {
         int count = 0;
@@ -273,4 +309,49 @@ public class JobHumidity extends android.app.job.JobService{
         return b;
     }
 
+    //set Channel
+    public final String PRIMARY_CHANNEL = "BCS";
+    private void showNotification1(String message) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel chan1 = new NotificationChannel(PRIMARY_CHANNEL,
+                    PRIMARY_CHANNEL, NotificationManager.IMPORTANCE_DEFAULT);
+            chan1.setLightColor(Color.GREEN);
+            chan1.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            chan1.enableLights(true);
+            chan1.shouldShowLights();
+
+            notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(chan1);
+
+            Intent activeI = new Intent(this, MainActivity.class);
+
+            PendingIntent appIntent = PendingIntent.getActivity(this, 0, activeI, 0);
+            Notification.Builder nb = new Notification.Builder(this.getApplicationContext(), PRIMARY_CHANNEL)
+                    .setContentTitle("BCS")
+                    .setContentText(message)
+                    .setSmallIcon(R.drawable.notify)
+                    .setAutoCancel(true)
+                    .setWhen(System.currentTimeMillis())
+                    .setContentIntent(appIntent);
+            notificationManager.notify(0, nb.build());
+        }
+    }
+
+
+    private void showNotification2(String message) {
+
+        Intent activeI = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                activeI, 0);
+        Notification notification = new Notification.Builder(this)
+                .setContentTitle("BCS")
+                .setContentText(message)
+                .setSmallIcon(R.drawable.notify)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .setWhen(System.currentTimeMillis())
+                .build();
+        notificationManager = (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(0, notification);
+    }
 }

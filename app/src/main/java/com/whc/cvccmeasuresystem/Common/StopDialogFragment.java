@@ -77,9 +77,7 @@ public class StopDialogFragment extends DialogFragment implements DialogInterfac
                 }else if(object instanceof HumidityMain)
                 {
                     HumidityMain humidityMain= (HumidityMain) object;
-                    humidityMain.timeBreak=true;
                     startMeasure=false;
-                    humidityMain.timeThread.interrupt();
                     humidityMain.stopMeasure();
                 }
                 break;

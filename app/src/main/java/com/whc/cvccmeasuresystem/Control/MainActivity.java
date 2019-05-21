@@ -1,9 +1,14 @@
 package com.whc.cvccmeasuresystem.Control;
 
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -42,6 +47,8 @@ import static com.whc.cvccmeasuresystem.Common.Common.*;
 
 
 public class MainActivity extends AppCompatActivity {
+
+
 
 
     @Override

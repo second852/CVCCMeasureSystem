@@ -173,6 +173,9 @@
             app:roundedCorners="true"
             app:showOutline="false" />
     </LinearLayout>
+
+
+
     <LinearLayout
         android:layout_marginTop="30dp"
         android:layout_gravity="center"
@@ -188,14 +191,15 @@
             android:src="@drawable/lighte"
             />
         <com.beardedhen.androidbootstrap.AwesomeTextView
+            android:id="@+id/remain"
             android:layout_marginTop="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="Humidity Sensor"
+            android:text="@string/measure_stop"
             android:textSize="18sp"
-            app:bootstrapBrand="regular" />
+            app:bootstrapBrand="danger" />
     </LinearLayout>
 
 
