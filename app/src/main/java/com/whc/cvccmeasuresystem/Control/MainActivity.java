@@ -37,6 +37,7 @@ import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.PagConDB;
+import com.whc.cvccmeasuresystem.FloatWindow.FloatWindowManager;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.R;
 
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
+        FloatWindowManager.getInstance().dismissWindow();
         SharedPreferences sharedPreferences=this.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         String finalFragment=sharedPreferences.getString(Common.finalFragment,"");
         boolean endModule=sharedPreferences.getBoolean(Common.endModule,true);

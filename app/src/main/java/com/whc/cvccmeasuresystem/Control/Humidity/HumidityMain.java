@@ -290,8 +290,6 @@ public class HumidityMain extends Fragment {
             StopDialogFragment aa= new StopDialogFragment();
             aa.setObject(HumidityMain.this);
             aa.show(getFragmentManager(),"show");
-            stopMeasure();
-
         }
     }
 

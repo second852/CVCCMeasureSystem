@@ -133,7 +133,6 @@ public class JobHumidity extends android.app.job.JobService{
                        sharedPreferences.edit().putBoolean(endMeasure,true).apply();
                        sendEndMessage();
                        handlerMessage.sendEmptyMessage(2);
-
                        if(onPause)
                        {
                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -317,8 +316,6 @@ public class JobHumidity extends android.app.job.JobService{
                     PRIMARY_CHANNEL, NotificationManager.IMPORTANCE_DEFAULT);
             chan1.setLightColor(Color.GREEN);
             chan1.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-            chan1.enableLights(true);
-            chan1.shouldShowLights();
 
             notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(chan1);

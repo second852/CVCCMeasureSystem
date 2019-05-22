@@ -111,7 +111,7 @@ public class AVCallFloatView extends FrameLayout {
                     // 点击效果
                     Intent intent = new Intent(getContext(),MainActivity.class);
                     getContext().startActivity(intent);
-                    FloatWindowManager.getInstance().dismissWindow();
+
                 } else {
                     //吸附效果
                     anchorToSide();
