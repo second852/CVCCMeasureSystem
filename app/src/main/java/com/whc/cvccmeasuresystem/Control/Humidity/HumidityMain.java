@@ -130,66 +130,66 @@ public class HumidityMain extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final View view = inflater.inflate(R.layout.humidity_main, container, false);
-        findViewById(view);
-        timeEndN.setOnClickListener(new showTime());
-        start.setOnClickListener(new startAction());
-        con.setOnClickListener(new continueAction());
-        stop.setOnClickListener(new stopAction());
+//        findViewById(view);
+//        timeEndN.setOnClickListener(new showTime());
+//        start.setOnClickListener(new startAction());
+//        con.setOnClickListener(new continueAction());
+//        stop.setOnClickListener(new stopAction());
         return view;
     }
 
     private void findViewById(View view) {
-        timeEndN=view.findViewById(R.id.timeEndN);
-        hour=view.findViewById(R.id.hour);
-        minute=view.findViewById(R.id.minute);
-        second=view.findViewById(R.id.second);
-        start=view.findViewById(R.id.start);
-        con=view.findViewById(R.id.con);
-        stop=view.findViewById(R.id.stop);
-        sensor=view.findViewById(R.id.sensor);
-        remain=view.findViewById(R.id.remain);
-        minimize=view.findViewById(R.id.minimize);
-        minimize.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FloatWindowManager.getInstance().applyOrShowFloatWindow(activity);
-            }
-        });
+//        timeEndN=view.findViewById(R.id.timeEndN);
+//        hour=view.findViewById(R.id.hour);
+//        minute=view.findViewById(R.id.minute);
+//        second=view.findViewById(R.id.second);
+//        start=view.findViewById(R.id.start);
+//        con=view.findViewById(R.id.con);
+//        stop=view.findViewById(R.id.stop);
+//        sensor=view.findViewById(R.id.sensor);
+//        remain=view.findViewById(R.id.remain);
+//        minimize=view.findViewById(R.id.minimize);
+//        minimize.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                FloatWindowManager.getInstance().applyOrShowFloatWindow(activity);
+//            }
+//        });
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        JobHumidity.onPause=false;
-        boolean endModule=sharedPreferences.getBoolean(Common.endModule,true);
-        if(!endModule&&pageCon!=null)
-        {
-            timeEndN.setText(pageCon.getCon1());
-            hour.setText(pageCon.getCon2());
-            minute.setText(pageCon.getCon3());
-            second.setText(pageCon.getCon4());
-        }else{
-            timeEndN.setText("00:00:00");
-            hour.setText("00");
-            minute.setText("00");
-            second.setText("00");
-        }
-
-        if(startMeasure)
-        {
-            remain.setText(getString(R.string.measure_start));
-            remain.setBootstrapBrand(DefaultBootstrapBrand.PRIMARY);
-        }else{
-            remain.setText(getString(R.string.measure_stop));
-            remain.setBootstrapBrand(DefaultBootstrapBrand.DANGER);
-        }
+//        JobHumidity.onPause=false;
+//        boolean endModule=sharedPreferences.getBoolean(Common.endModule,true);
+//        if(!endModule&&pageCon!=null)
+//        {
+//            timeEndN.setText(pageCon.getCon1());
+//            hour.setText(pageCon.getCon2());
+//            minute.setText(pageCon.getCon3());
+//            second.setText(pageCon.getCon4());
+//        }else{
+//            timeEndN.setText("00:00:00");
+//            hour.setText("00");
+//            minute.setText("00");
+//            second.setText("00");
+//        }
+//
+//        if(startMeasure)
+//        {
+//            remain.setText(getString(R.string.measure_start));
+//            remain.setBootstrapBrand(DefaultBootstrapBrand.PRIMARY);
+//        }else{
+//            remain.setText(getString(R.string.measure_stop));
+//            remain.setBootstrapBrand(DefaultBootstrapBrand.DANGER);
+//        }
 
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        JobHumidity.onPause=true;
+//        JobHumidity.onPause=true;
     }
 
 
