@@ -23,6 +23,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.beardedhen.androidbootstrap.AwesomeTextView;
@@ -51,12 +52,12 @@ public class HumidityMain extends Fragment {
 
 
     private static Activity activity;
-    private static BootstrapButton timeEndN,start,hour,minute,second;
-    private static ImageView sensor;
+    private static TextView time1,time2,time3,time4,dTime1,dTime2,dTime3,dTime4;
+    private static ImageView sensor1,sensor2,sensor3,sensor4;
     private static SharedPreferences sharedPreferences;
-    private static AwesomeTextView remain;
 
-    private BootstrapButton con,stop,minimize;
+
+    private BootstrapButton con,stop,minimize,start;
     private String setTime;
 
 
@@ -73,33 +74,23 @@ public class HumidityMain extends Fragment {
             switch (msg.what)
             {
                 case 0:
-                    sensor.setImageResource(R.drawable.lighte);
-                    sensor.clearAnimation();
+                    sensor1.setImageResource(R.drawable.lighte);
+                    sensor1.clearAnimation();
                     break;
                 case 1:
-                    sensor.setImageResource(R.drawable.lighto);
-                    sensor.startAnimation(animation);
+                    sensor1.setImageResource(R.drawable.lighto);
+                    sensor1.startAnimation(animation);
                     break;
                 case 2:
                     JobHumidity.showHour=0;
                     JobHumidity.showMin=0;
                     JobHumidity.showSecond=0;
-                    second.setText(String.format("%02d", JobHumidity.showSecond));
-                    minute.setText(String.format("%02d", JobHumidity.showMin));
-                    hour.setText(String.format("%02d", JobHumidity.showHour));
                    break;
                 case 3:
-                    second.setText(String.format("%02d", JobHumidity.showSecond));
-                    minute.setText(String.format("%02d", JobHumidity.showMin));
-                    hour.setText(String.format("%02d", JobHumidity.showHour));
                     break;
             }
 
             Common.pageCon = new PageCon();
-            pageCon.setCon1(timeEndN.getText().toString());
-            pageCon.setCon2(hour.getText().toString());
-            pageCon.setCon3(minute.getText().toString());
-            pageCon.setCon4(second.getText().toString());
             Common.savePageParameter(sharedPreferences,pageCon);
         }
     };
@@ -130,7 +121,7 @@ public class HumidityMain extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final View view = inflater.inflate(R.layout.humidity_main, container, false);
-//        findViewById(view);
+        findViewById(view);
 //        timeEndN.setOnClickListener(new showTime());
 //        start.setOnClickListener(new startAction());
 //        con.setOnClickListener(new continueAction());
@@ -139,22 +130,26 @@ public class HumidityMain extends Fragment {
     }
 
     private void findViewById(View view) {
-//        timeEndN=view.findViewById(R.id.timeEndN);
-//        hour=view.findViewById(R.id.hour);
-//        minute=view.findViewById(R.id.minute);
-//        second=view.findViewById(R.id.second);
-//        start=view.findViewById(R.id.start);
-//        con=view.findViewById(R.id.con);
-//        stop=view.findViewById(R.id.stop);
-//        sensor=view.findViewById(R.id.sensor);
-//        remain=view.findViewById(R.id.remain);
-//        minimize=view.findViewById(R.id.minimize);
-//        minimize.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                FloatWindowManager.getInstance().applyOrShowFloatWindow(activity);
-//            }
-//        });
+        time1=view.findViewById(R.id.time1);
+        time2=view.findViewById(R.id.time2);
+        time3=view.findViewById(R.id.time3);
+        time4=view.findViewById(R.id.time4);
+        dTime1=view.findViewById(R.id.dTime1);
+        dTime2=view.findViewById(R.id.dTime2);
+        dTime3=view.findViewById(R.id.dTime3);
+        dTime4=view.findViewById(R.id.dTime4);
+        start=view.findViewById(R.id.start);
+        con=view.findViewById(R.id.con);
+        stop=view.findViewById(R.id.stop);
+        sensor1=view.findViewById(R.id.sensor1);
+
+        minimize=view.findViewById(R.id.minimize);
+        minimize.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FloatWindowManager.getInstance().applyOrShowFloatWindow(activity);
+            }
+        });
     }
 
     @Override
@@ -193,31 +188,6 @@ public class HumidityMain extends Fragment {
     }
 
 
-    private class showTime implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            final Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
-            // Create a new instance of TimePickerDialog and return it
-            new TimePickerDialog(activity, new TimePickerDialog.OnTimeSetListener(){
-                @Override
-                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                    timeEndN.setError(null);
-                    setTime=String.format("%02d", hourOfDay)+" : "+String.format("%02d", minute);
-                    timeEndN.setText(setTime);
-
-                    Calendar calendar=Calendar.getInstance();
-                    calendar.set(Calendar.HOUR_OF_DAY,hourOfDay);
-                    calendar.set(Calendar.MINUTE,minute);
-
-                    JobHumidity.endTime=calendar.getTimeInMillis();
-                    JobHumidity.endHour=hourOfDay;
-                    JobHumidity.endMin=minute;
-                }
-            }, hour, minute, false).show();
-        }
-    }
 
 
     private class startAction implements View.OnClickListener {
@@ -240,7 +210,7 @@ public class HumidityMain extends Fragment {
 
             if ((JobHumidity.endTime-JobHumidity.nowTime)<0)
             {
-                timeEndN.setError(" ");
+
                 Common.showToast(activity,getString(R.string.error_little_time));
                 return;
             }
@@ -308,8 +278,6 @@ public class HumidityMain extends Fragment {
 
         JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         tm.cancel(0);
-        remain.setText(getString(R.string.measure_stop));
-        remain.setBootstrapBrand(DefaultBootstrapBrand.DANGER);
         Common.showToast(activity, getString(R.string.measure_stop));
     }
 
@@ -343,8 +311,6 @@ public class HumidityMain extends Fragment {
         builder.setRequiresDeviceIdle(false);
         tm.schedule(builder.build());
 
-        remain.setText(getString(R.string.measure_start));
-        remain.setBootstrapBrand(DefaultBootstrapBrand.PRIMARY);
         Common.showToast(activity, getString(R.string.measure_start));
     }
 
