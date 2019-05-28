@@ -11,7 +11,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.beardedhen.androidbootstrap.BootstrapEditText;
@@ -82,7 +86,7 @@ public class Common {
     public static final String solutionTimes = "solutionTimes";
 
 
-    public static final String HumidityMain = "HumidityMain";
+    public static final String HumidityMainString = "HumidityMain";
 
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;
@@ -446,6 +450,25 @@ public class Common {
         prefsEditor.putString(key, json);
         prefsEditor.apply();
     }
+
+
+    public static void clearImageAnimation(ImageView image)
+    {
+        image.setImageResource(R.drawable.lighte);
+        image.clearAnimation();
+    }
+
+    public static void setImageAnimation(ImageView image)
+    {
+        Animation animation = new AlphaAnimation(1, 0);
+        animation.setDuration(1000);
+        animation.setInterpolator(new LinearInterpolator());
+        animation.setRepeatCount(Animation.INFINITE);
+        animation.setRepeatMode(Animation.REVERSE);
+        image.setImageResource(R.drawable.lighto);
+        image.startAnimation(animation);
+    }
+
 
 
 }

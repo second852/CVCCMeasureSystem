@@ -8,6 +8,7 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +25,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -40,58 +43,64 @@ import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.R;
 
 
+
+
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import static com.whc.cvccmeasuresystem.Client.JobHumidity.measureFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.*;
-
 
 
 public class HumidityMain extends Fragment {
 
 
     private static Activity activity;
-    private static TextView time1,time2,time3,time4,dTime1,dTime2,dTime3,dTime4;
-    private static ImageView sensor1,sensor2,sensor3,sensor4;
+    private static ImageView[] imageViews;
     private static SharedPreferences sharedPreferences;
+    private static TextView showTime;
+    public static long startTime;
+
+    private BootstrapButton con, stop, minimize, start;
+    private static ProgressBar progress1,progress2;
+
+    private static long hour,min,second;
+    private static String setTime;
+    private static Drawable drawable;
 
 
-    private BootstrapButton con,stop,minimize,start;
-    private String setTime;
 
-
-
-    public static Handler showLightHandler=new Handler(Looper.myLooper()){
+    public static Handler showLightHandler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            Animation animation = new AlphaAnimation(1, 0);
-            animation.setDuration(1000);
-            animation.setInterpolator(new LinearInterpolator());
-            animation.setRepeatCount(Animation.INFINITE);
-            animation.setRepeatMode(Animation.REVERSE);
-            switch (msg.what)
-            {
+            switch (msg.what) {
                 case 0:
-                    sensor1.setImageResource(R.drawable.lighte);
-                    sensor1.clearAnimation();
+                    for (ImageView imageView : imageViews) {
+                        Common.setImageAnimation(imageView);
+                    }
                     break;
                 case 1:
-                    sensor1.setImageResource(R.drawable.lighto);
-                    sensor1.startAnimation(animation);
+                    long differ =System.currentTimeMillis()-startTime;
+                    second=(differ/1000)%60;
+                    min=((differ/1000)/60)%60;
+                    hour=((differ/1000)/60)/60;
+                    setTime="Duration\n"+String.format("%02d",hour)+":"+String.format("%02d",min)+":"+String.format("%02d",second);
+                    showTime.setText(setTime);
+
+
+
                     break;
                 case 2:
-                    JobHumidity.showHour=0;
-                    JobHumidity.showMin=0;
-                    JobHumidity.showSecond=0;
-                   break;
-                case 3:
+                    Common.setImageAnimation(imageViews[msg.arg1]);
                     break;
             }
 
-            Common.pageCon = new PageCon();
-            Common.savePageParameter(sharedPreferences,pageCon);
+
+//            Common.pageCon = new PageCon();
+//            Common.savePageParameter(sharedPreferences, pageCon);
         }
     };
 
@@ -108,8 +117,8 @@ public class HumidityMain extends Fragment {
         //init
         activity.setTitle("Humidity Measure");
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-        sharedPreferences.edit().putBoolean(endModule,false).apply();
-        sharedPreferences.edit().putString(finalFragment,HumidityMain).apply();
+        sharedPreferences.edit().putBoolean(endModule, false).apply();
+        sharedPreferences.edit().putString(finalFragment, HumidityMainString).apply();
     }
 
     @Override
@@ -121,29 +130,31 @@ public class HumidityMain extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final View view = inflater.inflate(R.layout.humidity_main, container, false);
+
         findViewById(view);
-//        timeEndN.setOnClickListener(new showTime());
-//        start.setOnClickListener(new startAction());
-//        con.setOnClickListener(new continueAction());
-//        stop.setOnClickListener(new stopAction());
+        showTime.setText("Duration\n 00:00:00");
+        start.setOnClickListener(new startAction());
+        con.setOnClickListener(new continueAction());
+        stop.setOnClickListener(new stopAction());
         return view;
     }
 
     private void findViewById(View view) {
-        time1=view.findViewById(R.id.time1);
-        time2=view.findViewById(R.id.time2);
-        time3=view.findViewById(R.id.time3);
-        time4=view.findViewById(R.id.time4);
-        dTime1=view.findViewById(R.id.dTime1);
-        dTime2=view.findViewById(R.id.dTime2);
-        dTime3=view.findViewById(R.id.dTime3);
-        dTime4=view.findViewById(R.id.dTime4);
-        start=view.findViewById(R.id.start);
-        con=view.findViewById(R.id.con);
-        stop=view.findViewById(R.id.stop);
-        sensor1=view.findViewById(R.id.sensor1);
+        imageViews = new ImageView[4];
+        imageViews[0] = view.findViewById(R.id.sample1I);
+        imageViews[1] = view.findViewById(R.id.sample2I);
+        imageViews[2] = view.findViewById(R.id.sample3I);
+        imageViews[3] = view.findViewById(R.id.sample4I);
 
-        minimize=view.findViewById(R.id.minimize);
+        progress1=view.findViewById(R.id.progress1);
+        progress2=view.findViewById(R.id.progress2);
+
+
+        showTime = view.findViewById(R.id.showTime);
+        start = view.findViewById(R.id.start);
+        con = view.findViewById(R.id.con);
+        stop = view.findViewById(R.id.stop);
+        minimize = view.findViewById(R.id.minimize);
         minimize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -188,42 +199,17 @@ public class HumidityMain extends Fragment {
     }
 
 
-
-
     private class startAction implements View.OnClickListener {
         @Override
         public void onClick(View view) {
 
-            if(startMeasure)
-            {
-                Common.showToast(activity, "Please wait util this measurement stop ");
+            if (startMeasure) {
+                Common.showToast(activity, "Measuring Now!");
                 return;
             }
-
-            JobHumidity.nowTime=System.currentTimeMillis();
-            Calendar nowCalendar=Calendar.getInstance();
-            int nowMin=nowCalendar.get(Calendar.MINUTE);
-            int nowHour=nowCalendar.get(Calendar.HOUR_OF_DAY);
-            JobHumidity.showMin= JobHumidity.endMin-nowMin;
-            JobHumidity.showHour= JobHumidity.endHour-nowHour;
-            JobHumidity.showSecond=00;
-
-            if ((JobHumidity.endTime-JobHumidity.nowTime)<0)
-            {
-
-                Common.showToast(activity,getString(R.string.error_little_time));
-                return;
-            }
-
-
-            if(JobHumidity.showMin<0)
-            {
-                JobHumidity.showMin=JobHumidity.showMin+60;
-                JobHumidity.showHour=JobHumidity.showHour-1;
-            }
-            //設定時間
-            showLightHandler.sendEmptyMessage(3);
             //重置圖片
+
+            startTime=System.currentTimeMillis();
             showLightHandler.sendEmptyMessage(0);
             startMeasure();
         }
@@ -233,22 +219,20 @@ public class HumidityMain extends Fragment {
         @Override
         public void onClick(View view) {
 
-            if(!startMeasure)
-            {
+            if (!startMeasure) {
                 return;
             }
 
-            if(JobHumidity.mRun)
-            {
+            if (JobHumidity.mRun) {
                 con.setText("continue");
                 con.setBootstrapBrand(DefaultBootstrapBrand.INFO);
                 stopMeasure();
-                JobHumidity.mRun=false;
-            }else{
+                JobHumidity.mRun = false;
+            } else {
                 con.setText("break");
                 con.setBootstrapBrand(DefaultBootstrapBrand.WARNING);
                 startMeasure();
-                JobHumidity.mRun=true;
+                JobHumidity.mRun = true;
             }
         }
     }
@@ -257,18 +241,16 @@ public class HumidityMain extends Fragment {
         @Override
         public void onClick(View view) {
 
-            StopDialogFragment aa= new StopDialogFragment();
+            StopDialogFragment aa = new StopDialogFragment();
             aa.setObject(HumidityMain.this);
-            aa.show(getFragmentManager(),"show");
+            aa.show(getFragmentManager(), "show");
         }
     }
 
-    public void stopMeasure()
-    {
-        sharedPreferences.edit().putBoolean(endMeasure,true).apply();
-        JobHumidity.mRun=false;
-        if(JobHumidity.socket!=null)
-        {
+    public void stopMeasure() {
+        sharedPreferences.edit().putBoolean(endMeasure, true).apply();
+        JobHumidity.mRun = false;
+        if (JobHumidity.socket != null) {
             try {
                 JobHumidity.socket.close();
             } catch (IOException e) {
@@ -282,9 +264,11 @@ public class HumidityMain extends Fragment {
     }
 
 
+    private void startMeasure() {
 
-    private void startMeasure()
-    {
+        progress1.setVisibility(View.GONE);
+        progress2.setVisibility(View.VISIBLE);
+
         //check Wifi
         WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(activity.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
@@ -293,13 +277,12 @@ public class HumidityMain extends Fragment {
             Common.showToast(activity, "Please connect BCS_Device");
             return;
         }
+
         JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        JobHumidity.handlerMessage= HumidityMain.this.showLightHandler;
-        JobHumidity.measureDuration="1";
-        JobHumidity.mRun=true;
-        JobHumidity.measureType="5";
-        measureFragment=Common.HumidityMain;
-        JobHumidity.measureTime=String.valueOf(JobHumidity.showHour*60+JobHumidity.showMin+1);
+        JobHumidity.handlerMessage = HumidityMain.this.showLightHandler;
+        JobHumidity.mRun = true;
+        JobHumidity.measureType = "5";
+        measureFragment = Common.HumidityMainString;
 
         ComponentName mServiceComponent = new ComponentName(activity, JobHumidity.class);
         JobInfo.Builder builder = new JobInfo.Builder(0, mServiceComponent);

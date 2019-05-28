@@ -10,13 +10,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Control.Humidity.HumidityMain;
 import com.whc.cvccmeasuresystem.Control.MainActivity;
-import com.whc.cvccmeasuresystem.DataBase.DataBase;
-import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
-import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
 import java.io.BufferedWriter;
@@ -27,19 +26,11 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
-import java.sql.Timestamp;
 
-import static com.whc.cvccmeasuresystem.Common.Common.arrayColor;
+
+
+
 import static com.whc.cvccmeasuresystem.Common.Common.endMeasure;
-import static com.whc.cvccmeasuresystem.Common.Common.endModule;
-import static com.whc.cvccmeasuresystem.Common.Common.finalFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.indicateColor;
-import static com.whc.cvccmeasuresystem.Common.Common.measureTimes;
-import static com.whc.cvccmeasuresystem.Common.Common.oneColor;
-import static com.whc.cvccmeasuresystem.Common.Common.sample1;
-import static com.whc.cvccmeasuresystem.Common.Common.sample2;
-import static com.whc.cvccmeasuresystem.Common.Common.sample3;
-import static com.whc.cvccmeasuresystem.Common.Common.sample4;
 import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
 import static com.whc.cvccmeasuresystem.Common.Common.userShare;
 
@@ -52,8 +43,8 @@ public class JobHumidity extends android.app.job.JobService{
     private NotificationManager notificationManager;
     public static final String ServerIP = "192.168.4.1"; //your computer IP address
     public static final int ServerPort = 23;
-    public static String measureDuration;
-    public static String measureTime;
+    public String measureDuration;
+    public String measureTime;
     public static Handler handlerMessage;
     public static boolean mRun;
     public static String measureType;
@@ -65,13 +56,13 @@ public class JobHumidity extends android.app.job.JobService{
     public static int[] firstVoltage=new int[4];
 
     public  int[] nowVoltage=new int[4];
-    public int differV,overCounts;
+    public int differV;
 
     private InputStream in;
     private PrintWriter out;
     private SharedPreferences sharedPreferences;
-    public static int endMin,endHour,showHour,showMin,showSecond;
-    public static long endTime,nowTime;
+    private long nowTime,differ;
+    private boolean showError;
 
 
 
@@ -80,8 +71,10 @@ public class JobHumidity extends android.app.job.JobService{
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         sharedPreferences = this.getSharedPreferences(userShare, Context.MODE_PRIVATE);
-
         firstMeasure=true;
+        measureDuration="1";
+        measureTime="9999999";
+        showError=false;
         new Thread(measureRun).start();
         new Thread(timeRun).start();
         return false;
@@ -126,46 +119,12 @@ public class JobHumidity extends android.app.job.JobService{
 
                    nowTime=System.currentTimeMillis();
                    Log.d("voltage nowTime", String.valueOf(nowTime));
-                   Log.d("voltage endTime", String.valueOf(endTime));
-                   if(endTime<nowTime) {
-                       mRun=false;
-                       startMeasure=false;
-                       sharedPreferences.edit().putBoolean(endMeasure,true).apply();
-                       sendEndMessage();
-                       handlerMessage.sendEmptyMessage(2);
-                       if(onPause)
-                       {
-                           if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                               showNotification1("Measurement has been completed!");
-                           }else{
-                               showNotification2("Measurement has been completed!");
-                           }
-                       }
 
+                   differ=nowTime-HumidityMain.startTime;
 
-                       break;
-                   }
+                   if(differ%1000==0) {
 
-
-                   if(nowTime%1000==0) {
-                       showSecond=showSecond-1;
-                       if(showSecond<0)
-                       {
-                           showSecond=showSecond+60;
-                           showMin=showMin-1;
-                       }
-                       if(showMin<0)
-                       {
-                           showHour=showHour-1;
-                           showMin=showMin+60;
-                       }
-                       if(showHour<0)
-                       {
-                           showHour=0;
-                           showMin=0;
-                           showSecond=0;
-                       }
-                       handlerMessage.sendEmptyMessage(3);
+                       handlerMessage.sendEmptyMessage(1);
 
                         try {
                             Thread.sleep(100);
@@ -242,7 +201,7 @@ public class JobHumidity extends android.app.job.JobService{
                                     firstMeasure=false;
                                 }
 
-                                overCounts=0;
+
                                 for(int k=0;k<=3;k++)
                                 {
 
@@ -250,13 +209,17 @@ public class JobHumidity extends android.app.job.JobService{
                                     differV=Math.abs(differV);
                                     if(differV>0)
                                     {
-                                        overCounts++;
+                                        showError=true;
+                                        Message message=new Message();
+                                        message.arg1=k;
+                                        message.what=2;
+                                        handlerMessage.sendMessage(message);
                                     }
                                     Log.d("voltage",String.valueOf(k)+". old : "+firstVoltage[k]+" now :" +nowVoltage[k]+" differ :"+differV);
                                 }
 
                                 //show error
-                                if(overCounts>=3)
+                                if(showError)
                                 {
                                     handlerMessage.sendEmptyMessage(1);
                                     if(onPause)
@@ -267,7 +230,7 @@ public class JobHumidity extends android.app.job.JobService{
                                             showNotification2("Very Wet!");
                                         }
                                     }
-
+                                    showError=false;
                                 }
                         }
 
