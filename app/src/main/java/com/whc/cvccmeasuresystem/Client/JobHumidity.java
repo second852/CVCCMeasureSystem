@@ -19,6 +19,9 @@ import android.view.animation.RotateAnimation;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Control.Humidity.HumidityMain;
 import com.whc.cvccmeasuresystem.Control.MainActivity;
+import com.whc.cvccmeasuresystem.DataBase.DataBase;
+import com.whc.cvccmeasuresystem.DataBase.HumidityDB;
+import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.R;
 
 import java.io.BufferedWriter;
@@ -66,6 +69,7 @@ public class JobHumidity extends android.app.job.JobService{
     private long nowTime,differ;
     private boolean showError;
     public static boolean setTime;
+    public HumidityDB humidityDB;
 
 
 
@@ -73,6 +77,7 @@ public class JobHumidity extends android.app.job.JobService{
 
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
+        humidityDB=new HumidityDB(new DataBase(this));
         sharedPreferences = this.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         firstMeasure=true;
         measureDuration="1";
@@ -127,6 +132,20 @@ public class JobHumidity extends android.app.job.JobService{
 
                    if(differ%1000==0) {
 
+                       HumidityMain.second=HumidityMain.second+1;
+
+                       if(HumidityMain.second>=60)
+                       {
+                           HumidityMain.second=0;
+                           HumidityMain.min=HumidityMain.min+1;
+                       }
+
+                       if( HumidityMain.min>=60)
+                       {
+                           HumidityMain.min=0;
+                           HumidityMain.hour=HumidityMain.hour+1;
+                       }
+
                        handlerMessage.sendEmptyMessage(1);
 
                         try {
@@ -177,6 +196,10 @@ public class JobHumidity extends android.app.job.JobService{
                         str = new String(bytes, Charset.forName("UTF-8"));
                         switch (str)
                         {
+
+                            case "$D,End,#":
+                                sendStartMessage();
+                                break;
                             case "$D,Start,#":
 
                                 //----------------Time ---------------------------//
@@ -188,8 +211,7 @@ public class JobHumidity extends android.app.job.JobService{
                                 startMeasure=true;
                                 new Thread(timeRun).start();
                                 //-------------------------------------------------//
-                                HumidityMain.message.setText(R.string.measure_start);
-                                HumidityMain.message.setTextColor(Color.BLUE);
+
                                 sharedPreferences.edit().putBoolean(endMeasure,false).apply();
                                 if (HumidityMain.progress.getAnimation() == null || HumidityMain.progress.getAnimation().hasEnded())
                                 {
@@ -219,9 +241,14 @@ public class JobHumidity extends android.app.job.JobService{
                                 {
                                     for(int k=1;k<=4;k++)
                                     {
+
                                         firstVoltage[k-1]=new Integer(voltages[k]);
+                                        HumidityMain.humidityVOS[k-1].setBaseVoltage(new Integer(voltages[k]));
+                                        humidityDB.update(HumidityMain.humidityVOS[k-1]);
                                     }
                                     firstMeasure=false;
+
+
                                 }
 
 
@@ -237,6 +264,9 @@ public class JobHumidity extends android.app.job.JobService{
                                         message.arg1=k;
                                         message.what=2;
                                         handlerMessage.sendMessage(message);
+                                        HumidityMain.humidityVOS[k].setOverVoltage(new Integer(nowVoltage[k]));
+                                        HumidityMain.humidityVOS[k].setLight(true);
+                                        humidityDB.update(HumidityMain.humidityVOS[k]);
                                     }
                                     Log.d("voltage",String.valueOf(k)+". old : "+firstVoltage[k]+" now :" +nowVoltage[k]+" differ :"+differV);
                                 }
@@ -244,7 +274,6 @@ public class JobHumidity extends android.app.job.JobService{
                                 //show error
                                 if(showError)
                                 {
-                                    handlerMessage.sendEmptyMessage(1);
                                     if(onPause)
                                     {
                                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

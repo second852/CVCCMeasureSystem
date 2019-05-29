@@ -28,6 +28,9 @@ public class DataBase extends SQLiteOpenHelper {
             "CREATE TABLE PageCon ( id INTEGER PRIMARY KEY AUTOINCREMENT, con1 TEXT ," +
                     "con2 TEXT,con3 TEXT, con4 TEXT, expTime TEXT ,step TEXT,fileId Integer) ;";
 
+    public static final String Table_Humidity =
+            "CREATE TABLE Humidity ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT ," +
+                    "beginTime DATETIME,baseVoltage INTEGER,overVoltage INTEGER,isLight TEXT,fileID INTEGER) ;";
 
     public DataBase(Context context) {
         super(context, DB_NAME, null, DB_VERSION);

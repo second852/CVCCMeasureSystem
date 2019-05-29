@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         DataBase dataBase=new DataBase(this);
         Common.tableExist("PageCon", DataBase.Table_PageCon,dataBase.getWritableDatabase());
+        Common.tableExist("Humidity", DataBase.Table_Humidity,dataBase.getWritableDatabase());
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
 
+import com.beardedhen.androidbootstrap.api.defaults.DefaultBootstrapBrand;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Main;
@@ -78,6 +79,8 @@ public class StopDialogFragment extends DialogFragment implements DialogInterfac
                 {
                     HumidityMain humidityMain= (HumidityMain) object;
                     startMeasure=false;
+                    humidityMain.con.setText("break");
+                    humidityMain.con.setBootstrapBrand(DefaultBootstrapBrand.WARNING);
                     humidityMain.stopMeasure();
                 }
                 break;
