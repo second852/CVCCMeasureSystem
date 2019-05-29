@@ -257,7 +257,7 @@ public class HumidityMain extends Fragment {
             saveFileDB.insert(saveFile);
             SaveFile nowFile=saveFileDB.findOldSaveFile(saveFile.getName());
 
-            int i=1;
+            int i=0;
             HumidityDB humidityDB=new HumidityDB(dataBase);
             for (HumidityVO humidityVO:humidityVOS)
             {
@@ -268,9 +268,9 @@ public class HumidityMain extends Fragment {
                 humidityVO.setBaseVoltage(0);
                 humidityVO.setOverVoltage(0);
                 humidityVO.setLight(false);
-//                humidityVO.setId((int) humidityDB.insert(humidityVO));
-//                Log.d("XXXXXX"," sharedPreferences: "+ humidityVO.getId());
-                sharedPreferences.edit().putInt("HumidityVO"+i,humidityVO.getId()).apply();
+                humidityVO.setId(humidityDB.insert(humidityVO));
+                Log.d("XXXXXX Id"," sharedPreferences: "+ humidityVO.getId());
+                sharedPreferences.edit().putLong("HumidityVO"+i,humidityVO.getId()).apply();
                 i++;
             }
         }
@@ -359,23 +359,18 @@ public class HumidityMain extends Fragment {
 
     public void setMeasureNowData(){
         HumidityDB humidityDB=new HumidityDB(new DataBase(activity));
-        for(HumidityVO humidityVO:humidityDB.getAll())
-        {
-            Log.d("XXXXXX",humidityVO.getId()+" : "+humidityVO.isLight());
-        }
-
 
         for(int i=0;i<4;i++)
         {
-            int id=sharedPreferences.getInt("HumidityVO"+i,0);
+            long id=sharedPreferences.getLong("HumidityVO"+i,0);
              Log.d("XXXXXX"," sharedPreferences: "+ id);
-//            humidityVOS[i]=humidityDB.getById(id);
-//            if(humidityVOS[i].isLight())
-//            {
-//                Common.setImageAnimation(imageViews[i]);
-//            }else{
-//                Common.clearImageAnimation(imageViews[i]);
-//            }
+             humidityVOS[i]=humidityDB.getById(id);
+             if(humidityVOS[i].isLight())
+            {
+                Common.setImageAnimation(imageViews[i]);
+            }else{
+                Common.clearImageAnimation(imageViews[i]);
+            }
         }
     };
 

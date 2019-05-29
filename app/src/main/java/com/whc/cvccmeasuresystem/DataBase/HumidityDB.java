@@ -35,7 +35,7 @@ public class HumidityDB {
         HumidityVO humidityVO;
         while (cursor.moveToNext()) {
             humidityVO = new HumidityVO();
-            humidityVO.setId(cursor.getInt(0));
+            humidityVO.setId(cursor.getLong(0));
             humidityVO.setName(cursor.getString(1));
             humidityVO.setBeginTime(new Timestamp(cursor.getLong(2)));
             humidityVO.setBaseVoltage(cursor.getInt(3));
@@ -49,14 +49,14 @@ public class HumidityDB {
     }
 
 
-    public HumidityVO getById(int id) {
+    public HumidityVO getById(long id) {
         String sql = "SELECT * FROM Humidity where id  = '"+id+"';";
         String[] args = {};
         Cursor cursor = db.rawQuery(sql, args);
         HumidityVO humidityVO=null;
         if (cursor.moveToNext()) {
             humidityVO = new HumidityVO();
-            humidityVO.setId(cursor.getInt(0));
+            humidityVO.setId(cursor.getLong(0));
             humidityVO.setName(cursor.getString(1));
             humidityVO.setBeginTime(new Timestamp(cursor.getLong(2)));
             humidityVO.setBaseVoltage(cursor.getInt(3));
@@ -89,7 +89,7 @@ public class HumidityDB {
         values.put("isLight", String.valueOf(humidityVO.isLight()));
         values.put("fileID", humidityVO.getFileID());
         String whereClause = "id = ?;";
-        String[] whereArgs = {Integer.toString(humidityVO.getId())};
+        String[] whereArgs = {Long.toString(humidityVO.getId())};
         return db.update(TABLE_NAME, values, whereClause, whereArgs);
     }
 
