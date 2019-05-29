@@ -172,7 +172,7 @@
     <TextView
         android:layout_marginTop="20dp"
         android:layout_below="@+id/buttonL"
-        android:id="@+id/senMessage"
+        android:id="@+id/message"
         android:text="@string/measure_stop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -182,14 +182,14 @@
     <RelativeLayout
         android:layout_centerHorizontal="true"
         android:id="@+id/progressR"
-        android:layout_below="@+id/senMessage"
-        android:layout_width="250dp"
-        android:layout_height="250dp">
+        android:layout_below="@+id/message"
+        android:layout_width="220dp"
+        android:layout_height="220dp">
 
 
         <ProgressBar
             android:layout_centerHorizontal="true"
-            android:id="@+id/progress1"
+            android:id="@+id/progress"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -198,20 +198,6 @@
             android:indeterminateDrawable="@drawable/ring_rotate"
             android:indeterminateDuration="0"
             android:indeterminateOnly="true" />
-
-        <ProgressBar
-            android:visibility="gone"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/progress2"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:indeterminateBehavior="repeat"
-            android:layout_gravity="center"
-            android:indeterminateDrawable="@drawable/ring_rotate"
-            android:indeterminateDuration="2000"
-            android:indeterminateOnly="true" />
-
         <TextView
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"

@@ -12,6 +12,9 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Control.Humidity.HumidityMain;
@@ -28,8 +31,7 @@ import java.net.Socket;
 import java.nio.charset.Charset;
 
 
-
-
+import static com.whc.cvccmeasuresystem.Common.Common.HistoryMain;
 import static com.whc.cvccmeasuresystem.Common.Common.endMeasure;
 import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
 import static com.whc.cvccmeasuresystem.Common.Common.userShare;
@@ -63,6 +65,7 @@ public class JobHumidity extends android.app.job.JobService{
     private SharedPreferences sharedPreferences;
     private long nowTime,differ;
     private boolean showError;
+    public static boolean setTime;
 
 
 
@@ -76,7 +79,7 @@ public class JobHumidity extends android.app.job.JobService{
         measureTime="9999999";
         showError=false;
         new Thread(measureRun).start();
-        new Thread(timeRun).start();
+
         return false;
     }
 
@@ -175,11 +178,31 @@ public class JobHumidity extends android.app.job.JobService{
                         switch (str)
                         {
                             case "$D,Start,#":
-                                startMeasure=true;
-                                sharedPreferences.edit().putBoolean(endMeasure,false).apply();
-                                break;
-                            default:
 
+                                //----------------Time ---------------------------//
+                                if(setTime)
+                                {
+                                    HumidityMain.startTime=System.currentTimeMillis();
+                                    setTime=false;
+                                }
+                                startMeasure=true;
+                                new Thread(timeRun).start();
+                                //-------------------------------------------------//
+                                HumidityMain.message.setText(R.string.measure_start);
+                                HumidityMain.message.setTextColor(Color.BLUE);
+                                sharedPreferences.edit().putBoolean(endMeasure,false).apply();
+                                if (HumidityMain.progress.getAnimation() == null || HumidityMain.progress.getAnimation().hasEnded())
+                                {
+                                    Animation a=new RotateAnimation(0,720,HumidityMain.progress.getPivotX(),HumidityMain.progress.getPivotY());
+                                    a.setRepeatCount(Animation.INFINITE);
+                                    a.setDuration(2000);
+                                    a.setInterpolator(new LinearInterpolator());
+                                    HumidityMain.progress.startAnimation(a);
+                                }
+                                handlerMessage.sendEmptyMessage(3);
+                                break;
+
+                            default:
                                 String[] voltages = str.split(",");
                                 try {
                                     new Integer(voltages[2]);

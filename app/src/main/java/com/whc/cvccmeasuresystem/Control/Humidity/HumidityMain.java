@@ -8,6 +8,7 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -24,6 +25,7 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,6 +38,7 @@ import com.whc.cvccmeasuresystem.Client.JobHumidity;
 import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
+import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Chart;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 import com.whc.cvccmeasuresystem.FloatWindow.FloatWindowManager;
@@ -60,15 +63,16 @@ public class HumidityMain extends Fragment {
     private static Activity activity;
     private static ImageView[] imageViews;
     private static SharedPreferences sharedPreferences;
-    private static TextView showTime;
+    public static TextView showTime,message;
     public static long startTime;
-
-    private BootstrapButton con, stop, minimize, start;
-    private static ProgressBar progress1,progress2;
-
+    public static ProgressBar progress;
     private static long hour,min,second;
     private static String setTime;
-    private static Drawable drawable;
+
+
+
+    private BootstrapButton con, stop, minimize, start;
+
 
 
 
@@ -79,22 +83,22 @@ public class HumidityMain extends Fragment {
             switch (msg.what) {
                 case 0:
                     for (ImageView imageView : imageViews) {
-                        Common.setImageAnimation(imageView);
+                        Common.clearImageAnimation(imageView);
                     }
                     break;
                 case 1:
-                    long differ =System.currentTimeMillis()-startTime;
-                    second=(differ/1000)%60;
-                    min=((differ/1000)/60)%60;
-                    hour=((differ/1000)/60)/60;
-                    setTime="Duration\n"+String.format("%02d",hour)+":"+String.format("%02d",min)+":"+String.format("%02d",second);
+                    long differ = System.currentTimeMillis() - startTime;
+                    second = (differ / 1000) % 60;
+                    min = ((differ / 1000) / 60) % 60;
+                    hour = ((differ / 1000) / 60) / 60;
+                    setTime = "Duration\n" + String.format("%02d", hour) + ":" + String.format("%02d", min) + ":" + String.format("%02d", second);
                     showTime.setText(setTime);
-
-
-
                     break;
                 case 2:
                     Common.setImageAnimation(imageViews[msg.arg1]);
+                    break;
+                case 3:
+                    Common.showToast(activity, activity.getString(R.string.measure_start));
                     break;
             }
 
@@ -146,9 +150,10 @@ public class HumidityMain extends Fragment {
         imageViews[2] = view.findViewById(R.id.sample3I);
         imageViews[3] = view.findViewById(R.id.sample4I);
 
-        progress1=view.findViewById(R.id.progress1);
-        progress2=view.findViewById(R.id.progress2);
-
+        progress=view.findViewById(R.id.progress);
+        message=view.findViewById(R.id.message);
+        message.setText(R.string.measure_stop);
+        message.setTextColor(Color.RED);
 
         showTime = view.findViewById(R.id.showTime);
         start = view.findViewById(R.id.start);
@@ -208,9 +213,9 @@ public class HumidityMain extends Fragment {
                 return;
             }
             //重置圖片
-
-            startTime=System.currentTimeMillis();
             showLightHandler.sendEmptyMessage(0);
+
+            JobHumidity.setTime=true;
             startMeasure();
         }
     }
@@ -248,6 +253,7 @@ public class HumidityMain extends Fragment {
     }
 
     public void stopMeasure() {
+        progress.clearAnimation();
         sharedPreferences.edit().putBoolean(endMeasure, true).apply();
         JobHumidity.mRun = false;
         if (JobHumidity.socket != null) {
@@ -265,9 +271,6 @@ public class HumidityMain extends Fragment {
 
 
     private void startMeasure() {
-
-        progress1.setVisibility(View.GONE);
-        progress2.setVisibility(View.VISIBLE);
 
         //check Wifi
         WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(activity.WIFI_SERVICE);
@@ -294,7 +297,6 @@ public class HumidityMain extends Fragment {
         builder.setRequiresDeviceIdle(false);
         tm.schedule(builder.build());
 
-        Common.showToast(activity, getString(R.string.measure_start));
     }
 
 }
