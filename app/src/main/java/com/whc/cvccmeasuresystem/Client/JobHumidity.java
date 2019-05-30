@@ -213,14 +213,7 @@ public class JobHumidity extends android.app.job.JobService{
                                 //-------------------------------------------------//
 
                                 sharedPreferences.edit().putBoolean(endMeasure,false).apply();
-                                if (HumidityMain.progress.getAnimation() == null || HumidityMain.progress.getAnimation().hasEnded())
-                                {
-                                    Animation a=new RotateAnimation(0,720,HumidityMain.progress.getPivotX(),HumidityMain.progress.getPivotY());
-                                    a.setRepeatCount(Animation.INFINITE);
-                                    a.setDuration(2000);
-                                    a.setInterpolator(new LinearInterpolator());
-                                    HumidityMain.progress.startAnimation(a);
-                                }
+
                                 handlerMessage.sendEmptyMessage(3);
                                 break;
 

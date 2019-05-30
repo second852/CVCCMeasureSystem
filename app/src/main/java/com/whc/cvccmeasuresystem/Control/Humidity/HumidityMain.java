@@ -2,14 +2,11 @@ package com.whc.cvccmeasuresystem.Control.Humidity;
 
 
 import android.app.Activity;
-import android.app.TimePickerDialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -22,21 +19,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
-import com.beardedhen.androidbootstrap.AwesomeTextView;
-import com.beardedhen.androidbootstrap.BootstrapButton;
-import com.beardedhen.androidbootstrap.api.defaults.DefaultBootstrapBrand;
 import com.whc.cvccmeasuresystem.Client.JobHumidity;
-import com.whc.cvccmeasuresystem.Client.JobService;
 import com.whc.cvccmeasuresystem.Common.Common;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
@@ -56,6 +42,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 
+import static com.whc.cvccmeasuresystem.Client.JobHumidity.handlerMessage;
 import static com.whc.cvccmeasuresystem.Client.JobHumidity.measureFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.*;
 
@@ -63,20 +50,23 @@ import static com.whc.cvccmeasuresystem.Common.Common.*;
 public class HumidityMain extends Fragment {
 
 
-    private static Activity activity;
-    private static ImageView[] imageViews;
+    public static Activity activity;
+
+    private static ImageView[] oneWater;
+    private static ImageView[] twoWater;
+    private static ImageView[] threeWater;
+    private static ImageView[] fourWater;
+
     private static SharedPreferences sharedPreferences;
-    public static TextView showTime,message;
+    public static TextView showTime;
     public static long startTime;
-    public static ProgressBar progress;
     public static long hour,min,second;
     private static String setTime;
     public static HumidityVO[] humidityVOS;
+    public static boolean pauseNow;
+    public static ImageView pause, stop, start,measureStatue;
 
-
-
-
-    public BootstrapButton con, stop, minimize, start;
+    public ImageView minimize;
 
 
 
@@ -87,18 +77,17 @@ public class HumidityMain extends Fragment {
             super.handleMessage(msg);
             switch (msg.what) {
                 case 0:
-                    for (ImageView imageView : imageViews) {
-                        Common.clearImageAnimation(imageView);
-                    }
+                    Common.clearImageAnimation(oneWater);
+                    Common.clearImageAnimation(twoWater);
+                    Common.clearImageAnimation(threeWater);
+                    Common.clearImageAnimation(fourWater);
                     break;
                 case 1:
-                    HumidityMain.message.setText(R.string.measure_start);
-                    HumidityMain.message.setTextColor(Color.BLUE);
-                    setTime = "Duration\n" + String.format("%02d", hour) + ":" + String.format("%02d", min) + ":" + String.format("%02d", second);
+                    startStatus();
+                    setTime = String.format("%02d", hour) + ":" + String.format("%02d", min) + ":" + String.format("%02d", second);
                     showTime.setText(setTime);
                     break;
                 case 2:
-                    Common.setImageAnimation(imageViews[msg.arg1]);
                     break;
                 case 3:
                     Common.showToast(activity, activity.getString(R.string.measure_start));
@@ -135,69 +124,41 @@ public class HumidityMain extends Fragment {
         final View view = inflater.inflate(R.layout.humidity_main, container, false);
         humidityVOS=new HumidityVO[4];
         findViewById(view);
-        showTime.setText("Duration\n 00:00:00");
         start.setOnClickListener(new startAction());
-        con.setOnClickListener(new continueAction());
+        pause.setOnClickListener(new continueAction());
         stop.setOnClickListener(new stopAction());
-
-        setMeasureNowData();
-        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                startMeasure=!(sharedPreferences.getBoolean(Common.endMeasure,true));
-                if(startMeasure)
-                {
-                    if (HumidityMain.progress.getAnimation() == null || HumidityMain.progress.getAnimation().hasEnded())
-                    {
-                        Animation a=new RotateAnimation(0,720,HumidityMain.progress.getPivotX(),HumidityMain.progress.getPivotY());
-                        a.setRepeatCount(Animation.INFINITE);
-                        a.setDuration(2000);
-                        a.setInterpolator(new LinearInterpolator());
-                        HumidityMain.progress.startAnimation(a);
-                    }
-                    showLightHandler.sendEmptyMessage(1);
-                    setMeasureNowData();
-                }else{
-
-                    HumidityMain.progress.clearAnimation();
-                    message.setText(getString(R.string.measure_stop));
-                    message.setTextColor(Color.RED);
-                    if( Common.pageCon!=null)
-                    {
-                        if(pageCon.getCon1().equals("continue"))
-                        {
-                            con.setText("continue");
-                            con.setBootstrapBrand(DefaultBootstrapBrand.INFO);
-                            showTime.setText(pageCon.getCon2());
-                            setMeasureNowData();
-                        }
-                    }
-
-
-                }
-
-                view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-            }
-        });
         return view;
     }
 
     private void findViewById(View view) {
-        imageViews = new ImageView[4];
-        imageViews[0] = view.findViewById(R.id.sample1I);
-        imageViews[1] = view.findViewById(R.id.sample2I);
-        imageViews[2] = view.findViewById(R.id.sample3I);
-        imageViews[3] = view.findViewById(R.id.sample4I);
 
-        progress=view.findViewById(R.id.progress);
-        message=view.findViewById(R.id.message);
-        message.setText(R.string.measure_stop);
-        message.setTextColor(Color.RED);
+        oneWater = new ImageView[1];
+        oneWater[0]=view.findViewById(R.id.one_water);
+
+        twoWater=new ImageView[2];
+        twoWater[0] = view.findViewById(R.id.two_water1);
+        twoWater[1] = view.findViewById(R.id.two_water2);
+
+        threeWater=new ImageView[3];
+        threeWater[0] = view.findViewById(R.id.three_water1);
+        threeWater[1] = view.findViewById(R.id.three_water2);
+        threeWater[2] = view.findViewById(R.id.three_water3);
+
+        fourWater=new ImageView[4];
+        fourWater[0]=view.findViewById(R.id.four_water1);
+        fourWater[1]=view.findViewById(R.id.four_water2);
+        fourWater[2]=view.findViewById(R.id.four_water3);
+        fourWater[3]=view.findViewById(R.id.four_water4);
+
+
+
 
         showTime = view.findViewById(R.id.showTime);
         start = view.findViewById(R.id.start);
-        con = view.findViewById(R.id.con);
+        pause = view.findViewById(R.id.pause);
         stop = view.findViewById(R.id.stop);
+        measureStatue=view.findViewById(R.id.measureStatue);
+
         minimize = view.findViewById(R.id.minimize);
         minimize.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,13 +168,35 @@ public class HumidityMain extends Fragment {
         });
 
 
-
     }
 
     @Override
     public void onStart() {
         super.onStart();
         JobHumidity.onPause=false;
+        startMeasure=!(sharedPreferences.getBoolean(endMeasure,true));
+        pauseNow=sharedPreferences.getBoolean("pauseNow",true);
+        if(!startMeasure)
+        {
+            stopStatus();
+        }else
+        {
+            if(pauseNow){
+                pauseStatus();
+            }else {
+                startStatus();
+            }
+        }
+
+        if(Common.pageCon!=null)
+        {
+            if(Common.pageCon.getCon1()==null||Common.pageCon.getCon1().trim().isEmpty())
+            {
+                showTime.setText("00:00:00");
+            }else{
+                showTime.setText(Common.pageCon.getCon1());
+            }
+        }
 
     }
 
@@ -222,9 +205,9 @@ public class HumidityMain extends Fragment {
         super.onPause();
         JobHumidity.onPause=true;
         PageCon pageCon=new PageCon();
-        pageCon.setCon1(con.getText().toString());
-        pageCon.setCon2(showTime.getText().toString());
+        pageCon.setCon1(showTime.getText().toString());
         Common.savePageParameter(sharedPreferences,pageCon);
+        sharedPreferences.edit().putBoolean("pauseNow",pauseNow).apply();
     }
 
 
@@ -232,16 +215,19 @@ public class HumidityMain extends Fragment {
         @Override
         public void onClick(View view) {
 
-            if (startMeasure||con.getText().equals("continue")) {
+            if (startMeasure||!pauseNow) {
                 Common.showToast(activity, "Measuring Now! Please Press Stop");
                 return;
             }
+
             //重置圖片
             showLightHandler.sendEmptyMessage(0);
-            hour=0;
-            min=0;
-            second=0;
+            //重置時間
+            hour=0;min=0;second=0;
+
             JobHumidity.setTime=true;
+
+
             startMeasure();
 
 
@@ -284,16 +270,16 @@ public class HumidityMain extends Fragment {
                 return;
             }
 
-            if (JobHumidity.mRun) {
-                con.setText("continue");
-                con.setBootstrapBrand(DefaultBootstrapBrand.INFO);
+            if (!pauseNow) {
+                pauseStatus();
                 stopMeasure();
                 JobHumidity.mRun = false;
+                pauseNow=true;
             } else {
-                con.setText("break");
-                con.setBootstrapBrand(DefaultBootstrapBrand.WARNING);
+                showLightHandler.sendEmptyMessage(1);
                 startMeasure();
                 JobHumidity.mRun = true;
+                pauseNow=false;
             }
         }
     }
@@ -310,10 +296,8 @@ public class HumidityMain extends Fragment {
 
     public void stopMeasure() {
 
-        HumidityMain.message.setText(R.string.measure_stop);
-        HumidityMain.message.setTextColor(Color.RED);
-        progress.clearAnimation();
-        sharedPreferences.edit().putBoolean(endMeasure, true).apply();
+
+
         JobHumidity.mRun = false;
         if (JobHumidity.socket != null) {
             try {
@@ -355,6 +339,7 @@ public class HumidityMain extends Fragment {
         builder.setRequiresDeviceIdle(false);
         tm.schedule(builder.build());
 
+        pauseNow=false;
     }
 
     public void setMeasureNowData(){
@@ -365,14 +350,40 @@ public class HumidityMain extends Fragment {
             long id=sharedPreferences.getLong("HumidityVO"+i,0);
              Log.d("XXXXXX"," sharedPreferences: "+ id);
              humidityVOS[i]=humidityDB.getById(id);
-             if(humidityVOS[i].isLight())
-            {
-                Common.setImageAnimation(imageViews[i]);
-            }else{
-                Common.clearImageAnimation(imageViews[i]);
-            }
         }
     };
+
+
+    public static void startStatus()
+    {
+        start.setImageResource(R.drawable.start_button_down);
+        pause.setImageResource(R.drawable.break_button_up);
+        stop.setImageResource(R.drawable.stop_button_up);
+        measureStatue.setImageResource(R.drawable.start);
+        showTime.setBackground(activity.getDrawable(R.drawable.corners_model_green));
+        showTime.setTextColor(activity.getColor(R.color.bootstrap_brand_success));
+    }
+
+    public static void pauseStatus()
+    {
+        start.setImageResource(R.drawable.start_button_up);
+        pause.setImageResource(R.drawable.break_button_down);
+        stop.setImageResource(R.drawable.stop_button_up);
+        measureStatue.setImageResource(R.drawable.pause);
+        showTime.setBackground(activity.getDrawable(R.drawable.corners_model_yellow));
+        showTime.setTextColor(activity.getColor(R.color.bootstrap_brand_warning));
+    }
+
+    public static void stopStatus()
+    {
+        sharedPreferences.edit().putBoolean(endMeasure, true).apply();
+        HumidityMain.start.setImageResource(R.drawable.start_button_up);
+        HumidityMain.pause.setImageResource(R.drawable.break_button_up);
+        HumidityMain.stop.setImageResource(R.drawable.stop_button_down);
+        HumidityMain.measureStatue.setImageResource(R.drawable.stop);
+        HumidityMain.showTime.setBackground(HumidityMain.activity.getDrawable(R.drawable.corners_model_gray));
+        HumidityMain.showTime.setTextColor(HumidityMain.activity.getColor(R.color.bootstrap_gray_light));
+    }
 
 
 }

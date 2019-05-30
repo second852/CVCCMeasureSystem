@@ -6,22 +6,27 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.beardedhen.androidbootstrap.BootstrapEditText;
 import com.beardedhen.androidbootstrap.BootstrapText;
 import com.github.mikephil.charting.components.Description;
 import com.google.gson.Gson;
+import com.whc.cvccmeasuresystem.Control.Humidity.HumidityMain;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.PagConDB;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
@@ -452,10 +457,13 @@ public class Common {
     }
 
 
-    public static void clearImageAnimation(ImageView image)
+    public static void clearImageAnimation(ImageView[] images)
     {
-        image.setImageResource(R.drawable.lighte);
-        image.clearAnimation();
+        for(ImageView imageView:images)
+        {
+            imageView.setImageResource(R.drawable.water_empty);
+            imageView.clearAnimation();
+        }
     }
 
     public static void setImageAnimation(ImageView image)
@@ -469,6 +477,29 @@ public class Common {
         image.startAnimation(animation);
     }
 
+
+    public static void setProgressBar(ProgressBar progressBar)
+    {
+        if (progressBar.getAnimation() == null ||progressBar.getAnimation().hasEnded())
+        {
+            Animation a=new RotateAnimation(0,720,progressBar.getPivotX(),progressBar.getPivotY());
+            a.setRepeatCount(Animation.INFINITE);
+            a.setDuration(2000);
+            a.setInterpolator(new LinearInterpolator());
+            progressBar.startAnimation(a);
+        }
+    }
+
+
+    public void getWidth(final View view)
+    {
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
+    }
 
 
 }

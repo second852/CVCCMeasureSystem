@@ -22,7 +22,9 @@ import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Set;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Set;
+import com.whc.cvccmeasuresystem.R;
 
+import static com.whc.cvccmeasuresystem.Common.Common.HistoryMain;
 import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
 
 
@@ -79,8 +81,7 @@ public class StopDialogFragment extends DialogFragment implements DialogInterfac
                 {
                     HumidityMain humidityMain= (HumidityMain) object;
                     startMeasure=false;
-                    humidityMain.con.setText("break");
-                    humidityMain.con.setBootstrapBrand(DefaultBootstrapBrand.WARNING);
+                    HumidityMain.stopStatus();
                     humidityMain.stopMeasure();
                 }
                 break;
