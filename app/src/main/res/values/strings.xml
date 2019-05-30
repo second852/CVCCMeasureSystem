@@ -3,6 +3,7 @@
     <string name="app_name">BC System</string>
     <string name="measure_stop">Measurement Stop</string>
     <string name="measure_start">Measurement Start</string>
+    <string name="measure_time">Measurement Time</string>
     <string name="home">Home</string>
     <string name="exit">Exit</string>
     <string name="measure_start_not_exit">Measuring Now! Please pressure "Stop" ! </string>

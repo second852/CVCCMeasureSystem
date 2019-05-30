@@ -3,11 +3,12 @@
     android:shape="rectangle" >
     <!-- The radius makes the corners rounded -->
     <corners
-        android:radius="3dp"
+        android:radius="5dp"
         >
     </corners>
     <stroke
-        android:width="0.5dp"
+        android:width="2dp"
+        android:color="#dddddd"
         >
     </stroke>
 </shape>
