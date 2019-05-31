@@ -1,6 +1,7 @@
 package com.whc.cvccmeasuresystem.Model;
 
 import java.sql.Timestamp;
+import java.util.Objects;
 
 public class HumidityVO {
 
@@ -11,6 +12,7 @@ public class HumidityVO {
     private Integer overVoltage;
     private boolean isLight;
     private int fileID;//3 file measure id
+
 
     public boolean isLight() {
         return isLight;
@@ -68,4 +70,8 @@ public class HumidityVO {
     public void setBeginTime(Timestamp beginTime) {
         this.beginTime = beginTime;
     }
+
+
+
+
 }

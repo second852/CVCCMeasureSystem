@@ -58,7 +58,7 @@ public class HumidityMain extends Fragment {
     private static ImageView[] fourWater;
 
     private static SharedPreferences sharedPreferences;
-    public static TextView showTime;
+    public static TextView showTime,overTime1,overTime2,overTime3,overTime4;
     public static long startTime;
     public static long hour,min,second;
     private static String setTime;
@@ -97,6 +97,42 @@ public class HumidityMain extends Fragment {
     };
 
 
+
+    public static Handler overHandler = new Handler(Looper.myLooper()) {
+        String setTime;
+        long[] time;
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            time= (long[]) msg.obj;
+            setTime = String.format("%02d", time[2]) + ":" + String.format("%02d", time[1]) + ":" + String.format("%02d", time[0]);
+            switch (msg.what)
+            {
+                case 0:
+                    setTextViewBlue(overTime1);
+                    overTime1.setText(setTime);
+                    Common.setImageAnimation(oneWater);
+                    break;
+                case 1:
+                    setTextViewBlue(overTime2);
+                    overTime2.setText(setTime);
+                    Common.setImageAnimation(twoWater);
+                    break;
+                case 2:
+                    setTextViewBlue(overTime3);
+                    overTime3.setText(setTime);
+                    Common.setImageAnimation(threeWater);
+                  break;
+                case 3:
+                    setTextViewBlue(overTime4);
+                    overTime4.setText(setTime);
+                    Common.setImageAnimation(fourWater);
+                   break;
+            }
+        }
+    };
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -113,10 +149,7 @@ public class HumidityMain extends Fragment {
         sharedPreferences.edit().putString(finalFragment, HumidityMainString).apply();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -151,7 +184,10 @@ public class HumidityMain extends Fragment {
         fourWater[3]=view.findViewById(R.id.four_water4);
 
 
-
+        overTime1=view.findViewById(R.id.overTime1);
+        overTime2=view.findViewById(R.id.overTime2);
+        overTime3=view.findViewById(R.id.overTime3);
+        overTime4=view.findViewById(R.id.overTime4);
 
         showTime = view.findViewById(R.id.showTime);
         start = view.findViewById(R.id.start);
@@ -175,9 +211,10 @@ public class HumidityMain extends Fragment {
         super.onStart();
         JobHumidity.onPause=false;
         startMeasure=!(sharedPreferences.getBoolean(endMeasure,true));
-        pauseNow=sharedPreferences.getBoolean("pauseNow",true);
+        pauseNow=sharedPreferences.getBoolean(Common.pauseNow,true);
         if(!startMeasure)
         {
+            pauseNow=true;
             stopStatus();
         }else
         {
@@ -187,6 +224,8 @@ public class HumidityMain extends Fragment {
                 startStatus();
             }
         }
+
+        setMeasureNowData();
 
         if(Common.pageCon!=null)
         {
@@ -207,7 +246,7 @@ public class HumidityMain extends Fragment {
         PageCon pageCon=new PageCon();
         pageCon.setCon1(showTime.getText().toString());
         Common.savePageParameter(sharedPreferences,pageCon);
-        sharedPreferences.edit().putBoolean("pauseNow",pauseNow).apply();
+        sharedPreferences.edit().putBoolean(Common.pauseNow,pauseNow).apply();
     }
 
 
@@ -344,14 +383,52 @@ public class HumidityMain extends Fragment {
 
     public void setMeasureNowData(){
         HumidityDB humidityDB=new HumidityDB(new DataBase(activity));
-
+        int count=0;
         for(int i=0;i<4;i++)
         {
             long id=sharedPreferences.getLong("HumidityVO"+i,0);
-             Log.d("XXXXXX"," sharedPreferences: "+ id);
-             humidityVOS[i]=humidityDB.getById(id);
+            Log.d("XXXXXX"," sharedPreferences: "+ id);
+            humidityVOS[i]=humidityDB.getById(id);
+            if(humidityVOS[i].isLight())
+            {
+                count++;
+            }
         }
-    };
+
+        switch (count)
+        {
+            case 1:
+                Common.setImageAnimation(oneWater);
+                Common.clearImageAnimation(twoWater);
+                Common.clearImageAnimation(threeWater);
+                Common.clearImageAnimation(fourWater);
+                break;
+            case 2:
+                Common.setImageAnimation(oneWater);
+                Common.setImageAnimation(twoWater);
+                Common.clearImageAnimation(threeWater);
+                Common.clearImageAnimation(fourWater);
+                break;
+            case 3:
+                Common.setImageAnimation(oneWater);
+                Common.setImageAnimation(twoWater);
+                Common.setImageAnimation(threeWater);
+                Common.clearImageAnimation(fourWater);
+                break;
+            case 4:
+                Common.setImageAnimation(oneWater);
+                Common.setImageAnimation(twoWater);
+                Common.setImageAnimation(threeWater);
+                Common.setImageAnimation(fourWater);
+                break;
+            default:
+                Common.clearImageAnimation(oneWater);
+                Common.clearImageAnimation(twoWater);
+                Common.clearImageAnimation(threeWater);
+                Common.clearImageAnimation(fourWater);
+                break;
+        }
+    }
 
 
     public static void startStatus()
@@ -377,13 +454,29 @@ public class HumidityMain extends Fragment {
     public static void stopStatus()
     {
         sharedPreferences.edit().putBoolean(endMeasure, true).apply();
+        sharedPreferences.edit().putBoolean(Common.pauseNow,true).apply();
         HumidityMain.start.setImageResource(R.drawable.start_button_up);
         HumidityMain.pause.setImageResource(R.drawable.break_button_up);
         HumidityMain.stop.setImageResource(R.drawable.stop_button_down);
         HumidityMain.measureStatue.setImageResource(R.drawable.stop);
-        HumidityMain.showTime.setBackground(HumidityMain.activity.getDrawable(R.drawable.corners_model_gray));
-        HumidityMain.showTime.setTextColor(HumidityMain.activity.getColor(R.color.bootstrap_gray_light));
+
+        setTextViewBlack( HumidityMain.showTime);
+
     }
+
+    public static  void  setTextViewBlack(TextView textView)
+    {
+        textView.setBackground(HumidityMain.activity.getDrawable(R.drawable.corners_model_gray));
+        textView.setTextColor(HumidityMain.activity.getColor(R.color.bootstrap_gray_light));
+    }
+
+    public static  void  setTextViewBlue(TextView textView)
+    {
+        textView.setBackground(HumidityMain.activity.getDrawable(R.drawable.corners_model_blue));
+        textView.setTextColor(HumidityMain.activity.getColor(R.color.bootstrap_brand_info));
+    }
+
+
 
 
 }

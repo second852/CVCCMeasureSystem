@@ -85,6 +85,7 @@ public class Common {
 
     public static final String finalFragment = "finalFragment";
     public static final String endMeasure = "endMeasure";
+    public static final String pauseNow = "pauseNow";
     public static final String finalPage = "finalPage";
     public static final String onPause = "onPause";
     public static final String endModule = "endModule";
@@ -466,15 +467,21 @@ public class Common {
         }
     }
 
-    public static void setImageAnimation(ImageView image)
+    public static void setImageAnimation(ImageView[] images)
     {
-        Animation animation = new AlphaAnimation(1, 0);
-        animation.setDuration(1000);
-        animation.setInterpolator(new LinearInterpolator());
-        animation.setRepeatCount(Animation.INFINITE);
-        animation.setRepeatMode(Animation.REVERSE);
-        image.setImageResource(R.drawable.lighto);
-        image.startAnimation(animation);
+        for(ImageView image:images)
+        {
+            if(image.getAnimation()==null||image.getAnimation().hasEnded())
+            {
+                Animation animation = new AlphaAnimation(1, 0);
+                animation.setDuration(1000);
+                animation.setInterpolator(new LinearInterpolator());
+                animation.setRepeatCount(Animation.INFINITE);
+                animation.setRepeatMode(Animation.REVERSE);
+                image.setImageResource(R.drawable.water_full);
+                image.startAnimation(animation);
+            }
+        }
     }
 
 
