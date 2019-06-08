@@ -48,10 +48,11 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class Common {
     public static String[] mainFunctionName = {"BatchStep1", "Ion channels", "Sensitivity", "Drift", "Hysteresis","Humidity","History"};
-    public static int[] mainFunctionImage = {R.drawable.batch, R.drawable.ionchannels, R.drawable.sensitivity, R.drawable.drift, R.drawable.hysteresis,R.drawable.lighto, R.drawable.history};
+    public static int[] mainFunctionImage = {R.drawable.batch, R.drawable.ionchannels, R.drawable.sensitivity, R.drawable.drift, R.drawable.hysteresis,R.drawable.water_full, R.drawable.history};
     public static final String needName = "Please input this name";
     public static final String userShare = "CVCCUser";
     public static final String userId = "userId";
+    public static final String fileId = "fileId";
     public static SimpleDateFormat timeToString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ");
     public static SimpleDateFormat timeToSheet = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss ");
     public static final String sample1String = "sample1";
@@ -91,8 +92,17 @@ public class Common {
     public static final String endModule = "endModule";
     public static final String solutionTimes = "solutionTimes";
 
+    public static final String settingsVoltage = "settingsVoltage";
+
+
 
     public static final String HumidityMainString = "HumidityMain";
+    public static final String HumidityMainTime = "HumidityMainTime";
+    public static final String HumidityOneThread = "HumidityOneThread";
+    public static final String HumidityTwoThread = "HumidityTwoThread";
+    public static final String HumidityThreeThread = "HumidityThreeThread";
+    public static final String HumidityFourThread = "HumidityFourThread";
+
 
     //measure constant
     public static Sample sample1, sample2, sample3, sample4;

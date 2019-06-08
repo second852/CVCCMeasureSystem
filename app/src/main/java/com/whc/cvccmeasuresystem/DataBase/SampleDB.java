@@ -170,10 +170,14 @@ public class SampleDB {
             samples.add(sample);
             Common.samples.add(sample);
         }
-        Common.sample1=samples.get(0);
-        Common.sample2=samples.get(1);
-        Common.sample3=samples.get(2);
-        Common.sample4=samples.get(3);
+        if(!samples.isEmpty())
+        {
+            Common.sample1=samples.get(0);
+            Common.sample2=samples.get(1);
+            Common.sample3=samples.get(2);
+            Common.sample4=samples.get(3);
+        }
+
         cursor.close();
         return dataMap;
     }

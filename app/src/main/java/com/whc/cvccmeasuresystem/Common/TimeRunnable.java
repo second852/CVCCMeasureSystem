@@ -1,25 +1,30 @@
 package com.whc.cvccmeasuresystem.Common;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Message;
+import android.util.Log;
 
 import com.whc.cvccmeasuresystem.Control.Humidity.HumidityMain;
 import com.whc.cvccmeasuresystem.Model.HumidityVO;
+import com.whc.cvccmeasuresystem.Model.PageCon;
 
 public class TimeRunnable implements Runnable {
 
     private int what;
     private HumidityVO humidityVO;
-    private boolean timeRun;
+    public static boolean timeRun;
     private long nowTime,differ,second,min,hour;
-    private long[] time;
+    private String setTime;
+    private SharedPreferences sharedPreferences;
+    private String nameThread;
 
 
-    public TimeRunnable(int what, HumidityVO humidityVO) {
+    public TimeRunnable(int what, HumidityVO humidityVO, SharedPreferences sharedPreferences, String nameThread) {
         this.what = what;
         this.humidityVO = humidityVO;
-        timeRun=true;
-        time=new long[3];
-
+        this.sharedPreferences = sharedPreferences;
+        this.nameThread = nameThread;
     }
 
     @Override
@@ -45,20 +50,24 @@ public class TimeRunnable implements Runnable {
                     hour=hour+1;
                 }
 
-                time[0]=second;
-                time[1]=min;
-                time[2]=hour;
-
+                setTime = String.format("%02d", hour) + ":" + String.format("%02d", min) ;
+                setTime=String.valueOf(setTime);
+                sharedPreferences.edit().putString(nameThread,setTime).apply();
+                Log.d("Sample Job",humidityVO.getName()+" : " +setTime);
                 Message message=new Message();
-                message.obj=time;
+                message.obj=setTime;
                 message.what=what;
                 HumidityMain.overHandler.sendMessage(message);
+
+
 
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
+
             }
         }
 

@@ -9,6 +9,7 @@ import android.support.v4.app.DialogFragment;
 import android.text.Html;
 
 import com.beardedhen.androidbootstrap.api.defaults.DefaultBootstrapBrand;
+import com.whc.cvccmeasuresystem.Client.JobHumidity;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Main;
@@ -84,6 +85,7 @@ public class StopDialogFragment extends DialogFragment implements DialogInterfac
                     HumidityMain.pauseNow=true;
                     HumidityMain.stopStatus();
                     humidityMain.stopMeasure();
+                    JobHumidity.stopErrorTime();
                 }
                 break;
             default:

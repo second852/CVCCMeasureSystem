@@ -58,14 +58,14 @@ public class SolutionAdapter extends BaseAdapter {
         Drawable drawable;
         if(position==0)
         {
-            drawable=context.getResources().getDrawable(R.drawable.show_date_model_1);
+            drawable=context.getDrawable(R.drawable.show_date_model_1);
             times.setText("Time");
             sampleName.setText("Name");
             sampleIon.setText("Ion");
             sampleIVol.setText("mV");
             dateTime.setText("DateTime");
         }else {
-            drawable=context.getResources().getDrawable(R.drawable.show_date_model_2);
+            drawable=context.getDrawable(R.drawable.show_date_model_2);
             Solution solution=solutions.get(position);
             Sample sample=sampleDB.findOldSample(solution.getSampleID());
             times.setText(solution.getNumber());

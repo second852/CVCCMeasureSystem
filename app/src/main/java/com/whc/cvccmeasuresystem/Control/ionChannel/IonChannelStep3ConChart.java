@@ -125,6 +125,10 @@ public class IonChannelStep3ConChart extends Fragment{
 
     private void setLineChart(LineChart lineChart, List<Solution> solutions, String name,Sample sample) {
         List<Entry> entries = new ArrayList<Entry>();
+        if(solutions==null)
+        {
+            return;
+        }
         size=solutions.size();
         if(size<=0)
         {

@@ -100,6 +100,7 @@ public class HomeDialogFragment extends DialogFragment implements  DialogInterfa
                     IonChannelStep3Set ionChannelStep3Set= (IonChannelStep3Set) object;
                     ionChannelStep3Set.finishMeasure();
                 }
+                Common.measureTimes=0;
                 break;
             default:
                 dialog.cancel();

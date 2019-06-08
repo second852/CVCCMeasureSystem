@@ -110,6 +110,7 @@ public class DriftStep2Chart extends Fragment{
 //        solution.setVoltage(200);
 //        solutions.add(solution);
 //        solutions.add(solution);
+
         setLineChart(lineCharts[0],solutions,sample1);
 
         solutions=dataMap.get(sample2);
@@ -126,6 +127,10 @@ public class DriftStep2Chart extends Fragment{
 
     private void setLineChart(LineChart lineChart, final List<Solution> solutions, final Sample sample) {
         List<Entry> entries = new ArrayList<Entry>();
+        if(solutions==null)
+        {
+            return;
+        }
         size=solutions.size();
         if(size<=0)
         {

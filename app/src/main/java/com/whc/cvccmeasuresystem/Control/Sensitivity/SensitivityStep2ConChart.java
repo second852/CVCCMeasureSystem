@@ -190,6 +190,10 @@ public class SensitivityStep2ConChart extends Fragment{
     private void setLineChart(LineChart lineChart, HashMap<String,List<Solution>> solutions, String name, String s, Sample sample) {
         String describe;
         List<Entry> entries = new ArrayList<Entry>();
+        if(solutions==null)
+        {
+            return;
+        }
         size=solutions.size();
         if(size<=0)
         {

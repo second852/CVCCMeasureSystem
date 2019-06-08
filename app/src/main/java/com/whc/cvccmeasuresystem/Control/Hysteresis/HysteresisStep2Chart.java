@@ -128,6 +128,10 @@ public class HysteresisStep2Chart extends Fragment{
 
 
     private void setLineChart(LineChart lineChart, final List<Solution> solutions, final Sample sample) {
+        if(solutions==null)
+        {
+            return;
+        }
         size=solutions.size();
         if(size<=0)
         {

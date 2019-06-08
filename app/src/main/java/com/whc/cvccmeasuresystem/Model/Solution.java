@@ -101,4 +101,12 @@ public class Solution implements Serializable{
         this.sampleID = sampleID;
     }
 
+    @Override
+    public String toString() {
+        return "Solution{" +
+                "ID=" + ID +
+                ", concentration='" + concentration + '\'' +
+                ", voltage=" + voltage +
+                '}';
+    }
 }

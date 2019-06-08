@@ -121,6 +121,10 @@ public class BatchStep2Chart extends Fragment{
 
     private void setLineChart(LineChart lineChart, final List<Solution> solutions, final Sample sample) {
         List<Entry> entries = new ArrayList<Entry>();
+        if(solutions==null)
+        {
+            return;
+        }
         size=solutions.size();
         if(size<=0)
         {

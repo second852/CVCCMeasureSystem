@@ -1,14 +1,10 @@
 package com.whc.cvccmeasuresystem.Control;
 
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +24,7 @@ import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep1;
 import com.whc.cvccmeasuresystem.Control.Dift.DriftStep2Main;
 import com.whc.cvccmeasuresystem.Control.History.HistoryMain;
+import com.whc.cvccmeasuresystem.Control.Humidity.HumidityMain;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
 import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep2Main;
 import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
@@ -36,13 +33,16 @@ import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep1;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
-import com.whc.cvccmeasuresystem.DataBase.PagConDB;
 import com.whc.cvccmeasuresystem.FloatWindow.FloatWindowManager;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.whc.cvccmeasuresystem.Common.Common.*;
 
@@ -58,17 +58,41 @@ public class MainActivity extends AppCompatActivity {
         TypefaceProvider.registerDefaultIconSets();
         setContentView(R.layout.activity_main);
         DataBase dataBase=new DataBase(this);
+//        dataBase.getWritableDatabase().execSQL("delete from Humidity");
         Common.tableExist("PageCon", DataBase.Table_PageCon,dataBase.getWritableDatabase());
         Common.tableExist("Humidity", DataBase.Table_Humidity,dataBase.getWritableDatabase());
+        Common.tableExist("HumidityVoltage", DataBase.Table_HumidityVoltage,dataBase.getWritableDatabase());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
         FloatWindowManager.getInstance().dismissWindow();
         SharedPreferences sharedPreferences=this.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         String finalFragment=sharedPreferences.getString(Common.finalFragment,"");
         boolean endModule=sharedPreferences.getBoolean(Common.endModule,true);
+//        Map<String,Object> m= (HashMap<String, Object>) sharedPreferences.getAll();
+//        Set<String> ss=m.keySet();
+//        Iterator itr = ss.iterator();
+//        while(itr.hasNext()) {
+//            String element = (String) itr.next();
+//            Object ee=m.get(element);
+//            if(ee instanceof String)
+//            {
+//                String sss= (String) ee;
+//                Log.d("Sample String ",element+" : "+sss);
+//            }
+//            if(ee instanceof Integer)
+//            {
+//                Integer sss= (Integer) ee;
+//                Log.d("Sample Integer ",element+" : "+String.valueOf(sss));
+//
+//            }
+//
+//        }
+
+
 
         if(endModule)
         {
@@ -124,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case Common.HumidityMainString:
                     oldFragment.add(Common.HumidityMainString);
-                    switchFragment(new com.whc.cvccmeasuresystem.Control.Humidity.HumidityMain(), getSupportFragmentManager());
+                    switchFragment(new HumidityMain(), getSupportFragmentManager());
                     break;
                   default:
                       switchFragment(new SignIn(), getSupportFragmentManager());
@@ -162,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
         }
         SharedPreferences sharedPreferences=this.getSharedPreferences(userShare, Context.MODE_PRIVATE);
         sharedPreferences.edit().putBoolean(Common.endModule,true).apply();
+        measureTimes=0;
         return true;
     }
 

@@ -216,9 +216,9 @@ public class JobService extends android.app.job.JobService{
                             solutionDB.insert(solution4);
 
                             Common.solution1=solution1;
-                            Common.solution2=solution1;
-                            Common.solution3=solution1;
-                            Common.solution4=solution1;
+                            Common.solution2=solution2;
+                            Common.solution3=solution3;
+                            Common.solution4=solution4;
 
 
                             handlerMessage.sendEmptyMessage(3);

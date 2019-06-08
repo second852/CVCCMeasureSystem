@@ -2,29 +2,42 @@ package com.whc.cvccmeasuresystem.Control.Humidity;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.whc.cvccmeasuresystem.Client.JobHumidity;
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Common.CustomDialogFragment;
 import com.whc.cvccmeasuresystem.Common.StopDialogFragment;
+import com.whc.cvccmeasuresystem.Common.TimeRunnable;
+import com.whc.cvccmeasuresystem.Control.MainActivity;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.HumidityDB;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
@@ -39,10 +52,11 @@ import com.whc.cvccmeasuresystem.R;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
-import static com.whc.cvccmeasuresystem.Client.JobHumidity.handlerMessage;
 import static com.whc.cvccmeasuresystem.Client.JobHumidity.measureFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.*;
 
@@ -66,8 +80,12 @@ public class HumidityMain extends Fragment {
     public static boolean pauseNow;
     public static ImageView pause, stop, start,measureStatue;
 
-    public ImageView minimize;
-
+    public ImageView minimize,settings;
+    public LinearLayout settingsL;
+    public TextView overVoltage;
+    public static boolean showAlert;
+    public  static FragmentManager fragmentManager;
+    public ImageView showImage;
 
 
 
@@ -84,12 +102,40 @@ public class HumidityMain extends Fragment {
                     break;
                 case 1:
                     startStatus();
-                    setTime = String.format("%02d", hour) + ":" + String.format("%02d", min) + ":" + String.format("%02d", second);
+                    setTime = String.format("%02d", hour) + ":" + String.format("%02d", min) ;
+                    setTime=String.valueOf(setTime);
                     showTime.setText(setTime);
+                    sharedPreferences.edit().putString(Common.HumidityMainTime,setTime).apply();
                     break;
                 case 2:
+
+                    if( JobHumidity.onPause)
+                    {
+                        Intent intent = new Intent(activity, MainActivity.class);
+                        activity.startActivity(intent);
+                    }else{
+                        if(showAlert)
+                        {
+                            new CustomDialogFragment(activity).Channel((List<String>) msg.obj).show();
+                            showAlert=false;
+                        }
+                    }
                     break;
                 case 3:
+                    Common.clearImageAnimation(oneWater);
+                    Common.clearImageAnimation(twoWater);
+                    Common.clearImageAnimation(threeWater);
+                    Common.clearImageAnimation(fourWater);
+
+                    setTextViewBlack(overTime1);
+                    setTextViewBlack(overTime2);
+                    setTextViewBlack(overTime3);
+                    setTextViewBlack(overTime4);
+
+                    overTime1.setText("00:00");
+                    overTime2.setText("00:00");
+                    overTime3.setText("00:00");
+                    overTime4.setText("00:00");
                     Common.showToast(activity, activity.getString(R.string.measure_start));
                     break;
             }
@@ -100,13 +146,11 @@ public class HumidityMain extends Fragment {
 
     public static Handler overHandler = new Handler(Looper.myLooper()) {
         String setTime;
-        long[] time;
 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            time= (long[]) msg.obj;
-            setTime = String.format("%02d", time[2]) + ":" + String.format("%02d", time[1]) + ":" + String.format("%02d", time[0]);
+            setTime= (String) msg.obj;
             switch (msg.what)
             {
                 case 0:
@@ -129,6 +173,7 @@ public class HumidityMain extends Fragment {
                     overTime4.setText(setTime);
                     Common.setImageAnimation(fourWater);
                    break;
+
             }
         }
     };
@@ -141,7 +186,7 @@ public class HumidityMain extends Fragment {
         } else {
             activity = getActivity();
         }
-
+        fragmentManager=getFragmentManager();
         //init
         activity.setTitle("Humidity Measure");
         sharedPreferences = activity.getSharedPreferences(userShare, Context.MODE_PRIVATE);
@@ -189,6 +234,8 @@ public class HumidityMain extends Fragment {
         overTime3=view.findViewById(R.id.overTime3);
         overTime4=view.findViewById(R.id.overTime4);
 
+
+
         showTime = view.findViewById(R.id.showTime);
         start = view.findViewById(R.id.start);
         pause = view.findViewById(R.id.pause);
@@ -203,7 +250,32 @@ public class HumidityMain extends Fragment {
             }
         });
 
+        settingsL=view.findViewById(R.id.settingsL);
+        settings=view.findViewById(R.id.settings);
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settingsL.setVisibility(View.VISIBLE);
+            }
+        });
+        settingsL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settingsL.setVisibility(View.GONE);
+                sharedPreferences.edit().putString(settingsVoltage,overVoltage.getText().toString()).apply();
+            }
+        });
+        overVoltage=view.findViewById(R.id.overVoltage);
 
+        showImage=view.findViewById(R.id.showData);
+        showImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment fragment=new HumidityData();
+                Common.switchFragment(fragment,getFragmentManager());
+                Common.oldFragment.add(Common.HumidityMainString);
+            }
+        });
     }
 
     @Override
@@ -223,19 +295,11 @@ public class HumidityMain extends Fragment {
             }else {
                 startStatus();
             }
+            setMeasureNowData();
         }
 
-        setMeasureNowData();
-
-        if(Common.pageCon!=null)
-        {
-            if(Common.pageCon.getCon1()==null||Common.pageCon.getCon1().trim().isEmpty())
-            {
-                showTime.setText("00:00:00");
-            }else{
-                showTime.setText(Common.pageCon.getCon1());
-            }
-        }
+        overVoltage.setText(sharedPreferences.getString(Common.settingsVoltage,"0"));
+        showTime.setText(sharedPreferences.getString(Common.HumidityMainTime,"00:00"));
 
     }
 
@@ -243,9 +307,6 @@ public class HumidityMain extends Fragment {
     public void onPause() {
         super.onPause();
         JobHumidity.onPause=true;
-        PageCon pageCon=new PageCon();
-        pageCon.setCon1(showTime.getText().toString());
-        Common.savePageParameter(sharedPreferences,pageCon);
         sharedPreferences.edit().putBoolean(Common.pauseNow,pauseNow).apply();
     }
 
@@ -253,6 +314,12 @@ public class HumidityMain extends Fragment {
     private class startAction implements View.OnClickListener {
         @Override
         public void onClick(View view) {
+
+            if(settingsL.getVisibility()==View.VISIBLE)
+            {
+                Common.showToast(activity, "Please Close View of Setting Voltage !");
+                return;
+            }
 
             if (startMeasure||!pauseNow) {
                 Common.showToast(activity, "Measuring Now! Please Press Stop");
@@ -265,7 +332,7 @@ public class HumidityMain extends Fragment {
             hour=0;min=0;second=0;
 
             JobHumidity.setTime=true;
-
+            TimeRunnable.timeRun=true;
 
             startMeasure();
 
@@ -281,22 +348,22 @@ public class HumidityMain extends Fragment {
             saveFile.setUserId(useId);
             saveFileDB.insert(saveFile);
             SaveFile nowFile=saveFileDB.findOldSaveFile(saveFile.getName());
+            sharedPreferences.edit().putInt(Common.fileId,nowFile.getID()).apply();
 
-            int i=0;
+
             HumidityDB humidityDB=new HumidityDB(dataBase);
-            for (HumidityVO humidityVO:humidityVOS)
+            for (int j=0;j<humidityVOS.length;j++)
             {
-                humidityVO=new HumidityVO();
-                humidityVO.setFileID(nowFile.getID());
-                humidityVO.setBeginTime(new Timestamp(0));
-                humidityVO.setName("Sample"+i);
-                humidityVO.setBaseVoltage(0);
-                humidityVO.setOverVoltage(0);
-                humidityVO.setLight(false);
-                humidityVO.setId(humidityDB.insert(humidityVO));
-                Log.d("XXXXXX Id"," sharedPreferences: "+ humidityVO.getId());
-                sharedPreferences.edit().putLong("HumidityVO"+i,humidityVO.getId()).apply();
-                i++;
+                humidityVOS[j]=new HumidityVO();
+                humidityVOS[j].setFileID(nowFile.getID());
+                humidityVOS[j].setBeginTime(new Timestamp(0));
+                humidityVOS[j].setName("HumidityName"+(j+1));
+                humidityVOS[j].setBaseVoltage(0);
+                humidityVOS[j].setOverVoltage(0);
+                humidityVOS[j].setLight(false);
+                humidityVOS[j].setId(humidityDB.insert(humidityVOS[j]));
+                Log.d("XXXXXX Id"," sharedPreferences: "+ humidityVOS[j].getId());
+                sharedPreferences.edit().putLong("HumidityVO"+j,humidityVOS[j].getId()).apply();
             }
         }
     }
@@ -361,7 +428,6 @@ public class HumidityMain extends Fragment {
             Common.showToast(activity, "Please connect BCS_Device");
             return;
         }
-
         JobScheduler tm = (JobScheduler) activity.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         JobHumidity.handlerMessage = HumidityMain.this.showLightHandler;
         JobHumidity.mRun = true;
@@ -377,13 +443,13 @@ public class HumidityMain extends Fragment {
         builder.setRequiresCharging(false);
         builder.setRequiresDeviceIdle(false);
         tm.schedule(builder.build());
-
         pauseNow=false;
     }
 
     public void setMeasureNowData(){
         HumidityDB humidityDB=new HumidityDB(new DataBase(activity));
         int count=0;
+        List<String> wet=new ArrayList<>();
         for(int i=0;i<4;i++)
         {
             long id=sharedPreferences.getLong("HumidityVO"+i,0);
@@ -392,7 +458,40 @@ public class HumidityMain extends Fragment {
             if(humidityVOS[i].isLight())
             {
                 count++;
+                wet.add("Channel "+(i+1));
             }
+        }
+
+        if(showAlert&&(!wet.isEmpty()))
+        {
+            Log.d("count  wet","show "+ wet);
+            new CustomDialogFragment(activity).Channel(wet).show();
+            showAlert=false;
+        }
+
+        if(count>=1)
+        {
+            setTextViewBlue(overTime1);
+            overTime1.setText(sharedPreferences.getString(Common.HumidityOneThread,"00:00"));
+
+        }
+
+        if(count>=2)
+        {
+            setTextViewBlue(overTime2);
+            overTime2.setText(sharedPreferences.getString(Common.HumidityTwoThread,"00:00"));
+        }
+
+        if(count>=3)
+        {
+            setTextViewBlue(overTime3);
+            overTime3.setText(sharedPreferences.getString(Common.HumidityThreeThread,"00:00"));
+        }
+
+        if(count>=4)
+        {
+            setTextViewBlue(overTime4);
+            overTime4.setText(sharedPreferences.getString(Common.HumidityFourThread,"00:00"));
         }
 
         switch (count)
@@ -475,6 +574,9 @@ public class HumidityMain extends Fragment {
         textView.setBackground(HumidityMain.activity.getDrawable(R.drawable.corners_model_blue));
         textView.setTextColor(HumidityMain.activity.getColor(R.color.bootstrap_brand_info));
     }
+
+
+
 
 
 

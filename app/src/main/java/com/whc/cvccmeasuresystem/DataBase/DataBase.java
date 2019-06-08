@@ -32,6 +32,10 @@ public class DataBase extends SQLiteOpenHelper {
             "CREATE TABLE Humidity ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT ," +
                     "beginTime DATETIME,baseVoltage INTEGER,overVoltage INTEGER,isLight TEXT,fileID INTEGER) ;";
 
+    public static final String Table_HumidityVoltage =
+            "CREATE TABLE HumidityVoltage ( id INTEGER PRIMARY KEY AUTOINCREMENT, Voltage1 INTEGER ," +
+                    "Voltage2 INTEGER,Voltage3 INTEGER,Voltage4 INTEGER,fileID Integer) ;";
+
     public DataBase(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
