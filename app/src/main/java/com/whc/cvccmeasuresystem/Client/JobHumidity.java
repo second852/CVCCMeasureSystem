@@ -265,8 +265,7 @@ public class JobHumidity extends android.app.job.JobService {
 
 
                                     overV = new Integer(sharedPreferences.getString(Common.settingsVoltage, "0"));
-                                    differV = nowVoltage[k] - firstVoltage[k];
-                                    differV = Math.abs(differV);
+                                    differV = firstVoltage[k]-nowVoltage[k] ;
                                     if (differV > overV) {
                                         showError = true;
 
