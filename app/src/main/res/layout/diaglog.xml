@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/corners_model_blue_full"
-        android:text="Very Wet !"
+        android:text="Wet !"
         android:padding="5dp"
         android:layout_gravity="center"
         android:gravity="center"

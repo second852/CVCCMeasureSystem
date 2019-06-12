@@ -322,9 +322,9 @@ public class JobHumidity extends android.app.job.JobService {
                                 if (showError) {
 
                                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                                        showNotification1("Very Wet!");
+                                        showNotification1("Wet!");
                                     } else {
-                                        showNotification2("Very Wet!");
+                                        showNotification2("Wet!");
                                     }
                                     Message message=new Message();
                                     message.what=2;
