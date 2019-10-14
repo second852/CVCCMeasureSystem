@@ -4,11 +4,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.text.Html;
 
-import com.beardedhen.androidbootstrap.api.defaults.DefaultBootstrapBrand;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+
 import com.whc.cvccmeasuresystem.Client.JobHumidity;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Main;
 import com.whc.cvccmeasuresystem.Control.Batch.BatchStep2Set;
@@ -23,9 +23,7 @@ import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep2Set;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Main;
 import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep3Set;
-import com.whc.cvccmeasuresystem.R;
 
-import static com.whc.cvccmeasuresystem.Common.Common.HistoryMain;
 import static com.whc.cvccmeasuresystem.Common.Common.startMeasure;
 
 

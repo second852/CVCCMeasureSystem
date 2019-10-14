@@ -31,13 +31,13 @@
         app:stl_underlineThickness="0dp"
         app:stl_defaultTabTextAllCaps="false"
         />
-    <android.support.v4.view.ViewPager
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/historyMainViewPager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/historyMainTag"
         >
-    </android.support.v4.view.ViewPager>
+    </androidx.viewpager.widget.ViewPager>
     <com.beardedhen.androidbootstrap.BootstrapButton
         android:id="@+id/backP"
         android:layout_alignParentRight="true"

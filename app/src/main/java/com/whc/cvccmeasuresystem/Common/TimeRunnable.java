@@ -1,13 +1,13 @@
 package com.whc.cvccmeasuresystem.Common;
 
-import android.app.Activity;
+
 import android.content.SharedPreferences;
 import android.os.Message;
 import android.util.Log;
 
 import com.whc.cvccmeasuresystem.Control.Humidity.HumidityMain;
 import com.whc.cvccmeasuresystem.Model.HumidityVO;
-import com.whc.cvccmeasuresystem.Model.PageCon;
+
 
 public class TimeRunnable implements Runnable {
 

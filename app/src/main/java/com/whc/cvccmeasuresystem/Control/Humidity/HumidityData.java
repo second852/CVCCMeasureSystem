@@ -5,55 +5,27 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.GridView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.whc.cvccmeasuresystem.Common.Common;
-import com.whc.cvccmeasuresystem.Control.Batch.BatchStep1;
-import com.whc.cvccmeasuresystem.Control.Dift.DriftStep1;
-import com.whc.cvccmeasuresystem.Control.History.HistoryMain;
-import com.whc.cvccmeasuresystem.Control.Hysteresis.HysteresisStep1;
-import com.whc.cvccmeasuresystem.Control.Sensitivity.SensitivityStep1;
-import com.whc.cvccmeasuresystem.Control.ionChannel.IonChannelStep1;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.HumidityVoltageDB;
-import com.whc.cvccmeasuresystem.DataBase.UserDB;
 import com.whc.cvccmeasuresystem.Model.HumidityVoltage;
-import com.whc.cvccmeasuresystem.Model.SaveFile;
-import com.whc.cvccmeasuresystem.Model.User;
 import com.whc.cvccmeasuresystem.R;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.whc.cvccmeasuresystem.Common.Common.CFName;
-import static com.whc.cvccmeasuresystem.Common.Common.mainFunctionImage;
-import static com.whc.cvccmeasuresystem.Common.Common.mainFunctionName;
-import static com.whc.cvccmeasuresystem.Common.Common.needSet;
-import static com.whc.cvccmeasuresystem.Common.Common.oldFragment;
-import static com.whc.cvccmeasuresystem.Common.Common.pageCon;
-import static com.whc.cvccmeasuresystem.Common.Common.solution1;
-import static com.whc.cvccmeasuresystem.Common.Common.solution2;
-import static com.whc.cvccmeasuresystem.Common.Common.solution3;
-import static com.whc.cvccmeasuresystem.Common.Common.solution4;
-import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.userShare;
-import static com.whc.cvccmeasuresystem.Control.History.HistoryMain.saveFiles;
 
 
 public class HumidityData extends Fragment {

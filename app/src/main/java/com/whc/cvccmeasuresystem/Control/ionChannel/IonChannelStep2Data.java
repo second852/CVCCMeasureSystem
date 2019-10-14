@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +19,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.beardedhen.androidbootstrap.AwesomeTextView;
-import com.github.mikephil.charting.data.Entry;
-import com.whc.cvccmeasuresystem.Common.SolutionAdapter;
 import com.whc.cvccmeasuresystem.Common.SolutionAdapterIonChannel;
 import com.whc.cvccmeasuresystem.Common.SolutionAdapterSlope;
-import com.whc.cvccmeasuresystem.Control.MainActivity;
-import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
-import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.Solution;
 import com.whc.cvccmeasuresystem.R;
 
