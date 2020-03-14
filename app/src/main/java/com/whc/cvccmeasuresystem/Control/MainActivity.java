@@ -2,18 +2,28 @@ package com.whc.cvccmeasuresystem.Control;
 
 
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.beardedhen.androidbootstrap.TypefaceProvider;
@@ -59,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
         Common.tableExist("PageCon", DataBase.Table_PageCon,dataBase.getWritableDatabase());
         Common.tableExist("Humidity", DataBase.Table_Humidity,dataBase.getWritableDatabase());
         Common.tableExist("HumidityVoltage", DataBase.Table_HumidityVoltage,dataBase.getWritableDatabase());
+
+        Common.askPermissions(Manifest.permission.ACCESS_FINE_LOCATION,this,0);
+
+
     }
 
     @Override
@@ -272,4 +286,64 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 0:
+                permissions();
+                break;
+        }
+    }
+
+    private void permissions()
+    {
+
+        String permission=Manifest.permission.ACCESS_FINE_LOCATION;
+        Activity activity=this;
+        int result = ContextCompat.checkSelfPermission(activity, permission);
+        if (result != PackageManager.PERMISSION_GRANTED) {
+
+            String remain;
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+                remain = "沒有位置權限，無法使用。\n要使用此功能請按\"YES\"，並允許位置權限!\n不使用請按\"NO\"!";
+            } else {
+                remain = "沒有位置權限!\n如果要使用此功能按\"YES\"。\n並到權限，打開位置權限!\n不使用此功能請按\"NO\"。";
+            }
+
+            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(activity,permission)) {
+                        Common.askPermissions(permission, activity, 0);
+                    } else {
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
+                        intent.setData(uri);
+                        startActivityForResult(intent, 0);
+                    }
+                }
+            };
+
+            DialogInterface.OnClickListener nolistener = new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                  activity.finish();
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle("無法使用CVCC量測系統!")
+                    .setMessage(remain)
+                    .setPositiveButton("YES", listener)
+                    .setNegativeButton("NO", nolistener)
+                    .show();
+
+
+        }
+
+
+    }
+
+
 }
