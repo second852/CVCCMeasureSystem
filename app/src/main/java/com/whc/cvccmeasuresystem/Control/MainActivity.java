@@ -56,12 +56,13 @@ import static com.whc.cvccmeasuresystem.Common.Common.*;
 
 public class MainActivity extends AppCompatActivity {
 
-
+    public static boolean dropboxOpen;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity.dropboxOpen=false;
         TypefaceProvider.registerDefaultIconSets();
         setContentView(R.layout.activity_main);
         DataBase dataBase=new DataBase(this);
@@ -78,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        if(dropboxOpen){
+            return;
+        }
 
         FloatWindowManager.getInstance().dismissWindow();
         SharedPreferences sharedPreferences=this.getSharedPreferences(userShare, Context.MODE_PRIVATE);
@@ -111,8 +116,8 @@ public class MainActivity extends AppCompatActivity {
             if(finalFragment.equals(IonChannel3Set))
             {
                 oldFragment=new ArrayList<>();
-                oldFragment.add(Common.IonChannel1);
-                oldFragment.add(Common.IonChannel2Set);
+                oldFragment.add(IonChannel1);
+                oldFragment.add(IonChannel2Set);
                 switchFragment(new IonChannelStep3Main(), getSupportFragmentManager());
             }else{
                 SignIn.signIn = false;
@@ -122,43 +127,43 @@ public class MainActivity extends AppCompatActivity {
         }else{
             SignIn.signIn = true;
             Gson gson = new Gson();
-            String json = sharedPreferences.getString(Common.finalPage, "");
-            Common.pageCon= gson.fromJson(json, PageCon.class);
+            String json = sharedPreferences.getString(finalPage, "");
+            pageCon= gson.fromJson(json, PageCon.class);
             oldFragment=new ArrayList<>();
-            oldFragment.add(Common.CFName);
+            oldFragment.add(CFName);
             switch (finalFragment) {
-                case Common.Drift2Set:
+                case Drift2Set:
 
-                    oldFragment.add(Common.Drift1);
+                    oldFragment.add(Drift1);
                     switchFragment(new DriftStep2Main(), getSupportFragmentManager());
                     break;
-                case Common.BS2:
-                    oldFragment.add(Common.BS1);
+                case BS2:
+                    oldFragment.add(BS1);
                     switchFragment(new BatchStep2Main(), getSupportFragmentManager());
                     break;
-                case Common.Hys2:
-                    oldFragment.add(Common.Hys1);
+                case Hys2:
+                    oldFragment.add(Hys1);
                     switchFragment(new HysteresisStep2Main(), getSupportFragmentManager());
                     break;
-                case Common.Sen2:
-                    oldFragment.add(Common.Sen2);
+                case Sen2:
+                    oldFragment.add(Sen2);
                     switchFragment(new SensitivityStep2Main(), getSupportFragmentManager());
                     break;
-                case Common.IonChannel1Set:
+                case IonChannel1Set:
                     Fragment fragment=new IonChannelStep2Main();
                     Bundle bundle=new Bundle();
-                    bundle.putSerializable(Common.reBack,false);
+                    bundle.putSerializable(reBack,false);
                     fragment.setArguments(bundle);
-                    oldFragment.add(Common.IonChannel1);
+                    oldFragment.add(IonChannel1);
                     switchFragment(fragment, getSupportFragmentManager());
                     break;
-                case Common.IonChannel3Set:
-                    oldFragment.add(Common.IonChannel1);
-                    oldFragment.add(Common.IonChannel2Set);
+                case IonChannel3Set:
+                    oldFragment.add(IonChannel1);
+                    oldFragment.add(IonChannel2Set);
                     switchFragment(new IonChannelStep3Main(), getSupportFragmentManager());
                     break;
-                case Common.HumidityMainString:
-                    oldFragment.add(Common.HumidityMainString);
+                case HumidityMainString:
+                    oldFragment.add(HumidityMainString);
                     switchFragment(new HumidityMain(), getSupportFragmentManager());
                     break;
                   default:

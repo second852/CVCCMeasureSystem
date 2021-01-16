@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -20,6 +21,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,9 +34,12 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.beardedhen.androidbootstrap.BootstrapEditText;
+import com.dropbox.core.android.Auth;
+import com.dropbox.core.v2.files.FileMetadata;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -43,11 +48,15 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.whc.cvccmeasuresystem.Common.Common;
+import com.whc.cvccmeasuresystem.Control.MainActivity;
 import com.whc.cvccmeasuresystem.DataBase.DataBase;
 import com.whc.cvccmeasuresystem.DataBase.SampleDB;
 import com.whc.cvccmeasuresystem.DataBase.SaveFileDB;
 import com.whc.cvccmeasuresystem.DataBase.SolutionDB;
 import com.whc.cvccmeasuresystem.DataBase.UserDB;
+import com.whc.cvccmeasuresystem.Drobox.DbxRequestConfigFactory;
+import com.whc.cvccmeasuresystem.Drobox.DropboxClientFactory;
+import com.whc.cvccmeasuresystem.Drobox.UploadFileTask;
 import com.whc.cvccmeasuresystem.Model.PageCon;
 import com.whc.cvccmeasuresystem.Model.Sample;
 import com.whc.cvccmeasuresystem.Model.SaveFile;
@@ -61,22 +70,29 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static com.whc.cvccmeasuresystem.Common.Common.needData;
 import static com.whc.cvccmeasuresystem.Common.Common.oldFragment;
 import static com.whc.cvccmeasuresystem.Common.Common.switchFragment;
 
 
-public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class HistoryMain extends Fragment {
 
+    private static final String TAG ="HistoryMain" ;
     private Activity activity;
     private View view, setDateView;
     private BootstrapEditText dateBegin, dateEnd;
@@ -97,6 +113,32 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
     private BootstrapButton export;
     private UserDB userDB;
     private static PageCon pageCon;
+    private LinearLayout fileChoice;
+    private ImageView local;
+    private ImageView dropBox;
+    private ImageView cancel;
+    private static final String dropBoxPath="/CVCC";
+
+    private Handler handler=new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what)
+            {
+                case 0:
+                    fileChoice.setVisibility(View.GONE);
+                    progressL.setVisibility(View.VISIBLE);
+                    Common.showToast(activity,"Uploading now!");
+                    break;
+                case 1:
+                    String fileInfo=String.valueOf(msg.obj);
+                    progressL.setVisibility(View.GONE);
+                    Common.showToast(activity,"Uploading is complete! ");
+                    Common.showToast(activity," File path is "+fileInfo);
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onAttach(Context context) {
@@ -111,26 +153,6 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
         userDB=new UserDB(new DataBase(activity));
         allChoice = false;
     }
-
-    private Handler handler=new Handler(Looper.getMainLooper()){
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what)
-            {
-                case 0:
-                 progressL.setVisibility(View.VISIBLE);
-                 Common.showToast(activity,"Uploading now!");
-                    break;
-                case 1:
-                    progressL.setVisibility(View.GONE);
-                    Common.showToast(activity,"Uploading is complete!");
-                    break;
-            }
-        }
-    };
-
-
 
     @Nullable
     @Override
@@ -153,6 +175,69 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
         setList();
         setPageCon();
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(MainActivity.dropboxOpen) {
+            try {
+                dropBoxAction();
+            }catch (Exception e){
+                Log.e(TAG, "onResume: ",e);
+            }
+        }
+    }
+
+    //---dropBox 上傳
+    private void dropBoxAction() throws Exception{
+        MainActivity.dropboxOpen=false;
+        try {
+            DropboxClientFactory.per(HistoryMain.this.activity);
+            DropboxClientFactory.getClient();
+        }catch (Exception e){
+            Log.e(TAG, "dropBoxAction: ",e);
+            Common.showToast(HistoryMain.this.activity,"DropBox connect fail !");
+            return;
+        }
+        Message message=handler.obtainMessage(0);
+        message.sendToTarget();
+        final String fileName=getFileName();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        DropBoxFileOut dropBoxFileOut=new DropBoxFileOut();
+        Future<byte[]> dataFuture=executor.submit(dropBoxFileOut);
+        while (!dataFuture.isDone()){}
+        byte[] dataResult=dataFuture.get();
+        if(dataResult==null){
+            Common.showToast(activity,"UpLoad file fail !");
+            return;
+        }
+        new UploadFileTask(activity, DropboxClientFactory.getClient(), new UploadFileTask.Callback() {
+            @Override
+            public void onUploadComplete(FileMetadata result) {
+                Message message=handler.obtainMessage(1);
+                message.obj=dropBoxPath+"/"+fileName;
+                message.sendToTarget();
+            }
+            @Override
+            public void onError(Exception e) {
+                Log.e(TAG, "Failed to upload file.", e);
+                Toast.makeText(activity,
+                        "An error has occurred",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+        },dataResult).execute(dropBoxPath, fileName);
+    }
+
+    public class DropBoxFileOut implements Callable<byte[]> {
+        @Override
+        public byte[] call() throws Exception {
+            Thread.sleep(5);
+            byte[]  result=outputExcel();
+            return result;
+        }
+    }
+
 
     private void setPageCon() {
         if(pageCon!=null)
@@ -189,11 +274,10 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
         dateBegin.setShowSoftInputOnFocus(false);
         dateEnd.setShowSoftInputOnFocus(false);
         search.setOnClickListener(new searchNewData());
-        export.setOnClickListener(new openCloudy());
+        export.setOnClickListener(new openFunction());
     }
 
     private void findViewById() {
-
         dateBegin = view.findViewById(R.id.dateBegin);
         dateEnd = view.findViewById(R.id.dateEnd);
         showDate = view.findViewById(R.id.showDate);
@@ -202,6 +286,13 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
         search = view.findViewById(R.id.search);
         progressL = view.findViewById(R.id.progressL);
         export = view.findViewById(R.id.export);
+        fileChoice=view.findViewById(R.id.fileChoice);
+        dropBox=view.findViewById(R.id.dropbox);
+        local=view.findViewById(R.id.local);
+        cancel=view.findViewById(R.id.cancelF);
+        local.setOnClickListener(new LocalFunction());
+        cancel.setOnClickListener(new CancelFunction());
+        dropBox.setOnClickListener(new DropBoxFunction());
     }
 
 
@@ -385,90 +476,9 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
     }
 
 
-    public void openCloud() {
-        ConnectivityManager mConnectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
-        if (mNetworkInfo == null) {
-            Common.showToast(activity, "I can’t connect to the Internet!!");
-            return;
-        }
-        firstEnter = true;
-        progressL.setVisibility(View.VISIBLE);
-        if (mGoogleApiClient == null) {
-            // Create the API client and bind it to an instance variable.
-            // We use this instance as the callback for connection and connection
-            // failures.
-            // Since no account name is passed, the user is prompted to choose.
-            mGoogleApiClient = new GoogleApiClient.Builder(activity)
-                    .addApi(Drive.API)
-                    .addScope(Drive.SCOPE_FILE)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
-        }
-        // Connect the client. Once connected, the camera is launched.
-        mGoogleApiClient.connect();
-    }
 
-    private void saveFileToDrive() {
-        // Start by creating a new contents, and setting a callback.
-
-        Drive.DriveApi.newDriveContents(mGoogleApiClient)
-                .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
-
-                    @Override
-                    public void onResult(final DriveApi.DriveContentsResult result) {
-                        // If the operation was not successful, we cannot do anything
-                        // and must
-                        // fail.
-                        if (!result.getStatus().isSuccess()) {
-                            Common.showToast(activity, "I can’t connect to the Internet!");
-                            return;
-                        }
-                        Runnable runnable = new Runnable() {
-                            @Override
-                            public void run() {
-                                // Otherwise, we can write our data to the new contents.
-                                // Get an output stream for the contents.
-                                OutputStream outputStream = result.getDriveContents().getOutputStream();
-                                // Write the bitmap data from it.
-                                ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
-                                String fileName, fileType;
-                                fileName = "CVCC.xls";
-                                fileType = "File/xls";
-                                handler.sendEmptyMessage(0);
-                                outputExcel(bitmapStream);
-
-                                try {
-                                    outputStream.write(bitmapStream.toByteArray());
-                                } catch (IOException e1) {
-
-                                }
-                                // Create the initial metadata - MIME type and title.
-                                // Note that the user will be able to change the title later.
-                                MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
-                                        .setMimeType(fileType).setTitle(fileName).build();
-                                // Create an intent for the file chooser, and start it.
-                                IntentSender intentSender = Drive.DriveApi
-                                        .newCreateFileActivityBuilder()
-                                        .setInitialMetadata(metadataChangeSet)
-                                        .setInitialDriveContents(result.getDriveContents())
-                                        .build(mGoogleApiClient);
-                                try {
-                                    activity.startIntentSenderForResult(
-                                            intentSender, 3, null, 0, 0, 0);
-                                } catch (IntentSender.SendIntentException e) {
-
-                                }
-                            }
-                        };
-                        new Thread(runnable).start();
-                    }
-                });
-    }
-
-
-    private void outputExcel(OutputStream outputStream) {
+    private byte[] outputExcel() throws IOException {
+        ByteArrayOutputStream bos=new ByteArrayOutputStream();
         try {
             int rowCount;
             SampleDB sampleDB=new SampleDB(new DataBase(activity));
@@ -580,13 +590,13 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
                 }
             }
 
-            workbook.write(outputStream);
+            workbook.write(bos);
             workbook.close();
-            outputStream.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            bos.flush();
+        } finally {
+            bos.close();
         }
+        return bos.toByteArray();
     }
 
 
@@ -603,57 +613,11 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 0) {
-            progressL.setVisibility(View.GONE);
-            openCloud();
-        } else if (requestCode == 3) {
-            progressL.setVisibility(View.GONE);
-            if (resultCode == -1) {
-                Common.showToast(activity, "Success!");
-            } else {
-                Common.showToast(activity, "Fail!");
-            }
-            if(mGoogleApiClient!=null)
-            {
-                mGoogleApiClient.disconnect();
-                mGoogleApiClient=null;
-            }
-        }
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
-        saveFileToDrive();
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
 
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult result) {
-        if (!result.hasResolution()) {
-            // show the localized error dialog.
-            GoogleApiAvailability.getInstance().getErrorDialog(activity, result.getErrorCode(), 0).show();
-            return;
-        }
-        // Called typically when the app is not yet authorized, and authorization dialog is displayed to the user.
-        if (!firstEnter) {
-            Common.showToast(activity, "Fail!");
-            progressL.setVisibility(View.GONE);
-            return;
-        }
-        firstEnter = false;
-        try {
-            result.startResolutionForResult(activity, 0);
-        } catch (IntentSender.SendIntentException e) {
-            e.printStackTrace();
-        }
-    }
 
-    private class openCloudy implements View.OnClickListener {
+    private class openFunction implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             if(choicePrint.size()<=0)
@@ -661,6 +625,57 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
                 Common.showToast(activity,"Please choice file");
                 return;
             }
+            fileChoice.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private class CancelFunction implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            fileChoice.setVisibility(View.GONE);
+        }
+    }
+
+    private class LocalFunction implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            Message message=handler.obtainMessage(0);
+            message.sendToTarget();
+            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            File file = new File(dir, getFileName());
+            LocalFileOut fileOut=new LocalFileOut(file);
+            new Thread(fileOut).start();
+        }
+    }
+
+    public class LocalFileOut implements Runnable{
+        private  File file;
+        public LocalFileOut(File file) {
+            this.file = file;
+        }
+        @Override
+        public void run() {
+            try(OutputStream outputStream = new FileOutputStream(file)){
+                byte[] data=outputExcel();
+                outputStream.write(data);
+            }catch (Exception e){
+                Log.e(TAG, "run: ",e);
+            }finally {
+                Message message=handler.obtainMessage(1);
+                String[] path= file.getAbsolutePath().split("/");
+                int length=path.length-1;
+                message.obj="/"+path[length-1]+"/"+path[length];
+                message.sendToTarget();
+            }
+        }
+    }
+
+    private class DropBoxFunction implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
             WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(activity.WIFI_SERVICE);
             WifiInfo wifiInfo = wifiManager.getConnectionInfo();
             String ssId = wifiInfo.getSSID();
@@ -668,7 +683,16 @@ public class HistoryMain extends Fragment implements GoogleApiClient.ConnectionC
                 Common.showToast(activity, "Please change WiFi!");
                 return;
             }
-            openCloud();
+            MainActivity.dropboxOpen=true;
+            Auth.startOAuth2PKCE(activity, getString(R.string.DropboxKey), DbxRequestConfigFactory.getRequestConfig(), DbxRequestConfigFactory.scope);
         }
     }
+
+    public static SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMdd-HHmm");
+    private String getFileName(){
+        String fileName="CVCC"+timeFormat.format(new Date())+".xls";
+        return fileName;
+    }
+
+
 }

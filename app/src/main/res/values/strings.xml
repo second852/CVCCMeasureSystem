@@ -10,7 +10,8 @@
 
 
     <string name="error_little_time">Time must be ahead of now time</string>
-
+    <string name="DropboxKey">545dgip5pv42kwj</string>
+    <string name="mainDropboxKey">db-545dgip5pv42kwj</string>
 
     <string-array name="ion">
         <item>pH</item>
